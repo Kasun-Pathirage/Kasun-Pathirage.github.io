@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasun Pathirage | Hardware & Mechatronics Engineer</title>
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #e60000; /* Subtle red accent for an automotive/hardware feel */
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        header {
+            background-color: var(--primary);
+            color: #fff;
+            padding: 4rem 2rem;
+            text-align: center;
+            border-bottom: 4px solid var(--secondary);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 3rem;
+            letter-spacing: -1px;
+        }
+        header p {
+            font-size: 1.25rem;
+            color: #ccc;
+            max-width: 600px;
+            margin: 1rem auto 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+        }
+        .section-title {
+            font-size: 2rem;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+        .project-card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            transition: transform 0.2s ease;
+        }
+        .project-card:hover {
+            transform: translateY(-2px);
+        }
+        .project-card h3 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .project-date {
+            font-size: 1rem;
+            color: #666;
+            font-weight: normal;
+        }
+        .tech-stack {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        .project-card ul {
+            padding-left: 1.2rem;
+        }
+        .project-card li {
+            margin-bottom: 0.5rem;
+        }
+        .media-placeholder {
+            background-color: #eee;
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 1rem;
+            color: #888;
+        }
+        .contact {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 3rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Kasun Pathirage</h1>
+    <p>Ph.D. Candidate in Electrical & Computer Engineering at UMD</p>
+    <p style="font-size: 1rem; color: #aaa; margin-top: 0.5rem;">Hardware Engineering • Power Electronics • Mechatronics Integration</p>
+</header>
+
+<div class="container">
+    
+    <h2 class="section-title">Engineering Projects</h2>
+
+    <!-- Project 1 -->
+    <div class="project-card">
+        <h3>Voice-Activated Mechatronic Car Control <span class="project-date">March 2026</span></h3>
+        <div class="tech-stack">ESP8266 | ULN2003G Darlington | DC-DC Converters | SinRic Pro API | OEM Reverse Engineering</div>
+        <p>Reverse-engineered the OEM electrical system of a 2003 Mitsubishi Lancer to design and integrate a custom electromechanical control system, enabling secure voice-activated remote engine start/stop and trunk release.</p>
+        <ul>
+            <li>Deciphered legacy OEM schematics and probed physical wiring harnesses to tap into lock, sensor, and indicator signal lines safely.</li>
+            <li>Replaced standard linear regulators with a 12V to 3.3V DC-DC switching power converter, minimizing quiescent current draw to prevent battery drain.</li>
+            <li>Developed custom control circuitry using an ESP8266 and a ULN2003G Darlington transistor array to drive high-current relays and custom servo linkages.</li>
+            <li>Implemented robust hardware-level safeguards (relay isolation, in-line fuses) and software-level watchdog timers.</li>
+        </ul>
+        <!-- Replace this div with an actual <img> or <video> tag when you upload your media -->
+        <div class="media-placeholder">[ Embed Demo Video & Altium Schematic Here ]</div>
+    </div>
+
+    <!-- Project 2 -->
+    <div class="project-card">
+        <h3>High-Power DC-DC Converter Troubleshooting <span class="project-date">2025 – 2026</span></h3>
+        <div class="tech-stack">Altium Designer | Power Electronics | Signal Analysis | EMI Optimization</div>
+        <p>Isolated and resolved complex hardware failures in power electronic systems and designed optimized multi-layer circuit boards.</p>
+        <ul>
+            <li>Debugged a severe hardware gain failure in a high-gain DC-DC converter by isolating reverse current leakage through a MOSFET body diode.</li>
+            <li>Designed two-layer EMI-optimized printed circuit boards in Altium Designer.</li>
+            <li>Incorporated noise-reduction techniques, including guard rings and ground planes for stable sensing hardware operation.</li>
+        </ul>
+        <div class="media-placeholder">[ Embed PCB Layout & Troubleshooting Scope Captures Here ]</div>
+    </div>
+
+    <!-- Project 3 -->
+    <div class="project-card">
+        <h3>Automated Testing Robotics <span class="project-date">Siemens Healthineers (Germany)</span></h3>
+        <div class="tech-stack">Robotics | Mechatronic Design | Industrial Automation</div>
+        <p>Evaluated and engineered automation solutions for strict medical device testing environments during a professional engineering internship.</p>
+        <ul>
+            <li>Tasked with evaluating the potential to automate rigorous hardware component testing procedures.</li>
+            <li>Designed and prototyped a specialized robotic automation device that was successfully implemented by the engineering team into their testing pipeline.</li>
+        </ul>
+        <div class="media-placeholder">[ Embed Prototype Photos Here (If non-NDA) ]</div>
+    </div>
+
+    <h2 class="section-title">Contact & Links</h2>
+    <div class="contact">
+        <h2>Let's Build Something</h2>
+        <p>I am actively seeking roles in hardware engineering and robotics integration.</p>
+        <p>
+            <a href="mailto:your.email@umd.edu">Email Me</a> | 
+            <a href="https://github.com/Kasun-Pathirage">GitHub Profile</a> | 
+            <a href="#">LinkedIn Profile</a>
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>
