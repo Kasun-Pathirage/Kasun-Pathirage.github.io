@@ -94,6 +94,22 @@
             margin-top: 1rem;
             color: #888;
         }
+        .btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: #fff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: normal;
+            transition: background-color 0.2s;
+        }
+        .btn:hover {
+            background-color: var(--secondary);
+            color: #fff;
+            text-decoration: none;
+        }
         .contact {
             text-align: center;
             margin-top: 4rem;
@@ -102,12 +118,12 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-        a {
+        .contact a {
             color: var(--secondary);
             text-decoration: none;
             font-weight: bold;
         }
-        a:hover {
+        .contact a:hover {
             text-decoration: underline;
         }
     </style>
@@ -135,7 +151,7 @@
             <li>Developed custom control circuitry using an ESP8266 and a ULN2003G Darlington transistor array to drive high-current relays and custom servo linkages.</li>
             <li>Implemented robust hardware-level safeguards (relay isolation, in-line fuses) and software-level watchdog timers.</li>
         </ul>
-        <!-- Replace this div with an actual <img> or <video> tag when you upload your media -->
+        <a href="car-control.html" class="btn">View Project Details &rarr;</a>
         <div class="media-placeholder">[ Embed Demo Video & Altium Schematic Here ]</div>
     </div>
 
@@ -149,6 +165,7 @@
             <li>Designed two-layer EMI-optimized printed circuit boards in Altium Designer.</li>
             <li>Incorporated noise-reduction techniques, including guard rings and ground planes for stable sensing hardware operation.</li>
         </ul>
+        <a href="dc-dc-converter.html" class="btn">View Project Details &rarr;</a>
         <div class="media-placeholder">[ Embed PCB Layout & Troubleshooting Scope Captures Here ]</div>
     </div>
 
@@ -161,6 +178,7 @@
             <li>Tasked with evaluating the potential to automate rigorous hardware component testing procedures.</li>
             <li>Designed and prototyped a specialized robotic automation device that was successfully implemented by the engineering team into their testing pipeline.</li>
         </ul>
+        <a href="automated-robotics.html" class="btn">View Project Details &rarr;</a>
         <div class="media-placeholder">[ Embed Prototype Photos Here (If non-NDA) ]</div>
     </div>
 
