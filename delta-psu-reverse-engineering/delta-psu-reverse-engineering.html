@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Reverse-engineered a 12.2 Volt, 90 Ampere (~1100 Watt) server power supply unit with no datasheet, and modified its feedback loop to convert a fixed 12.2V output into a variable voltage supply (up to ~14.5 V).">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Reverse-Engineering a Server PSU into a High-Current Charger | Kasun Pathirage">
+<meta property="og:description" content="Reverse-engineered a 12.2 Volt, 90 Ampere (~1100 Watt) server power supply unit with no datasheet, and modified its feedback loop to convert a fixed 12.2V output into a variable voltage supply (up to ~14.5 V).">
+<meta property="og:site_name" content="Kasun Pathirage">
+<meta name="twitter:card" content="summary_large_image">
+<title>Reverse-Engineering a Server PSU into a High-Current Charger | Kasun Pathirage</title>
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f6f8;
+        color: #333;
+        line-height: 1.6;
+    }
+    .container {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    h1 { color: #1a1a1a; margin-top: 0; }
+    h2 {
+        color: #1a1a1a;
+        margin-top: 2.5rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid #eee;
+    }
+    h3 { color: #1a1a1a; margin-top: 1.8rem; }
+    .back-link { display: inline-block; margin-bottom: 2rem; color: #e60000; text-decoration: none; font-weight: bold; }
+    .back-link:hover { text-decoration: underline; }
+    .meta { color: #555; }
+    a { color: #e60000; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+    .table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+    th, td { border: 1px solid #ddd; padding: 0.45rem 0.6rem; text-align: left; }
+    th { background-color: #1a1a1a; color: #fff; }
+    tr:nth-child(even) { background-color: #f8f8f8; }
+    figure { margin: 1.2rem 0; text-align: center; }
+    figure img { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); display: block; margin: 0 auto; }
+    figure.figure-wide img { max-width: 480px; }
+    figcaption { font-size: 0.85rem; color: #777; margin-top: 0.5rem; }
+    .figure-grid { display: grid; gap: 1rem; margin: 1.2rem 0; }
+    .figure-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .figure-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .figure-grid figure { margin: 0; }
+    @media (max-width: 640px) {
+        .figure-grid.cols-2, .figure-grid.cols-3 { grid-template-columns: 1fr; }
+    }
+    .video-series-box {
+        background: #fafafa;
+        border: 1px solid #eee;
+        border-left: 4px solid #e60000;
+        border-radius: 6px;
+        padding: 1.2rem 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .video-series-box h4 { margin: 0 0 0.6rem 0; color: #1a1a1a; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .video-series-box a.video-thumb { display: block; position: relative; border-radius: 6px; overflow: hidden; }
+    .video-series-box a.video-thumb img { display: block; width: 100%; height: auto; transition: transform 0.2s ease; }
+    .video-series-box a.video-thumb:hover img { transform: scale(1.03); }
+    .video-series-box figcaption { font-size: 0.8rem; }
+    .video-series-box .playlist-link { margin: 1rem 0 0 0; font-weight: 600; }
+</style>
+<style id="single-figure-size">
+    /* Standalone images: keep them from filling the whole screen so the text stays readable. Click to zoom. */
+    .container > figure img { max-width: min(100%, 560px); max-height: 400px; width: auto; }
+    .container > figure.figure-wide img { max-width: min(100%, 680px); max-height: 460px; }
+    .container > figure.figure-narrow img { max-width: min(100%, 380px); max-height: 360px; }
+</style>
+<style id="compact-tables">
+    /* Tables: size to their content instead of the full column, and cap long ones with a scroll + sticky header. */
+    .container .table-wrap { max-height: 460px; overflow: auto; border-radius: 6px; }
+    .container .table-wrap table { width: auto; max-width: 100%; margin: 0 auto; font-size: 0.85rem; }
+    .container .table-wrap th, .container .table-wrap td { padding: 0.32rem 0.6rem; }
+    .container .table-wrap th { position: sticky; top: 0; z-index: 1; }
+</style>
+<style id="img-sizing">
+    /* Image rows with custom column widths, set by dragging in edit mode. Phones still stack them. */
+    @media (min-width: 641px) {
+        .figure-grid[style*="--cols"] { grid-template-columns: var(--cols) !important; }
+        .figure-grid[style*="--cols"] > figure img, .figure-grid[style*="--cols"] > figure video { width: 100%; height: auto; max-height: none; }
+    }
+    /* Image rows with a height cap, set by dragging the handle under a row in edit mode. */
+    .figure-grid[style*="--row-h"] > figure img, .figure-grid[style*="--row-h"] > figure video { max-height: var(--row-h) !important; width: auto !important; max-width: 100%; }
+</style></head>
+<body>
+
+<div class="container">
+    <a href="../index.html" class="back-link">← Back to Portfolio</a>
+
+    <h1>Reverse-Engineering a Server PSU into a High-Current BMW Charger</h1>
+    <p class="meta"><strong>Date:</strong> May 2026 | <strong>Tech:</strong> Delta/Dell DPS-1100BB Server PSU, dsPIC33FJ64GS606, Analog Feedback Loops, Multimeter &amp; Oscilloscope Reverse Engineering</p>
+
+    <hr style="border: 0; border-top: 1px solid #ddd; margin: 2rem 0;">
+
+    <div class="video-series-box">
+        <h4>🎥 Watch the Build: 4-Part Video Series</h4>
+        <div class="figure-grid cols-2">
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/l3F6WUHF6hg" target="_blank" rel="noopener">
+                    <img src="https://img.youtube.com/vi/l3F6WUHF6hg/hqdefault.jpg" alt="Part 1 video thumbnail" loading="lazy">
+                </a>
+                <figcaption>Part 1: Turning ON</figcaption>
+            </figure>
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/W0Z9JjYx1C0" target="_blank" rel="noopener">
+                    <img src="https://img.youtube.com/vi/W0Z9JjYx1C0/hqdefault.jpg" alt="Part 2 video thumbnail" loading="lazy">
+                </a>
+                <figcaption>Part 2: Increasing the Output Voltage</figcaption>
+            </figure>
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/DDP4cOxENo8" target="_blank" rel="noopener">
+                    <img src="https://img.youtube.com/vi/DDP4cOxENo8/hqdefault.jpg" alt="Part 3 video thumbnail" loading="lazy">
+                </a>
+                <figcaption>Part 3: Reassembly and Testing</figcaption>
+            </figure>
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/0mQRyEZ8rv8" target="_blank" rel="noopener">
+                    <img src="https://img.youtube.com/vi/0mQRyEZ8rv8/hqdefault.jpg" alt="Part 4 video thumbnail" loading="lazy">
+                </a>
+                <figcaption>Part 4: How I Figured Out How to Increase Voltage</figcaption>
+            </figure>
+        </div>
+        <p class="playlist-link"><a href="https://www.youtube.com/playlist?list=PLcdCyRXAL_N8" target="_blank" rel="noopener">▶ Watch the full playlist on YouTube</a></p>
+    </div>
+
+<h2>Overview</h2>
+<p>I picked up a Dell/Delta <strong>D1100E-S0 (DPS-1100BB)</strong> server power supply: 1100 W, 80 PLUS Platinum, a regulated 12.2 V at up to 90 A. Used ones go for about $30 on eBay, which is nothing compared to a bench supply with that kind of current rating.</p>
+
+<figure class="figure"><img src="images/image01.jpg" alt="The label on the underside of the D1100E-S0: 12.2 V @ 90.16 A, 1100 W, 80 PLUS Platinum." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>The label on the underside of the D1100E-S0: 12.2 V @ 90.16 A, 1100 W, 80 PLUS Platinum.</figcaption></figure><p>I wanted a high-current supply to keep my BMW's battery up while flashing its ECUs. Flashing takes a while, and if the battery voltage sags partway through, the flash can fail and brick the ECUs. This requirement needed two changes to the server PSU:</p><ol>
+<li>Getting the main output to turn on without a server motherboard.</li>
+<li>Raising the voltage from 12.2 V to the ~13.8–14 V an alternator would normally supply.</li>
+</ol>
+<p>There are guides online for doing this to HP server supplies, but this Dell/Delta unit is quite different and none of them match its pinout or feedback circuit. There's no datasheet either, so everything below came from a multimeter, an oscilloscope and a lot of continuity testing.</p>
+<h2>Step 1: Turning the Power Supply On</h2>
+<p>Plugging it in wasn't enough. Server PSUs wait for the motherboard to assert a few control signals on a header before they enable the main output, so plugging it in only lit the status LED green:</p>
+
+<p>The main +12 V output was still off at this point, reading about 1.6 mV.</p>
+<div class="figure-grid cols-2" style="--cols: 0.871fr 1.129fr; --row-h: 239px;"><figure><img src="images/image02.jpg" alt="Status LED turns green as soon as mains power is connected." loading="lazy" style="width: 286px; max-width: 100%; max-height: none; height: auto;"><figcaption>Status LED turns green as soon as mains power is connected.</figcaption></figure><figure><img src="images/image03.jpg" alt="Main output terminals reading ~1.6 mV with only mains power applied, indicating the main rail isn't enabled yet." loading="lazy" style="width: 358px; max-width: 100%; max-height: none; height: auto;"><figcaption>Main output terminals reading ~1.6 mV with only mains power applied, indicating the main rail isn't enabled yet.</figcaption></figure></div>
+<p>The large terminal on the edge is the main +12&nbsp;V output, and the terminal in the center is ground. What was already live at this stage was standby power, available from a smaller terminal in the center when the unit is flipped over. It read 12 V but could only supply about 3 A, which was insufficient for the intended application.</p>
+<div class="figure-grid cols-2" style="--row-h: 200px;">
+<figure><img src="images/image04.jpg" alt="Standby power already reads 12 V before the main output is enabled (max ~3 A)." loading="lazy"><figcaption>Standby power already reads 12 V before the main output is enabled (max ~3 A).</figcaption></figure>
+<figure><img src="images/image05.jpg" alt="Flip side: the edge terminal is main +12 V, the center terminal is ground, reading 0 V for now." loading="lazy"><figcaption>Flip side: the edge terminal is main +12 V, the center terminal is ground, reading 0 V for now.</figcaption></figure>
+</div>
+<p>Enabling the main output meant working out the control header. It's a 24-pin connector, twelve pins on each side.</p>
+<div class="figure-grid cols-2" style="--cols: 0.694fr 1.306fr; --row-h: 261px;">
+<figure><img src="images/image06.jpg" alt="The 24-pin control header, 12 pins on the top side." loading="lazy"><figcaption>The 24-pin control header, 12 pins on the top side.</figcaption></figure>
+<figure><img src="images/image07.jpg" alt="The 24-pin control header, 12 pins on the flip side." loading="lazy"><figcaption>The 24-pin control header, 12 pins on the flip side.</figcaption></figure></div><h3>Mapping the Control Pins</h3>
+<p>I began by soldering dedicated ground and power leads directly onto the output copper as I knew I'd need an easily accessible ground line and +12 V tap points later during this analysis. The soldered wires were small gauge for now.</p><p>Tip: use flux on the big copper output pads. They soak up heat and are usually a bit oxidized, so solder won't wet them easily without it.</p><figure><img src="images/image09.jpg" alt="Dedicated ground tap soldered onto the output copper." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Dedicated ground tap soldered onto the output copper.</figcaption></figure><p>With no datasheet, I had to reverse-engineer the header pin by pin. First, with a multimeter in continuity mode, I found which pins are grounded by default: pins 6 and 10 on the top side, and pins 16, 18, 20, and 22 on the flip side.</p>
+<p>Next, I measured which pins carry voltage while the unit is only in standby (main output still off):</p>
+<div class="table-wrap"><table><thead><tr><th>Pin</th><th>Voltage in Standby (V)</th><th>Purpose</th></tr></thead><tbody><tr><td>1</td><td>0</td><td></td></tr>
+<tr><td>2</td><td>0</td><td></td></tr>
+<tr><td>3</td><td>0</td><td></td></tr>
+<tr><td>4</td><td>0</td><td></td></tr>
+<tr><td>5</td><td>3.3</td><td></td></tr>
+<tr><td>6</td><td>0</td><td>GND</td></tr>
+<tr><td>7</td><td>0</td><td></td></tr>
+<tr><td>8</td><td>0</td><td></td></tr>
+<tr><td>9</td><td>0</td><td></td></tr>
+<tr><td>10</td><td>0</td><td>GND</td></tr>
+<tr><td>11</td><td>0</td><td></td></tr>
+<tr><td>12</td><td>0</td><td></td></tr>
+<tr><td>13</td><td>2.1</td><td>Possibly a PWM or feedback pin (output of a resistive divider)</td></tr>
+<tr><td>14</td><td>3.3</td><td></td></tr>
+<tr><td>15</td><td>12</td><td>Potentially indicates standby power</td></tr>
+<tr><td>16</td><td>0</td><td>GND</td></tr>
+<tr><td>17</td><td>3.3</td><td></td></tr>
+<tr><td>18</td><td>0</td><td>GND</td></tr>
+<tr><td>19</td><td>3.3</td><td></td></tr>
+<tr><td>20</td><td>0</td><td>GND</td></tr>
+<tr><td>21</td><td>0</td><td></td></tr>
+<tr><td>22</td><td>0</td><td>GND</td></tr>
+<tr><td>23</td><td>0</td><td></td></tr>
+<tr><td>24</td><td>0</td><td></td></tr>
+</tbody></table></div>
+<p>Two of the pins sat around 2–3.3 V, which looked like logic enables. I tried shorting header pins 13 and 14 together and then to ground (a trick I'd read about for a different supply), and it worked. The fan spun up and the main output jumped to 12.2 V.</p>
+<p>I soldered header pins 13 and 14 together, and added a small switch between that joined pair and ground so I could turn the main output on and off at will.</p>
+<div class="figure-grid cols-2" style="--cols: 1.06fr 0.94fr; --row-h: 222px;"><figure><img src="images/image08.jpg" alt="Header pins 13 and 14 bridged together, with a switch wired from the joined pair to ground." loading="lazy"><figcaption>Header pins 13 and 14 bridged together, with a switch wired from the joined pair to ground.</figcaption></figure><figure><img src="images/image10.jpg" alt="Switch soldered between the bridged pins and ground." loading="lazy"><figcaption>Switch soldered between the bridged pins and ground.</figcaption></figure></div>
+
+<p>With the switch wired up, flipping it turned the main output on:</p>
+<figure class="figure"><img src="images/image11.jpg" alt="Main output live and drawing a load after closing the switch between header pins 13/14 and ground." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Main output live and drawing a load after closing the switch between header pins 13/14 and ground.</figcaption></figure>
+<p>Re-measuring the header with the main output now enabled filled in the rest of the picture:</p>
+<div class="table-wrap"><table><thead><tr><th>Pin</th><th>Standby (V)</th><th>Main Power On (V)</th><th>Purpose</th></tr></thead><tbody><tr><td>1</td><td>0</td><td></td><td></td></tr>
+<tr><td>2</td><td>0</td><td></td><td></td></tr>
+<tr><td>3</td><td>0</td><td></td><td></td></tr>
+<tr><td>4</td><td>0</td><td></td><td></td></tr>
+<tr><td>5</td><td>3.3</td><td></td><td></td></tr>
+<tr><td>6</td><td>0</td><td>0</td><td>GND</td></tr>
+<tr><td>7</td><td>0</td><td></td><td></td></tr>
+<tr><td>8</td><td>0</td><td></td><td></td></tr>
+<tr><td>9</td><td>0</td><td></td><td></td></tr>
+<tr><td>10</td><td>0</td><td>0</td><td>GND</td></tr>
+<tr><td>11</td><td>0</td><td></td><td></td></tr>
+<tr><td>12</td><td>0</td><td></td><td></td></tr>
+<tr><td>13</td><td>2.1</td><td>0</td><td>Must connect to GND to enable main power</td></tr>
+<tr><td>14</td><td>3.3</td><td>0</td><td>Must connect to GND to enable main power</td></tr>
+<tr><td>15</td><td>12</td><td>12</td><td>Potentially indicates standby power</td></tr>
+<tr><td>16</td><td>0</td><td>0</td><td>GND</td></tr>
+<tr><td>17</td><td>3.3</td><td></td><td>3.3</td></tr>
+<tr><td>18</td><td>0</td><td>0</td><td>GND</td></tr>
+<tr><td>19</td><td>3.3</td><td></td><td>3.3</td></tr>
+<tr><td>20</td><td>0</td><td></td><td></td></tr>
+<tr><td>21</td><td>0</td><td></td><td></td></tr>
+<tr><td>22</td><td>0</td><td>0</td><td>GND</td></tr>
+<tr><td>23</td><td>0</td><td>V_OUT</td><td>Remote Sense (+)</td></tr>
+<tr><td>24</td><td>0</td><td>0</td><td>Remote Sense (-)</td></tr>
+</tbody></table></div>
+<h2>Step 2: Raising the Output Voltage</h2>
+<p>With the supply turning on reliably, the next problem was voltage: I needed roughly 13.8–14&nbsp;V, and the supply is hard-regulated to 12.2&nbsp;V. My first approach followed the same trick used on similar HP supplies: exploit the remote-sense input.</p>
+<p>Pins 23 and 24 turned out to be Remote Sense (+) and Remote Sense (−). With remote sensing, the supply measures voltage at the load instead of at its own terminals, to make up for drop in the cables. If you feed the sense pin a voltage <em>lower</em> than what's actually present at the output, the control loop "thinks" the output has sagged and compensates by cranking up the real output voltage.</p>
+<p>Since the remote-sense (+) pin already sat at the full 12.2&nbsp;V, it had to be pulled up to the output through some internal resistance. Grounding it through an external resistor would form a voltage divider with that internal resistance, pulling the sensed voltage down and, in theory, pushing the real output up. I tried a range of resistor values from the sense pin to ground and logged the resulting output voltage:</p>
+<div class="table-wrap"><table><thead><tr><th>Resistor to GND</th><th>Output Voltage (V)</th></tr></thead><tbody><tr><td>Open circuit</td><td>12.34</td></tr>
+<tr><td>120 kΩ</td><td>12.36</td></tr>
+<tr><td>17 kΩ</td><td>12.39</td></tr>
+<tr><td>10 kΩ</td><td>12.59</td></tr>
+<tr><td>5 kΩ</td><td>12.67</td></tr>
+<tr><td>570 Ω</td><td>12.67</td></tr>
+<tr><td>100 Ω</td><td>12.67</td></tr>
+</tbody></table></div>
+<p>The output voltage plateaued at 12.67&nbsp;V no matter how low I pushed the external resistance. That's a gain of only about 0.3 V over the open-circuit reading, far short of the 13.8 V+ I needed. A plateau like that points to a fixed internal resistance in series with my external one. Even at 0 Ω external, the internal resistance keeps the sensed voltage above a floor. So, on this supply the remote-sense trick topped out there.</p>
+<h2>Opening the Case and Tracing the Feedback Network</h2>
+<p>With remote sense maxed out, I had to find the real feedback network inside and change it. So I opened the case.</p>
+<p><strong>Safety note:</strong> the primary-side bulk capacitor in a supply like this can hold a lethal charge well after it's unplugged. Supplies like this have active power-factor correction, which keeps that capacitor at roughly 380–400&nbsp;V regardless of whether the mains input is 120 or 230&nbsp;VAC. Let it discharge on its own, or discharge it manually, before opening anything up.</p>
+<p>After I removed all the case screws, the outer shell came off, and I separated the main board from the housing:</p>
+<div class="figure-grid cols-2" style="--cols: 0.775fr 1.225fr; --row-h: 248px;"><figure><img src="images/image12.jpg" alt="Outer casing removed." loading="lazy"><figcaption>Outer casing removed.</figcaption></figure><figure><img src="images/image14.jpg" alt="Board free of the housing." loading="lazy"><figcaption>Board free of the housing.</figcaption></figure></div>
+
+<p>With everything exposed, I taped over the dangling wires and terminals so nothing would short while I probed around.</p>
+<figure class="figure"><img src="images/image15.jpg" alt="Exposed terminals covered in electrical tape to prevent accidental shorts." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Exposed terminals covered in electrical tape to prevent accidental shorts.</figcaption></figure>
+<p>Here's the layout and the main ICs, starting with the back of the main board. It's a double-sided PCB with two daughterboards on top, a lot more complicated than the single-board HP supplies in other guides. I noticed two microcontrollers, one on a daughterboard, and another on the main PCB.</p>
+<figure class="figure"><img src="images/image16.jpg" alt="Reverse side of the main board." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Reverse side of the main board.</figcaption></figure>
+<div class="figure-grid cols-3" style="--cols: 1.394fr 0.722fr 0.885fr; --row-h: 200px;">
+<figure><img src="images/image17.jpg" alt="Daughterboard carrying a PIC microcontroller." loading="lazy"><figcaption>Daughterboard carrying a PIC microcontroller.</figcaption></figure>
+<figure><img src="images/image18.jpg" alt="DAC section on main board carrying another PIC microcontroller." loading="lazy"><figcaption>DAC section on main board carrying another PIC microcontroller.</figcaption></figure>
+<figure><img src="images/image19.jpg" alt="Over-voltage-protection section." loading="lazy"><figcaption>Over-voltage-protection section.</figcaption></figure>
+</div>
+<p>I started my analysis by tracing pin 23 (remote sense +) to see what it connects to.</p><p>It led to two resistors: one from remote sense (+) to the 12 V output, and one to a pin on a comparator IC with no markings (so no datasheet). Since most of the logic on this board runs at 3.3&nbsp;V, there had to be a third resistor tying that comparator input down to ground, forming a divider that scales the 12&nbsp;V output down before it's sampled. Probing around confirmed the divider, sketched below.</p>
+<div class="figure-grid cols-2" style="--cols: 1.117fr 0.883fr; --row-h: 261px;">
+<figure><img src="images/image22.jpg" alt="The divider feeding the unmarked IC (probably a comparator)." loading="lazy"><figcaption>The divider feeding the unmarked IC (probably a comparator).</figcaption></figure>
+<figure><img src="images/image23.jpg" alt="Sketch of the divider in the photo on the left." loading="lazy"><figcaption>Sketch of the divider in the photo on the left.</figcaption></figure>
+</div>
+<p>Without knowing what the IC was, I couldn't get any further this way. I turned my attention to the over-voltage-protection circuit instead, on the thought that the supply might be hitting an OVP clamp that was independently limiting the output. That circuit uses an LM393 dual comparator, but next to it was a transistor-looking part marked only “64” that I couldn't identify either. It wasn't a BJT: a diode test didn't show the two junctions a BJT would have.</p>
+<figure class="figure"><img src="images/image24.jpg" alt="LM393 over-voltage-protection comparator, next to the unidentified “64”-marked component." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>LM393 over-voltage-protection comparator, next to the unidentified “64”-marked component.</figcaption></figure>
+<p>I dropped that idea: if the supply were actually hitting an OVP fault at 12.7&nbsp;V, I'd expect to see a corresponding fault code on the PMBus (I did connect to the PMBus during this project, but lost the logged data, so I'm not including it here). More importantly, even if this LM393 circuit was what was clamping the output when I adjusted the remote-sense network, its output would still have to feed back into one of the two on-board microcontrollers, and judging by their location and the parts around them, one handles the AC input and down-conversion while the other handles output voltage feedback. Since the microcontroller on the daughterboard sits physically closest to the output circuitry, I assumed it was the one responsible for voltage regulation, and shifted my search there.</p>
+<h2>Finding the Feedback Pin on the Microcontroller</h2>
+<p>The main daughterboard is built around a <strong>dsPIC33FJ64GS606</strong>. I couldn't find a direct continuity path from the 12 V output to the daughterboard, so something (a buffer, a resistor) had to be in between. Instead I powered it up and carefully probed for a point near 12 V.</p>
+<p>I pulled the microcontroller's datasheet to locate its ADC-capable pins:</p>
+<p><a href="https://www.mouser.com/en/ProductDetail/Microchip-Technology/dsPIC33FJ64GS606-I-PT" target="_blank" rel="noopener">Microchip dsPIC33FJ64GS606 </a><a href="https://www.mouser.com/datasheet/3/282/1/70000591f.pdf" target="_blank" rel="noopener">datasheet (PDF)</a></p>
+<figure class="figure"><img src="images/image25.jpg" alt="Locating the ADC-capable pins on the dsPIC33FJ64GS606 pinout." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Locating the ADC-capable pins on the dsPIC33FJ64GS606 pinout.</figcaption></figure>
+<p>Then I probed every ADC pin, looking for anything between 0 and 3.3 V that could be the feedback input. I had a specific target in mind: I'd read that this supply family has an over-voltage cutoff around 14.5&nbsp;V, and if that's true, whatever ADC samples the output should read 3.3&nbsp;V exactly at that 14.5&nbsp;V cutoff. At the nominal 12.2&nbsp;V output, that same ADC should read (12.2&nbsp;/&nbsp;14.5)&nbsp;×&nbsp;3.3&nbsp;V&nbsp;≈&nbsp;2.77&nbsp;V, so that's the value I was hunting for.</p>
+<figure class="figure"><img src="images/image26.jpg" alt="Probing ADC pins on the daughterboard, watching for a reading near 2.7 V." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Probing ADC pins on the daughterboard, watching for a reading near 2.7 V.</figcaption></figure>
+<p>One pin read about 2.7 V. This pin was also connected to a test point, making it easy to probe.</p>
+<div class="figure-grid cols-2" style="--cols: 0.893fr 1.107fr; --row-h: 241px;">
+<figure><img src="images/image28.jpg" alt="Candidate feedback pin reading ~2.7 V." loading="lazy"><figcaption>Candidate feedback pin reading ~2.7 V.</figcaption></figure><figure><img src="images/image27.jpg" alt="Zoomed view to show the tapped location." loading="lazy"><figcaption>Zoomed view to show the tapped location.</figcaption></figure>
+
+</div>
+<p>To confirm it, I repeated the remote-sense-resistor experiment while watching this pin directly. Grounding the remote-sense pin through a 5&nbsp;kΩ resistor only pulled this candidate pin down to about 2.6&nbsp;V, and a 570&nbsp;Ω resistor pulled it down to about 2 V. That's about what you'd expect from a real feedback node.</p>
+<div class="figure-grid cols-2" style="--cols: 1.002fr 0.998fr; --row-h: 245px;">
+<figure><img src="images/image29.jpg" alt="Feedback pin dropping to ~2.6 V with a 5 kΩ resistor on remote sense." loading="lazy"><figcaption>Feedback pin dropping to ~2.6 V with a 5 kΩ resistor on remote sense.</figcaption></figure>
+<figure><img src="images/image30.jpg" alt="Feedback pin dropping to ~2 V with a 570 Ω resistor on remote sense." loading="lazy"><figcaption>Feedback pin dropping to ~2 V with a 570 Ω resistor on remote sense.</figcaption></figure>
+</div>
+<p>The test point adjacent to it tracked the 12 V output directly.</p><div class="figure-grid cols-2" style="--cols: 0.928fr 1.072fr; --row-h: 243px;">
+<figure><img src="images/image33.jpg" alt="Adjacent test point tracking the main 12 V output on the daughterboard." loading="lazy"><figcaption>Adjacent test point tracking the main 12 V output on the daughterboard.</figcaption></figure><figure><img src="images/image31.jpg" alt="Zoomed view to show the tapped location." loading="lazy"><figcaption>Zoomed view to show the tapped location.</figcaption></figure>
+
+
+</div><p>When I added the remote-sense resistor and the output went up, this voltage went up with it, so both are part of the same feedback path.</p>
+
+<figure><img src="images/image34.jpg" alt="Reading rising alongside the output as remote-sense resistance is applied." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Reading rising alongside the output as remote-sense resistance is applied.</figcaption></figure><h3>Tracing the Resistive Dividers</h3>
+<p>To actually change what the microcontroller reads as feedback, I needed to find the resistive divider(s) that scale the 12&nbsp;V output down into the 3.3&nbsp;V range the ADC expects, and modify them.</p><p>I traced one end of a resistor (silkscreen-labeled <strong>07C</strong>) back to the 12&nbsp;V rail. The other end of 07C connects to a resistor (<b>50B</b>) with a capacitor in parallel, whose far sides both go to ground. That's the lower leg of a divider. The midpoint of this divider feeds the tied-together PIC pins 14 and 15, both of which are ADC-capable pins. I labeled this as "network 1".</p>
+<div class="figure-grid cols-3" style="--cols: 0.992fr 0.989fr 1.019fr; --row-h: 179px;">
+<figure class="figure"><img src="images/image35.jpg" alt="The 07C resistor traced back to the 12 V rail." loading="lazy"><figcaption>The 07C resistor traced back to the 12 V rail.</figcaption></figure><figure><img src="images/image36.jpg" alt="07C's other end feeding into 50B and a parallel capacitor." loading="lazy"><figcaption>07C's other end feeding into 50B and a parallel capacitor.</figcaption></figure><figure><img src="images/image42.jpg" alt="Divider network 1 has its midpoint landing on the tied PIC pins 14/15." loading="lazy"><figcaption>Divider network 1 has its midpoint landing on the tied PIC pins 14/15.</figcaption></figure>
+
+</div>
+<figure><img src="images/image40.jpg" alt="A schematic sketch showing the resistor divider network 1 and where it connects on the microcontroller." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>A schematic sketch showing the resistor divider network 1 and where it connects on the microcontroller.</figcaption></figure><p>Right next to it, a second resistor (labeled <b>54C</b>) also connects to the 12 V rail, and its other end feeds into another resistor (<b>02C</b>) with a parallel capacitor, again returning to ground. So there's a second, independent divider. The midpoint of this second divider feeds PIC pin 13, also an ADC-capable pin. I labeled this as "network 2".</p>
+<div class="figure-grid cols-3" style="--cols: 0.916fr 1.011fr 1.073fr; --row-h: 176px;">
+<figure><img src="images/image38.jpg" alt="54C resistor, also tied to the 12 V rail." loading="lazy"><figcaption>54C resistor, also tied to the 12 V rail.</figcaption></figure>
+<figure><img src="images/image39.jpg" alt="54C's other end feeding into 02C and a parallel capacitor." loading="lazy"><figcaption>54C's other end feeding into 02C and a parallel capacitor.</figcaption></figure><figure><img src="images/image41.jpg" alt="Divider network 2 has its midpoint landing on PIC pin 13." loading="lazy"><figcaption>Divider network 2 has its midpoint landing on PIC pin 13.</figcaption></figure></div>
+
+<figure><img src="images/image37.jpg" alt="A schematic sketch showing the resistor divider network 2 and where it connects on the microcontroller." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>A schematic sketch showing the resistor divider network 2 and where it connects on the microcontroller.</figcaption></figure><p>Both dividers sense the output and have nearly the same ratio, about 0.22. That puts each midpoint at 12.2 × 0.22 ≈ 2.68 V, which matches what I'd measured.</p>
+<figure><img src="images/image43.jpg" alt="Schematic sketch for the two divider networks." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Schematic sketch for the two divider networks.</figcaption></figure><figure><img src="images/image44.jpg" alt="Expected feedback voltage at the divider midpoints." loading="lazy" style="width: 429px; max-width: 100%; max-height: none; height: auto;"><figcaption>Expected feedback voltage at the divider midpoints.</figcaption></figure>
+<h2>Building the Trim Circuit</h2>
+<p>Earlier, I'd seen that adding external resistance at the remote-sense pin and raising the real output voltage caused the voltage <em>at the resistive dividers</em> to drop. So to make the microcontroller regulate higher, I needed to lower the voltage at the divider midpoints, which meant lowering the resistance of each divider's bottom leg. The easiest way was to add a resistor in parallel with each bottom-leg resistor.</p>
+<p>Conveniently, there were already exposed test points at both divider midpoints, so I soldered fine tie-wire onto each one to bring the nodes out to somewhere I could work with them.</p>
+<figure class="figure"><img src="images/image45.jpg" alt="Tie-wire soldered onto the divider midpoint test points." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Tie-wire soldered onto the divider midpoint test points.</figcaption></figure>
+<p>I kept the stripped ends short as a long bare end can short to a nearby part. Also, a long wire can pick up noise and can affect the readings on this sensitive ADC input.</p>
+<figure class="figure"><img src="images/image46.jpg" alt="After soldering both tie-wires." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>After soldering both tie-wires.</figcaption></figure>
+<p>Bringing the nodes out this way enabled me to try a range of parallel resistor values rather than committing to one. I worked out the target resistor values with a quick set of divider calculations. I've labeled the modified version of "network 1" as "network 3", and the modified version of "network 2" as "network 4":</p>
+<figure><img src="images/image47.jpg" alt="Divider calculation, part 1." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Divider calculation, part 1.</figcaption></figure><figure><img src="images/image48.jpg" alt="Divider calculation, part 2." loading="lazy" style="max-height: none; width: 481px; height: auto; max-width: 100%;"><figcaption>Divider calculation, part 2.</figcaption></figure><figure><img src="images/image49.jpg" alt="Divider calculation, part 3." loading="lazy" style="max-height: none; width: 477px; height: auto; max-width: 100%;"><figcaption>Divider calculation, part 3.</figcaption></figure><figure><img src="images/image50.jpg" alt="Divider calculation, part 4." loading="lazy" style="max-height: none; width: 486px; height: auto; max-width: 100%;"><figcaption>Divider calculation, part 4.</figcaption></figure><figure><img src="images/image51.jpg" alt="Divider calculation, part 5." loading="lazy" style="max-height: none; width: 492px; height: auto; max-width: 100%;"><figcaption>Divider calculation, part 5.</figcaption></figure><figure class="figure"><img src="images/image54.jpg" alt="The final trim circuit: a pot in parallel with the bottom leg of each divider (networks 3 and 4)." loading="lazy" style="max-height: none; width: 499px; height: auto; max-width: 100%;"><figcaption>The final trim circuit: a pot in parallel with the bottom leg of each divider (networks 3 and 4).</figcaption></figure>
+<p>Picking the pot's range mattered. The divider ratio changes fast at low resistance and flattens out as resistance goes up (see the two graphs below). With a very large pot, almost all the adjustment would happen in the first few turns and the rest would do almost nothing. So I capped the maximum resistance: high enough to get back close to the stock ratio at full scale, low enough that the adjustment is spread more evenly across the turns.</p><p>A 50 kΩ pot was enough for the first divider. At full resistance the ratio is about 0.21, close to the stock 0.22, so it barely changes anything at that end of its range. Likewise, a 100 kΩ variable resistor was sufficient for the second divider, again landing around a 0.21 ratio at maximum resistance.</p><div class="figure-grid cols-2" style="--cols: 0.995fr 1.005fr; --row-h: 276px;"><figure><img src="images/image52.jpg" alt="Divider ratio vs. pot resistance for network 3 (first divider). At 50 kΩ it reaches about 0.21, close to the stock 0.22, while the adjustment stays usable across the pot's turns." loading="lazy"><figcaption>Divider ratio vs. pot resistance for network 3 (first divider). At 50 kΩ it reaches about 0.21, close to the stock 0.22, while the adjustment stays usable across the pot's turns.</figcaption></figure><figure><img src="images/image53.jpg" alt="The same plot for network 4 (second divider), with a 100 kΩ pot." loading="lazy"><figcaption>The same plot for network 4 (second divider), with a 100 kΩ pot.</figcaption></figure></div>
+
+<h2>Dialing In the Voltage</h2>
+<p>With a variable resistor wired onto the first divider, the output climbed to 13.2&nbsp;V:</p>
+<figure class="figure"><img src="images/image55.jpg" alt="Output voltage reaching 13.2 V with the trim pot adjusted." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Output voltage reaching 13.2 V with the trim pot adjusted.</figcaption></figure>
+<p>Turning the pot further counterclockwise pushed the voltage higher still:</p>
+<figure class="figure"><img src="images/image56.jpg" alt="Output climbing further as the trim pot is rotated." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Output climbing further as the trim pot is rotated.</figcaption></figure>
+<p>When I went too far, the over-voltage protection tripped. The status LED started blinking yellow (fault mode), and my on/off switch couldn't clear it, so the supply needed a full power cycle to reset.</p>
+<figure class="figure"><img src="images/image57.jpg" alt="Over-voltage protection tripped: status LED blinking yellow." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Over-voltage protection tripped: status LED blinking yellow.</figcaption></figure>
+<p>Adjusting only one of the two dividers, I could reach at most about 13.85&nbsp;V before triggering OVP.</p>
+<figure class="figure"><img src="images/image58.jpg" alt="Maximum of ~13.85 V reachable while adjusting only one divider." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Maximum of ~13.85 V reachable while adjusting only one divider.</figcaption></figure>
+<p>Adjusting both dividers together pushed the ceiling higher, since neither ADC input alone reached the microcontroller's trip threshold as quickly. I could get to about 14.2 V this way.</p>
+<figure class="figure"><img src="images/image59.jpg" alt="Higher output achievable once both dividers are trimmed together." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Higher output achievable once both dividers are trimmed together.</figcaption></figure>
+<p>Instead of leaving two loose trimmer pots hanging inside, I made a small board with one pot per divider so I can adjust the voltage after the case is closed.</p>
+<figure class="figure"><img src="images/image60.jpg" alt="Small trim board with two potentiometers, one per divider, wired to the daughterboard." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Small trim board with two potentiometers, one per divider, wired to the daughterboard.</figcaption></figure>
+<h2>Load Testing</h2>
+<p>After reassembling the case, I soldered a pair of low-gauge (large-diameter) wires directly to the main output to handle real current, and set up a load test with a high-current DC motor.</p>
+
+<p>For the load, I used a blower motor from a 2014 BMW 750i with seized bearings, which draws a lot of current. That made it a decent stand-in for a real car load.</p>
+<div class="figure-grid cols-2" style="--row-h: 264px;"><figure><img src="images/image61.jpg" alt="Reassembled supply with heavy-gauge output leads for load testing." loading="lazy"><figcaption>Reassembled supply with heavy-gauge output leads for load testing.</figcaption></figure><figure><img src="images/image62.jpg" alt="Blower motor from a 2014 BMW 750i used as the test load." loading="lazy"><figcaption>Blower motor from a 2014 BMW 750i used as the test load.</figcaption></figure></div>
+<p>Current was measured with a clamp ammeter, which had a zero error of −2.6&nbsp;A that needed to be accounted for in the readings.</p>
+
+<p>With the trim pots set to bring the output to 13.91&nbsp;V, I powered the motor:</p>
+<div class="figure-grid cols-2" style="--row-h: 266px;"><figure><img src="images/image63.jpg" alt="Clamp ammeter zeroed out, showing a −2.6 A offset before any load is applied." loading="lazy"><figcaption>Clamp ammeter zeroed out, showing a −2.6 A offset before any load is applied.</figcaption></figure><figure><img src="images/image64.jpg" alt="Output set to 13.91 V immediately before energizing the motor." loading="lazy"><figcaption>Output set to 13.91 V immediately before energizing the motor.</figcaption></figure></div>
+<p>With the motor running, the clamp ammeter read 17.8&nbsp;A, which, correcting for the −2.6&nbsp;A zero error, works out to about 20.4&nbsp;A actually flowing into the motor. Under that load the output dropped from 13.91 V to about 13.75 V, only 0.16 V, which is fine for this.</p>
+<figure class="figure"><img src="images/image65.jpg" alt="Ammeter reading 17.8 A (≈ 20.4 A corrected) while the motor runs at ~13.75 V." loading="lazy" style="max-height: 300px; width: auto; height: auto; max-width: 100%;"><figcaption>Ammeter reading 17.8 A (≈ 20.4 A corrected) while the motor runs at ~13.75 V.</figcaption></figure>
+<p>It held nearly 14 V at over 20 A, so it did the job: it stands in for the alternator and keeps the battery up while I flash the BMW's ECUs.</p>
+
+</div>
+
+<script src="../assets/zoom.js"></script>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

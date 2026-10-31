@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Reverse-engineered a 2003 Lancer&#x27;s HVAC actuator after its knob kept snapping from a stiffened linkage. 3D-printed a servo bracket and coupler to bypass it, then motorized the knob to track the blend door&#x27;s position.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Motorizing a Lancer&#x27;s HVAC Blend Door | Kasun Pathirage">
+<meta property="og:description" content="Reverse-engineered a 2003 Lancer&#x27;s HVAC actuator after its knob kept snapping from a stiffened linkage. 3D-printed a servo bracket and coupler to bypass it, then motorized the knob to track the blend door&#x27;s position.">
+<meta property="og:site_name" content="Kasun Pathirage">
+<meta name="twitter:card" content="summary_large_image">
+<title>Motorizing a Lancer's HVAC Blend Door | Kasun Pathirage</title>
+<style>
+    :root {
+        --primary: #1a1a1a;
+        --secondary: #e60000;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f6f8;
+        color: #333;
+        line-height: 1.6;
+    }
+    .container {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    h1 { color: #1a1a1a; margin-top: 0; }
+    .hero-image { margin: 1.5rem 0; }
+    .hero-image img { display: block; width: 100%; max-height: 420px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    h2 {
+        color: #1a1a1a;
+        margin-top: 2.5rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid #eee;
+    }
+    h3 { color: #1a1a1a; margin-top: 1.8rem; }
+    .back-link { display: inline-block; margin-bottom: 2rem; color: #e60000; text-decoration: none; font-weight: bold; }
+    .back-link:hover { text-decoration: underline; }
+    .meta { color: #555; }
+    a { color: #e60000; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+    .table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+    th, td { border: 1px solid #ddd; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background-color: #1a1a1a; color: #fff; }
+    tr:nth-child(even) { background-color: #f8f8f8; }
+    figure { margin: 1.2rem 0; text-align: center; }
+    figure img { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); display: block; margin: 0 auto; }
+    figure.figure-wide img { max-width: 620px; }
+    figure.figure-narrow img { max-width: 380px; }
+    figcaption { font-size: 0.85rem; color: #777; margin-top: 0.5rem; }
+    .figure-grid { display: grid; gap: 1rem; margin: 1.2rem 0; }
+    .figure-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .figure-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .figure-grid figure { margin: 0; }
+    .figure-grid > figure { min-width: 0; }
+    @media (max-width: 640px) {
+        .figure-grid.cols-2, .figure-grid.cols-3 { grid-template-columns: 1fr; }
+    }
+    .quick-facts {
+        background: #fafafa;
+        border: 1px solid #eee;
+        border-left: 4px solid #e60000;
+        border-radius: 6px;
+        padding: 1.2rem 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .quick-facts h4 { margin: 0 0 0.6rem 0; color: #1a1a1a; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .quick-facts ul { margin: 0; padding-left: 1.2rem; }
+    .quick-facts li { margin-bottom: 0.35rem; }
+    .downloads-box a.btn { margin-right: 0.6rem; margin-bottom: 0.5rem; }
+    pre {
+        background: #1a1a1a;
+        color: #e8e8e8;
+        padding: 1rem 1.2rem;
+        border-radius: 6px;
+        overflow: auto;
+        max-height: 340px;
+        font-size: 0.76rem;
+        line-height: 1.4;
+    }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+    p code, li code, td code { background: #eee; color: #a30000; padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.88em; }
+    .btn {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        background-color: var(--primary);
+        color: #fff;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: normal;
+        transition: background-color 0.2s;
+        font-size: 0.9rem;
+    }
+    .btn:hover { background-color: var(--secondary); color: #fff; text-decoration: none; }
+
+    /* Interactive 3D viewer */
+    .viewer-box {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 6px;
+        margin: 1.5rem 0;
+        overflow: hidden;
+    }
+    .viewer-tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid #eee; background: #fafafa; }
+    .viewer-tab {
+        font-family: inherit; font-size: 0.85rem; background: none; border: none; cursor: pointer;
+        color: #555; padding: 0.7rem 1rem; border-right: 1px solid #eee;
+    }
+    .viewer-tab:last-child { border-right: none; }
+    .viewer-tab.is-active { color: #e60000; font-weight: bold; background: #fff; }
+    .viewer-stage {
+        position: relative; width: 100%; height: clamp(240px, 46vh, 420px); background: #eee;
+        background-image:
+            linear-gradient(#e2e2e2 1px, transparent 1px),
+            linear-gradient(90deg, #e2e2e2 1px, transparent 1px);
+        background-size: 26px 26px;
+    }
+    .viewer-stage canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+    .viewer-stage canvas:active { cursor: grabbing; }
+    .viewer-hint {
+        position: absolute; left: 12px; bottom: 10px; font-size: 0.72rem; letter-spacing: 0.02em;
+        color: #888; pointer-events: none;
+    }
+    .viewer-loading {
+        position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        font-size: 0.82rem; color: #888; background: #eee;
+    }
+    .viewer-loading[hidden] { display: none; }
+    .viewer-caption { padding: 0.9rem 1.1rem; font-size: 0.88rem; color: #555; border-top: 1px solid #eee; }
+    .viewer-caption p { margin: 0; }
+    .viewer-downloads { padding: 0 1.1rem 1rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
+    .viewer-downloads a { font-size: 0.82rem; color: #e60000; text-decoration: none; font-weight: 600; white-space: nowrap; }
+    .viewer-downloads a:hover { text-decoration: underline; }
+    .video-series-box a.video-thumb { display: block; position: relative; border-radius: 6px; overflow: hidden; }
+    .video-series-box a.video-thumb img { display: block; width: 100%; height: auto; transition: transform 0.2s ease; }
+    .video-series-box a.video-thumb:hover img { transform: scale(1.03); }
+    .video-series-box figcaption { font-size: 0.8rem; }
+    .video-series-box .playlist-link { margin: 1rem 0 0 0; font-weight: 600; }
+    sub { line-height: 0; }
+    sub sub { font-size: 80%; }
+    sub sub sub { font-size: 85%; }
+    p[style*="text-align:center"] { padding: 0.2em 0 0.5em; overflow-x: auto; overflow-y: hidden; }
+    @media (max-width: 640px) { p[style*="text-align:center"] { font-size: 0.85em; } }
+    .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 0.15em; }
+    .frac > span { padding: 0.1em 0.25em 0.3em; line-height: 1.25; }
+    .frac sub { line-height: 1; }
+    .frac > span:first-child { border-bottom: 1px solid currentColor; }
+</style>
+<style id="single-figure-size">
+    /* Standalone images: keep them from filling the whole screen so the text stays readable. Click to zoom. */
+    .container > figure img { max-width: min(100%, 560px); max-height: 400px; width: auto; }
+    .container > figure.figure-wide img { max-width: min(100%, 680px); max-height: 460px; }
+    .container > figure.figure-narrow img { max-width: min(100%, 380px); max-height: 360px; }
+</style>
+<style id="compact-tables">
+    /* Tables: size to their content instead of the full column, and cap long ones with a scroll + sticky header. */
+    .container .table-wrap { max-height: 460px; overflow: auto; border-radius: 6px; }
+    .container .table-wrap table { width: auto; max-width: 100%; margin: 0 auto; font-size: 0.85rem; }
+    .container .table-wrap th, .container .table-wrap td { padding: 0.32rem 0.6rem; }
+    .container .table-wrap th { position: sticky; top: 0; z-index: 1; }
+</style>
+<style id="img-sizing">
+    /* Image rows with custom column widths, set by dragging in edit mode. Phones still stack them. */
+    @media (min-width: 641px) {
+        .figure-grid[style*="--cols"] { grid-template-columns: var(--cols) !important; }
+        .figure-grid[style*="--cols"] > figure img, .figure-grid[style*="--cols"] > figure video { width: 100%; height: auto; max-height: none; }
+    }
+    /* Image rows with a height cap, set by dragging the handle under a row in edit mode. */
+    .figure-grid[style*="--row-h"] > figure img, .figure-grid[style*="--row-h"] > figure video { max-height: var(--row-h) !important; width: auto !important; max-width: 100%; }
+</style></head>
+<body>
+
+<div class="container">
+    <a href="../index.html" class="back-link">← Back to Portfolio</a>
+
+    <h1>Motorizing a Mitsubishi Lancer's HVAC Blend Door</h1>
+    <p class="meta"><strong>Date:</strong>&nbsp;February 2023&nbsp; |&nbsp; <strong>Tech:</strong> Free-Body Torque Analysis, Cam-Follower Linkage, Closed-Loop Servo Control, Thévenin Equivalent, Settling-Time Bound, Sensor Linearization via Calibrated Lookup Table, DfAM, Arduino Nano / ESP8266, DRV8833</p>
+
+    <hr style="border: 0; border-top: 1px solid #ddd; margin: 2rem 0;">
+
+    <div class="quick-facts video-series-box">
+        <h4>🎥 Watch the Build: 2-Part Video Series</h4>
+        <div class="figure-grid cols-2">
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/R66rsbbOmAk" target="_blank" rel="noopener">
+                    <img src="https://img.youtube.com/vi/R66rsbbOmAk/hqdefault.jpg" alt="Part 1 video thumbnail" loading="lazy">
+                </a>
+                <figcaption>Part 1: The Custom Mechanical Mounts</figcaption>
+            </figure>
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/EmcxPi2tjaE" target="_blank" rel="noopener">
+                    <img src="https://img.youtube.com/vi/EmcxPi2tjaE/hqdefault.jpg" alt="Part 2 video thumbnail" loading="lazy">
+                </a>
+                <figcaption>Part 2: Wiring &amp; the Self-Turning Knob</figcaption>
+            </figure>
+        </div>
+        <p class="playlist-link"><a href="https://www.youtube.com/playlist?list=PLIieeidNUI08" target="_blank" rel="noopener">▶ Watch the full playlist on YouTube</a></p>
+    </div>
+
+    <h2 id="viewer">Interactive 3D Models</h2>
+    <p>Below are the final servo bracket, its two printed screw-boss standoffs, the original (pre-reinforcement) knob shaft, and the knob–potentiometer coupler, all from the SolidWorks files. Drag to rotate, scroll to zoom. SolidWorks downloads are below the viewer.</p>
+    <div class="viewer-box">
+        <div class="viewer-tabs" role="tablist">
+            <button class="viewer-tab is-active" data-model="assembly" role="tab" aria-selected="true">Full bracket assembly</button>
+            <button class="viewer-tab" data-model="servo_base_part" role="tab" aria-selected="false">Bracket plate</button>
+            <button class="viewer-tab" data-model="servo_screw_base" role="tab" aria-selected="false">Screw boss (base)</button>
+            <button class="viewer-tab" data-model="servo_screw_top" role="tab" aria-selected="false">Screw boss (top)</button>
+            <button class="viewer-tab" data-model="dashboard_knob_rod" role="tab" aria-selected="false">Original knob shaft</button>
+            <button class="viewer-tab" data-model="pot_and_motor_combo_knob" role="tab" aria-selected="false">Knob–pot coupler</button>
+        </div>
+        <div class="viewer-stage">
+            <canvas id="stl-canvas"></canvas>
+            <div class="viewer-hint">drag to rotate · scroll to zoom</div>
+            <div class="viewer-loading" id="viewer-loading">loading mesh…</div>
+        </div>
+        <div class="viewer-caption" id="viewer-caption">
+            <p data-model="assembly" data-label="Full bracket assembly">The final two-anchor servo mounting bracket, fully assembled with hardware: the main plate, both printed screw-boss standoffs, and the fasteners joining them. This is the design that replaced the single-anchor version, which bent under the servo’s torque.</p>
+            <p data-model="servo_base_part" data-label="Bracket plate" hidden="">The main bracket plate. It keys into the AC actuator’s exposed mounting holes on one side and carries the servo mount on the other, with two anchor points to resist torsion.</p>
+            <p data-model="servo_screw_base" data-label="Screw boss (base)" hidden="">Base half of a printed screw-boss standoff, joining the bracket’s plate sections at one of the two anchor points.</p>
+            <p data-model="servo_screw_top" data-label="Screw boss (top)" hidden="">Upper half of the printed screw-boss standoff, mating with the base half. This portion goes into the anchor point.</p>
+            <p data-model="dashboard_knob_rod" data-label="Original knob shaft" hidden="">The original knob shaft design, before reinforcement. Like the coupler, this 3D-printed PLA shaft bent under summer heat, which led to the dowel-pin modification described in the text.</p>
+            <p data-model="pot_and_motor_combo_knob" data-label="Knob–pot coupler" hidden="">The printed coupler bridging the user-facing dashboard knob and the potentiometer’s own knob, letting the potentiometer track the knob’s position directly.</p>
+        </div>
+        <div class="viewer-downloads" id="viewer-downloads"></div>
+    </div>
+
+    <div class="quick-facts">
+        <h4>Quick Facts</h4>
+        <ul>
+            <li><strong>The failure:</strong>&nbsp;<br>The factory temperature knob on older Lancers relies on a cable-and-lever mechanism to pull the blend door. The linkage stiffens with age, and eventually the knob snaps before the door moves. New knobs break the same way because the problem is the linkage being insufficient to turn a stiffened internal mechanism.</li>
+            <li><strong>The fix:</strong>&nbsp;<br>I bypassed the cable mechanism entirely, using a 20 kg‑cm servo to drive the blend-door gear directly and a potentiometer on the dashboard knob to tell it where to go. I designed the servo mount so it needed no holes in the factory actuator.</li>
+            <li><strong>Actuator:</strong> <br>I picked a Miuzei 20 kg‑cm digital servo over a stepper (open loop, needs a driver, bigger for the same torque) and a DC gear motor (needs its own PID loop to hold position).</li>
+            <li><strong>Position sensing:</strong> <br>I read a 10 kΩ potentiometer through an RC low-pass filter and mapped it through a hand-calibrated lookup table instead of a plain <code>map()</code>.</li>
+            <li><strong>Control boards:</strong> <br>I used an Arduino Nano to run the servo/potentiometer loop for the basic fix, and built a different board pairing an ESP8266 NodeMCU with a DRV8833 dual H-bridge for a motorized-knob upgrade.</li>
+            <li><strong>Power:</strong>&nbsp;<br>I tapped the cigarette lighter's 12 V and stepped it down through a Tobsun EA50-5V 50 W (10 A) buck converter, which I sized for the servo's ~3&nbsp;A stall current plus headroom for the knob motor and a Wi-Fi‑enabled board.</li>
+            <li><strong>Fabrication:</strong> <br>I 3D printed all the brackets, housings, couplers and the enclosure. I measured the factory mounting holes with calipers and a clay imprint, since there's no CAD model or open-source dimensions for this part.</li>
+        </ul>
+    </div>
+
+    <h2>The Problem: The Knob Keeps Breaking</h2>
+    <p>The temperature knob on older Lancers is known for getting so stiff that it snaps. Mine did.</p>
+    <figure class="figure-narrow">
+        <img src="images/broken-knob.jpg" alt="The broken temperature control knob on the Lancer's dashboard, cracked and glued unsuccessfully." loading="lazy" style="width: 198px; max-width: 100%; max-height: none; height: auto;">
+        <figcaption>The broken knob. I tried gluing it, but that didn't hold.</figcaption>
+    </figure>
+    <p>I replaced it and it broke again. Therefore, the knob wasn't the real problem. Behind the dashboard, a cable-pull mechanism uses a set of gears and levers to amplify the knob's motion and pull the blend door across its range. As it stiffens, the gears and levers can't overcome the resistance anymore, and the force ends up snapping the knob instead of moving the door.</p>
+    <div class="figure-grid cols-2">
+        <figure><img src="images/mechanism-dash-side.jpg" alt="The mechanical-advantage linkage, at the dashboard side." loading="lazy"><figcaption>The mechanical-advantage linkage, at the dashboard side.</figcaption></figure>
+        <figure><img src="images/mechanism-under-dash.jpg" alt="The rest of the mechanical-advantage linkage under the dashboard." loading="lazy"><figcaption>The rest of the mechanical-advantage linkage under the dashboard.</figcaption></figure>
+    </div>
+    <h3>Quick Mechanical-Advantage Check</h3>
+    <p>Before rebuilding anything, I wanted a rough number for why the linkage was failing. I modeled the mechanism as two rigid bodies meeting at a CAM contact: body <em>a</em>, which receives the pulling force from the knob's cable, and body <em>b</em>, which delivers the output force into the blend-door's bevel gear. A cylindrical boss on body <em>b</em> rides in a track on body <em>a</em>, so the two only ever interact through that single contact point.</p>
+    
+    <p>Balancing torque about Fulcrum<sub>a</sub> gives the torque body <em>a</em> carries into the CAM contact:</p>
+    <p style="text-align:center; font-style:italic; color:#555;">τ<sub>a</sub>&nbsp;=&nbsp;F<sub>in</sub>&nbsp;sin(θ<sub>(a<sub>1</sub>,F<sub>in</sub>)</sub>)&nbsp;×&nbsp;d<sub>a<sub>1</sub></sub></p><div class="figure-grid cols-3">
+        <figure><img src="images/mech-advantage-01-overview.jpg" alt="The mechanism modeled as two rigid bodies, a and b, pivoting about their own fulcrums and meeting at a CAM interface." loading="lazy"><figcaption>The two rigid bodies, pivoting about Fulcrum<sub>a</sub> and Fulcrum<sub>b</sub>, meeting at the CAM interface.</figcaption></figure>
+        <figure><img src="images/mech-advantage-02-input-force.jpg" alt="Body a receiving the input force from the cable at arm d_a_1, at angle theta(a1,Fin)." loading="lazy"><figcaption>Body <em>a</em> takes the cable's input force F<sub>in</sub> at arm d<sub>a<sub>1</sub></sub>&nbsp;at an angle θ<sub>(a<sub>1</sub>,F<sub>in</sub>)</sub>.</figcaption></figure>
+        <figure><img src="images/mech-advantage-03-torque-a.jpg" alt="Torque on body a about fulcrum a, equal to F_in times sine of theta(a1,Fin) times d_a_1." loading="lazy"><figcaption>Torque on body <em>a</em> about Fulcrum<sub>a</sub>.</figcaption></figure>
+    </div>
+    
+    <p>The tangential force at the contact is F′&nbsp;=&nbsp;<span class="frac"><span>τ<sub>a</sub></span><span>d<sub>a<sub>2</sub></sub></span></span>, and resolving that along the actual contact normal gives the CAM reaction force. Since the contact is assumed frictionless, that same magnitude pushes back on body <em>b</em> (Newton's third law):</p>
+    <p style="text-align:center; font-style:italic; color:#555;">F<sub>R<sub>cam<sub>(b|a)</sub></sub></sub>&nbsp;=&nbsp;F<sub>R<sub>cam<sub>(a|b)</sub></sub></sub>&nbsp;=&nbsp;<span class="frac"><span>F<sub>in</sub>&nbsp;sin(θ<sub>(a<sub>1</sub>,F<sub>in</sub>)</sub>)&nbsp;×&nbsp;d<sub>a<sub>1</sub></sub></span><span>cos(θ<sub>R<sub>cam<sub>a</sub></sub></sub>)&nbsp;×&nbsp;d<sub>a<sub>2</sub></sub></span></span></p><div class="figure-grid cols-3">
+        <figure><img src="images/mech-advantage-04-tangential.jpg" alt="Projecting the torque on body a out to arm d_a_2 gives a tangential force F prime at the CAM contact." loading="lazy"><figcaption>Projected out to arm d<sub>a<sub>2</sub></sub>, that torque gives a tangential contact force F′.</figcaption></figure>
+        <figure><img src="images/mech-advantage-05-reaction-a.jpg" alt="Decomposing the tangential force along the CAM contact gives the true reaction force F_R_cam_(a given b), equal to F prime divided by cosine of theta_R_cam_a." loading="lazy"><figcaption>Resolved onto the contact normal, the CAM reaction is F<sub>R<sub>cam<sub>(a|b)</sub></sub></sub>.</figcaption></figure>
+        <figure><img src="images/mech-advantage-06-newton3.jpg" alt="By Newton's third law, body b pushes back on body a with an equal and opposite reaction force at the CAM contact." loading="lazy"><figcaption>By Newton's third law, body <em>b</em> feels an equal and opposite reaction F<sub>R<sub>cam<sub>(b|a)</sub></sub></sub>.</figcaption></figure>
+    </div>
+    
+    <p>On body <em>b</em>, that reaction creates a torque about Fulcrum<sub>b</sub>, which must balance the torque the output force applies at arm d<sub>b<sub>2</sub></sub>:</p>
+    <p style="text-align:center; font-style:italic; color:#555;">F<sub>R<sub>cam<sub>(b|a)</sub></sub></sub>&nbsp;cos(θ<sub>R<sub>cam<sub>b</sub></sub></sub>)&nbsp;×&nbsp;d<sub>b<sub>1</sub></sub>&nbsp;=&nbsp;F<sub>out</sub>&nbsp;sin(θ<sub>(b<sub>2</sub>,F<sub>out</sub>)</sub>)&nbsp;×&nbsp;d<sub>b<sub>2</sub></sub></p><div class="figure-grid cols-3">
+        <figure><img src="images/mech-advantage-07-reaction-b.jpg" alt="The reaction force acting on body b at arm d_b_1 from the fulcrum b." loading="lazy"><figcaption>That reaction lands on body <em>b</em> at arm length d<sub>b<sub>1</sub></sub> from Fulcrum<sub>b</sub>.</figcaption></figure>
+        <figure><img src="images/mech-advantage-08-torque-b.jpg" alt="Torque on body b from the CAM reaction, equal to F_R_cam_(b given a) times cosine of theta_R_cam_b times d_b_1." loading="lazy"><figcaption>Torque on body <em>b</em> from the CAM reaction.</figcaption></figure>
+        <figure><img src="images/mech-advantage-09-output-force.jpg" alt="The same torque delivered at arm d_b_2 sets the output force into the bevel gear." loading="lazy"><figcaption>The same torque, delivered at arm d<sub>b<sub>2</sub></sub>, sets the output force F<sub>out</sub>.</figcaption></figure>
+    </div>
+    <p>Substituting the reaction force from the first half of the derivation and solving for the ratio the linkage actually delivers:</p>
+    
+    <p style="text-align:center; font-style:italic; color:#555;"><span class="frac"><span>F<sub>out</sub></span><span>F<sub>in</sub></span></span>&nbsp;=&nbsp;<span class="frac"><span>cos(θ<sub>R<sub>cam<sub>b</sub></sub></sub>)&nbsp;×&nbsp;sin(θ<sub>(a<sub>1</sub>,F<sub>in</sub>)</sub>)&nbsp;×&nbsp;d<sub>a<sub>1</sub></sub>&nbsp;×&nbsp;d<sub>b<sub>1</sub></sub></span><span>cos(θ<sub>R<sub>cam<sub>a</sub></sub></sub>)&nbsp;×&nbsp;sin(θ<sub>(b<sub>2</sub>,F<sub>out</sub>)</sub>)&nbsp;×&nbsp;d<sub>a<sub>2</sub></sub>&nbsp;×&nbsp;d<sub>b<sub>2</sub></sub></span></span></p><figure class="figure-wide">
+        <img src="images/mech-advantage-10-combined-ratio.jpg" alt="The combined force ratio F_out over F_in, equal to cosine theta_R_cam_b times sine theta(a1,Fin) times d_a_1 times d_b_1, all over cosine theta_R_cam_a times sine theta(b2,Fout) times d_a_2 times d_b_2." loading="lazy" style="width: 350px; max-width: 100%; max-height: none; height: auto;">
+        <figcaption>The two torque balances combined into the overall mechanical-advantage ratio.</figcaption>
+    </figure>
+    <p>Not all of these arms and angles are fixed, though. As the knob turns, the CAM boss slides along body <em>a</em>'s track, so d<sub>a<sub>2</sub></sub> and every angle in the formula changes continuously over the knob's travel:</p><div class="figure-grid cols-2" style="--row-h: 194px;"><figure><img src="images/mech-advantage-11-da2-range.jpg" alt="As the CAM slides along the track, d_a_2 varies between l_a_2_min and l_a_2_max." loading="lazy"><figcaption>d<sub>a<sub>2</sub></sub> sweeps between l<sub>a<sub>2<sub>min</sub></sub></sub> and l<sub>a<sub>2<sub>max</sub></sub></sub> as the CAM slides.</figcaption></figure><figure><img src="images/mech-advantage-12-theta-a1-range.jpg" alt="The input angle theta(a_1,F_in) sweeps between a minimum and maximum over the knob's travel, while d_a_1 stays a fixed length." loading="lazy"><figcaption>θ<sub>(a<sub>1</sub>,F<sub>in</sub>)</sub> likewise sweeps over a min/max range, although d<sub>a<sub>1</sub></sub> itself remains a fixed length.</figcaption></figure><figure><img src="images/mech-advantage-15-cam-angles.jpg" alt="The two CAM-side contact angles, theta_R_cam_a and theta_R_cam_b, which change as the knob turns." loading="lazy"><figcaption>The two contact angles at the CAM interface, θ<sub>R<sub>cam<sub>a</sub></sub></sub> and θ<sub>R<sub>cam<sub>b</sub></sub></sub>, change.</figcaption></figure><figure><img src="images/mech-advantage-13-theta-b2.jpg" alt="The output angle theta(b_2,F_out), the angle at which the output force is delivered to the blend door's bevel gear." loading="lazy"><figcaption>θ<sub>(b<sub>2</sub>,F<sub>out</sub>)</sub>&nbsp;is the angle at which the output force is delivered.</figcaption></figure></div>
+    
+    <figure><img src="images/mech-advantage-14-arms-b.jpg" alt="Body b's two arm lengths, d_b_1 to the CAM contact and d_b_2 to the output, which stay constant." loading="lazy" style="width: 327px; max-width: 100%; max-height: none; height: auto;"><figcaption>Body <em>b</em>'s arms, d<sub>b<sub>1</sub></sub> to the CAM and d<sub>b<sub>2</sub></sub> to the output, however, remain constant.</figcaption></figure>
+    <p>To put numbers in, I took rough measurements of the real linkage, using the least favourable arm ratios and generous values for the angles:</p>
+    <ul>
+        <li>The ratio d<sub>a<sub>1</sub></sub>/d<sub>a<sub>2</sub></sub> bottoms out around 1/1.5 at the CAM's far travel limit.</li>
+        <li>The fixed ratio d<sub>b<sub>1</sub></sub>/d<sub>b<sub>2</sub></sub> is also about 1/1.5.</li>
+        <li>The cable keeps θ<sub>(a<sub>1</sub>,F<sub>in</sub>)</sub> close enough to 90° through its small sweep that sin(θ<sub>(a<sub>1</sub>,F<sub>in</sub>)</sub>)&nbsp;≈&nbsp;1.</li>
+        <li>The output angle θ<sub>(b<sub>2</sub>,F<sub>out</sub>)</sub> swings between 60° and 120°, bottoming out at sin(θ<sub>(b<sub>2</sub>,F<sub>out</sub>)</sub>)&nbsp;=&nbsp;sin(60°)&nbsp;=&nbsp;√3/2&nbsp;≈&nbsp;0.87 at either extreme.</li>
+        <li>Giving the geometry the benefit of the doubt, cos(θ<sub>R<sub>cam<sub>b</sub></sub></sub>)/cos(θ<sub>R<sub>cam<sub>a</sub></sub></sub>)&nbsp;≈&nbsp;1.5.</li>
+    </ul>
+    <p>Plugging all of that in:</p>
+    <p style="text-align:center; font-style:italic; color:#555;"><span class="frac"><span>F<sub>out</sub></span><span>F<sub>in</sub></span></span>&nbsp;≈&nbsp;1.5&nbsp;×&nbsp;<span class="frac"><span>2</span><span>√3</span></span>&nbsp;×&nbsp;<span class="frac"><span>1</span><span>1.5</span></span>&nbsp;×&nbsp;<span class="frac"><span>1</span><span>1.5</span></span>&nbsp;≈&nbsp;0.77</p>
+    <p>So even with generous assumptions, the linkage doesn't amplify force. It loses about 23%, trading force for knob travel. That matched what happened in the car: with no force margin, a slightly stiffer mechanism was enough for the knob to break first.</p>
+    <p>A new knob wasn't going to fix the linkage, so I decided to motorize the temperature control. That also opened the door to automatic climate control later.</p>
+
+    <h2>Choosing How to Actuate the Blend Door</h2>
+    <p>Three options were on the table: a DC gear motor with an encoder, a stepper motor, or a servo.</p>
+    
+    <p>I picked the servo (a Miuzei 20 kg‑cm digital unit) because it has a lot of torque for its size and positions repeatably.</p><p>A stepper with the same torque would be bigger, need a driver IC, and run open loop, so with a gear this stiff I'd have no way of knowing whether it actually moved. A DC gear motor would also be bigger and would need its own PID loop to hold a position. The servo already has closed-loop positioning built in.</p>
+
+    <h2>Reverse-Engineering the Mounting Points</h2>
+    <p>After I removed the lever mechanism under the dashboard, several mounting holes on the AC blend door actuator itself were exposed. These were the holes the factory linkage used, and the only real option for anchoring a bracket.</p>
+    <figure class="figure-narrow">
+        <img src="images/actuator-holes.jpg" alt="The AC blend door actuator with the factory lever mechanism removed, exposing mounting holes." loading="lazy" style="width: 437px; max-width: 100%; max-height: none; height: auto;">
+        <figcaption>The blend door actuator with the factory linkage removed, exposing the holes a bracket could anchor to.</figcaption>
+    </figure>
+    <p>My plan was to design a bracket that picked up those same holes, with the servo's output shaft mating to the temperature blend door's gear coupler. The diameters were easy to measure with calipers, but the positions weren't: the holes sat at different depths in a cramped spot, and I couldn't get the caliper in at a consistent angle.</p>
+    <p>So I pressed a thick layer of modeling clay on a hard backing against the holes to get an imprint, then measured the imprint on the bench.</p>
+    <figure class="figure-wide">
+        <img src="images/clay-imprint-ai-render.jpg" alt="Left: the real actuator holes. Right: an AI-generated rendering approximating what the clay negative imprint of those holes looked like, since no photo of the actual imprint was taken." loading="lazy" style="max-width: 45%;">
+        <figcaption>I did not save a photo of the actual clay imprint, so this is an AI-generated approximation (right) of what it looked like, next to the real holes it was taken from (left).</figcaption>
+    </figure>
+    <p>I didn't want to waste a full bracket print on bad measurements, so first I printed a bare skeleton with a pin at each hole location. It also showed how uneven the hole depths were:</p>
+    <figure class="figure-narrow">
+        <img src="images/test-print-skeleton.jpg" alt="CAD model of the minimal test skeleton, with pins marking the measured hole locations." loading="lazy">
+        <figcaption>CAD model of the test-fit skeleton, with a pin at each measured hole.</figcaption>
+    </figure>
+    
+    <p>After a few rounds of this, the positions and depths were right.</p>
+
+    <h2>Designing and Printing the Servo Bracket</h2>
+    <p>In my first real attempts, I used a large rectangular piece to hold the servo, with a separate circular piece keying into a subset of the available actuator holes. I designed these in SolidWorks and 3D printed them in PLA on a Creality Ender 3 V2:</p>
+    <div class="figure-grid cols-3">
+        <figure><img src="images/test-print-skeleton-1.jpg" alt="Single anchor point design 1 (3D printed)." loading="lazy"><figcaption>Single anchor point design 1 (3D Printed).</figcaption></figure>
+        <figure><img src="images/test-print-skeleton-2.jpg" alt="Single anchor point design 2 (3D printed)." loading="lazy"><figcaption>Single anchor point design 2 (3D Printed).</figcaption></figure>
+        <figure><img src="images/test-print-skeleton-3.jpg" alt="Single anchor point design 3 (3D printed)." loading="lazy"><figcaption>Single anchor point design 3 (3D Printed).</figcaption></figure>
+    </div><figure class="figure-narrow">
+        <img src="images/cad-failed-bracket.jpg" alt="SolidWorks CAD render of the first servo bracket attempt, a single rectangular piece with a circular locating piece." loading="lazy">
+        <figcaption>Single anchor point design 4 (Screenshot of CAD Model).</figcaption>
+    </figure>
+    <p>With only one anchor point, the bracket bent as the servo fought the stiff gear, so it failed. I then built a two-point design that resists the twisting as the servo drives the gear. I split the design into multiple pieces, each with a flat face on the build plate, so they would stick well and need no supports. That way, if one piece broke or needed a change, I only had to reprint that piece.</p><p>The printed pieces, each viewable in the 3D viewer, are linked below:</p>
+    <ul class="viewer-part-links">
+        <li><a href="#viewer" data-viewer-tab="servo_base_part">Bracket plate</a>: the main plate that keys into the actuator's holes and carries the servo.</li>
+        <li><a href="#viewer" data-viewer-tab="servo_screw_base">Screw boss (base)</a>: lower half (base) of the standoff at each anchor point (×2).</li>
+        <li><a href="#viewer" data-viewer-tab="servo_screw_top">Screw boss (top)</a>: upper half of the same standoff (×2).</li>
+    </ul>
+    <p>I held them together with screws and nuts, which also added stiffness:</p>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Qty</th><th>Hardware</th></tr></thead>
+            <tbody>
+                <tr><td>8</td><td>M2.5 × 25&nbsp;mm Torx cheese-head screws (ISO 14580)</td></tr>
+                <tr><td>8</td><td>M2.5 thin hex nuts (ISO 4036)</td></tr>
+                <tr><td>4</td><td>M4 × 16&nbsp;mm socket-head cap screws (ISO 4762)</td></tr>
+                <tr><td>4</td><td>M4 thin hex nuts (ISO 4036)</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <p>The CAD model of the complete bracket assembly, with screws and nuts, can be viewed interactively in:&nbsp;<a href="#viewer" data-viewer-tab="assembly">Full bracket assembly</a>.</p>
+    <figure><img src="images/bracket-installed.jpg" alt="The printed servo bracket installed on the actuator in the car." loading="lazy"><figcaption>The finished bracket, installed on the actuator along with the servo mounted on the bracket.</figcaption></figure>
+    <h3>Coupling the Servo to the Original Gear</h3>
+    <p>The servo's output had to attach to the original gear that couples directly into the car's internal AC temperature control mechanism:</p>
+    <figure class="figure-narrow">
+        <img src="images/gear-coupling-01-original-gear.jpg" alt="The servo mounted in place, with the original gear that couples into the car's internal temperature control mechanism highlighted behind it." loading="lazy">
+        <figcaption>The servo coupling into the internal actuator mechanism via a bevel gear.</figcaption>
+    </figure>
+    <p>I did the coupling in the following steps:</p>
+    <figure class="figure-wide">
+        <img src="images/gear-coupling-02-steps.jpg" alt="A four-step diagram: trim a servo output horn to shape, friction-fit it onto the servo's output shaft, then glue the original gear on top with two-part epoxy." loading="lazy">
+        <figcaption>Trim a servo output horn to shape, friction-fit it to the output shaft, then glue on the original gear.</figcaption>
+    </figure>
+    <p>Servos come with plastic and metal output horns that mate tightly with the splines on the output shaft. I trimmed one of these to shape, friction-fit it onto the shaft, then glued the original gear onto it with JB-Weld two-part epoxy. It has held up for 3 years so far! Lining up the servo shaft with the gear's axis was critical. Any misalignment here could damage the bracket due to undue stress, hinder free mobility of the servo or break the glue bond.</p>
+    <figure class="figure-narrow">
+        <img src="images/gear-coupling-03-alignment.jpg" alt="The assembled gear-and-servo coupling installed in the car, with a dashed line marking the alignment between the servo's output shaft and the gear's axis." loading="lazy">
+        <figcaption>Checking shaft-to-gear alignment after final installation.</figcaption>
+    </figure>
+
+    <h2>Closing the Loop: Sensing the Knob Position</h2>
+    <h3>Measuring the Knob Position</h3>
+    <p>The servo also needed to know where the dashboard knob was set. In my first attempt, I tapped the cable that already ran under the dashboard and fed it into a custom potentiometer. For that, I 3D printed a housing for an angular potentiometer built from copper pads at each detent position. However, it didn't produce stable enough readings, so next I tried a commercial linear potentiometer, again with a printed housing. That didn't work as expected either.</p>
+    <div class="figure-grid cols-2" style="--cols: 0.715fr 1.285fr; --row-h: 225px;"><figure>
+        <img src="images/cad-angular-pot.jpg" alt="SolidWorks CAD render of the failed angular potentiometer housing built from copper contact pads." loading="lazy">
+        <figcaption>Housing for the angular potentiometer with copper pads (not shown) at each temperature step.</figcaption>
+    </figure><figure>
+        <img src="images/cad-linear-pot.jpg" alt="SolidWorks CAD render of the linear potentiometer housing attempt." loading="lazy">
+        <figcaption>Housing for the commercial linear potentiometer (not shown).</figcaption>
+    </figure></div>
+    <p>Therefore I took the cable mechanism out completely and mounted a plain rotary potentiometer at the dashboard controller, held with a nut. While the nut held the potentiometer in place, it could get loosened due to repeated rotation. Therefore, I glued the potentiometer as an additional structural safety measure. I used hot glue temporarily because it was easy to undo.</p>
+    <div class="figure-grid cols-2" style="--cols: 1fr 1fr;">
+        <figure><img src="images/pot-top-temp.jpg" alt="Photo of the potentiometer temporarily installed at the dashboard, viewed from the top." loading="lazy"><figcaption>The potentiometer temporarily installed, viewed from the top.</figcaption></figure>
+        <figure><img src="images/pot-behind-temp.jpg" alt="Photo of the potentiometer temporarily installed at the dashboard, viewed from the bottom." loading="lazy"><figcaption>Same install, viewed from the bottom.</figcaption></figure>
+    </div>
+
+    <h3>Coupling the Knob to the Potentiometer</h3>
+    <p>With the cable-pull mechanism gone, the dashboard knob itself needed to couple directly to the potentiometer's shaft. I modeled the original knob shaft (<a href="#viewer" data-viewer-tab="dashboard_knob_rod">view in 3D</a>) in SolidWorks, but its shape didn't fit the potentiometer, so I designed and printed a coupler (<a href="#viewer" data-viewer-tab="pot_and_motor_combo_knob">view in 3D</a>).</p>
+    <p>Print orientation mattered here. For accuracy, the part had to be printed with the shaft axis vertical. However, this left the layers weak against twisting. Printing on its side would give a part that is much stronger against torsion, but less accurate, since there's no flat face for the build plate. I went with accuracy, but found that it created a lot of issues downstream: the PLA coupler and the knob shaft both deformed in the summer heat inside the car. While using ABS material instead of PLA may have solved this, my printer can't do ABS reliably. Therefore, I added a hole through the center for a metal dowel pin, which reinforces the weak layers, preventing bending or deforming. Note that a real dowel pin is not necessary here: a nail with the head cut off, or a thick safety pin bent back and forth until it breaks to length, works fine.</p>
+    <div class="figure-grid cols-2" style="--cols: 1.227fr 0.773fr;">
+        <figure><img src="images/reinforced-shaft-knob.jpg" alt="The metal pin partially inserted into the coupler (left), next to the knob (right)." loading="lazy"><figcaption>The metal pin partially inserted into the coupler (left) and knob (right).</figcaption></figure>
+        <figure><img src="images/reinforced-shaft-inserted.jpg" alt="The reinforced coupler inserted into the knob." loading="lazy"><figcaption>After inserting the reinforced coupler into the knob.</figcaption></figure></div>
+
+    <h2>The Control Board</h2>
+    <p>I built a custom PCB to connect an Arduino Nano (or an ESP8266 NodeMCU for wireless control) to the potentiometer and servo.</p><figure class="figure-wide">
+        <img src="images/wiring-simple.jpg" alt="Wiring diagram for the basic servo and potentiometer control circuit, showing the Arduino Nano, potentiometer, servo, buck converter, and fuse." loading="lazy">
+        <figcaption>Wiring diagram for the base servo/potentiometer control loop.</figcaption>
+    </figure><p>I also added headers for a Bluetooth module, buttons and an OLED screen for later, but they are irrelevant to this project.</p>
+    
+    <div class="figure-grid cols-2" style="--cols: 0.943fr 1.057fr;">
+        <figure><img src="images/pcb-front.jpg" alt="The front of the custom PCB with the Arduino Nano installed." loading="lazy"><figcaption>The Arduino Nano on the custom control board.</figcaption></figure>
+        <figure><img src="images/pcb-rear.jpg" alt="The rear side of the custom PCB, showing hand-soldered connections." loading="lazy"><figcaption>The rear side of the custom control board.</figcaption></figure>
+    </div>
+    <p>I took power from the cigarette lighter's 12 V, so a fault here couldn't take anything else in the car down with it, and used a Tobsun EA50-5V 50 W buck converter to step it down to 5 V efficiently, with plenty of current headroom:</p>
+    <figure class="figure-narrow">
+        <img src="images/buck-converter.jpg" alt="The Tobsun EA50-5V buck converter used to step 12V down to 5V." loading="lazy">
+        <figcaption>The Tobsun EA50-5V 50&nbsp;W step-down converter.</figcaption>
+    </figure>
+    <p>It's rated well above what this build alone draws: the servo's stall current is about 3&nbsp;A, the motorized-knob motor (discussed later) draws about 1&nbsp;A at stall, and a Wi-Fi‑enabled board can briefly pull ~1 A while establishing a connection. That's about 5 A worst case, well under the converter's 10 A rating.</p><p>I found that the ground connection at the cigarette lighter is unstable and introduces noise to the circuit in the form of ground fluctuations. Therefore, I used a stronger ground: attaching the ground to a screw that screws directly onto the chassis, under the center arm rest.</p>
+    
+
+    <div class="figure-grid cols-2" style="--cols: 0.504fr 1.496fr; --row-h: 282px;">
+        <figure><img src="images/chassis-ground-photo.jpg" alt="Photo of the soldered ring terminal connected to the chassis ground screw." loading="lazy"><figcaption>Grounding to the chassis under the arm rest. A metal screw taps directly into chassis ground.</figcaption></figure><figure><img src="images/chassis-ground-diagram.jpg" alt="Diagram showing the ground connection point under the car's arm rest." loading="lazy"><figcaption>Zoomed inset showing a soldered ring terminal on the ground screw.</figcaption></figure>
+        
+    </div><h2>Installing It in the Car</h2>
+    <p>I put the board and wiring in a 3D-printed enclosure in the cabin. I gave it one opening for a micro/mini-USB cable, so the Arduino can be reprogrammed without disassembling anything, and a second opening for the wiring harness.</p>
+    <div class="figure-grid cols-2" style="--cols: 0.983fr 1.017fr; --row-h: 188px;">
+        <figure><img src="images/enclosure-usb-opening.jpg" alt="The enclosure's USB programming port opening." loading="lazy"><figcaption>USB opening for reprogramming.</figcaption></figure>
+        <figure><img src="images/enclosure-harness-opening.jpg" alt="The enclosure's wire harness opening." loading="lazy"><figcaption>The harness opening, on the other side.</figcaption></figure>
+    </div>
+    <div class="figure-grid cols-2" style="--cols: 0.954fr 1.046fr;">
+        <figure><img src="images/enclosure-cables.jpg" alt="Cables routed through the enclosure's harness opening." loading="lazy"><figcaption>Cables routed through the harness opening.</figcaption></figure>
+        <figure><img src="images/enclosure-buck-converter.jpg" alt="The buck converter mounted inside the 3D printed enclosure." loading="lazy"><figcaption>The buck converter, mounted inside the enclosure.</figcaption></figure>
+    </div>
+    <p>I ran the wiring under the dashboard, wrapped in harness covering. I used lever-nut connectors for joints that need higher current capacity and might need servicing later, JST connectors for signal lines, and crimp connectors anywhere the joint was meant to be permanent.</p>
+    <figure class="figure-narrow">
+        <img src="images/wiring-harness-lever-nuts.jpg" alt="Lever nut connectors used in the wiring harness under the dashboard." loading="lazy">
+        <figcaption>Lever-nut connectors on the higher-current, serviceable joints.</figcaption>
+    </figure>
+
+    <h2>Signal Conditioning and the Lookup Table</h2>
+    <p>Rather than use Arduino's built-in <code>map()</code> function on the raw potentiometer reading, I used a lookup table for three reasons:</p><ol>
+        <li>The knob only has a few discrete positions, so a continuous mapping isn't needed.</li>
+        <li>The potentiometer I had was noisy, and the reading drifted enough to make the servo jitter. The table's fixed bins absorb that drift (software hysteresis would also work).</li>
+        <li>The potentiometer itself was non-linear, with the resistance changing slowly at the low end and quickly at the high end.</li>
+    </ol>
+    <p>I built a calibration table by sweeping the potentiometer through equal angular steps and recording the ADC value at each one. It maps those uneven raw values onto evenly spaced servo angles.</p>
+    <p>I added a hardware RC low-pass filter between the potentiometer output and the ADC input to further cut noise from resistance variation. I wanted the filter to settle in under 100 ms. A filter needs roughly 5 time constants (5×R×C) to fully settle, and the maximum Thevenin-equivalent resistance the filter capacitor ever sees is about 2.5&nbsp;kΩ (5&nbsp;kΩ in parallel with 5&nbsp;kΩ, at the midpoint of the 10&nbsp;kΩ potentiometer). The true worst case for a non-linear pot may not fall exactly at the midpoint, but this gives an upper limit on the capacitor of about 8&nbsp;µF:</p>
+    <p style="text-align:center; font-style:italic; color:#555;">5 × 2.5kΩ × C &lt; 100&nbsp;ms &nbsp;⇒&nbsp; C &lt; 8&nbsp;µF</p>
+    <figure class="figure-wide">
+        <img src="images/rc-filter-note.jpg" alt="Circuit diagram and Thevenin-equivalent derivation for the potentiometer's RC low-pass filter." loading="lazy">
+        <figcaption>The filter's Thevenin equivalent, used to bound the worst-case source resistance R<sub>Tot</sub> seen by the filter capacitor.</figcaption>
+    </figure>
+    <p>I chose a 4.7 µF capacitor, giving a low-pass cutoff of roughly <span class="frac"><span>1</span><span>2πR<sub>max</sub>C</span></span> ≈ 13.5&nbsp;Hz.</p>
+    <p>Here's the calibrated lookup-table firmware for the basic servo-only version. It averages ten ADC samples per reading, then maps the result through the calibration bins:</p>
+    <pre><code>// As explained in the text/video, I have used two microcontroller boards here for two separate builds, one an Arduino Nano, and the second, an ESP8266 NodeMCU.
+// To run code on an Arduino Nano:
+//   1. Use plain pin numbers for digital pins. The Nano has no "D7" name, so write
+//      #define servo_signal_pin 7 (or whichever pin the servo is on).
+// However, A0 doesn't have to be changed.
+//   2. Change Serial.begin(74880) to Serial.begin(9600) and set the Serial Monitor to match.
+//      (74880 is the ESP8266's boot baud rate, so its startup messages stay readable.)
+//   3. Redo the calibration (lookup table). Both ADCs read 0-1023, but the Nano has a full scale voltage 0-5 V and the NodeMCU only has 0-3.3 V, so the bin edges in ac_pot_trig_vals will shift.
+
+#include &lt;Arduino.h&gt;
+#include &lt;Servo.h&gt;
+
+#define servo_signal_pin D7  // The pin that sends the PWM signals to the servo.
+#define pot_input_pin A0     // The pin that reads the potentiometer output voltage - Must be an ADC linkable pin.
+
+int current_pot_val;  // Stores the last received potentiometer value
+
+// Below we implement a lookup-table type logic to 1) reduce effects of noise causing servo jitter, 2) workaround the non-linearity in my potentiometer.
+// Note: If your potentiometer is a linear one, the following manual mapping would become equal spaced.
+const int num_ac_steps = 11;  // The number of virtual detents/levels of temperatures
+int ac_pot_trig_vals[num_ac_steps + 1] = {1024, 930, 910, 890, 870, 850, 760, 670, 580, 490, 450, 0};  // AC detent bin edges for the potentiometer values.
+int ac_servo_angle_vals[num_ac_steps] = {0, 18, 36, 54, 72, 90, 108, 126, 144, 162, 180};  // Corresponding servo angles
+int ac_servo_step_delay_ms = 50;  // Low delay = quick response but louder servo noise.
+int ac_servo_angle = 0;
+Servo acServoObj;
+
+// Poll, average, and extract the potentiometer reading.
+int getACKnobPotValue(){
+  int num_reps = 10;
+  current_pot_val = 0;
+  for (int i=0; i&lt;num_reps; i++){
+    current_pot_val += analogRead(pot_input_pin);
+    delayMicroseconds(10);
+  }
+  current_pot_val /= num_reps;
+  return current_pot_val;
+}
+
+// Walk the lookup table to find which bin the potentiometer value lands in.
+int getServoAngleBasedOnPotVal(){
+  current_pot_val = getACKnobPotValue();
+  for (int i=0; i&lt;num_ac_steps; i++){
+    if ((current_pot_val&lt;ac_pot_trig_vals[i]) &amp;&amp; (current_pot_val &gt;= ac_pot_trig_vals[i+1])){
+      ac_servo_angle = ac_servo_angle_vals[i];
+      break;
+    }
+  }
+  return ac_servo_angle;
+}
+
+// Poll the potentiometer, get the target angle, and step the servo to it.
+void updateServoPosition() {
+  int current_ac_servo_angle = ac_servo_angle;
+  int target_ac_servo_angle = getServoAngleBasedOnPotVal();
+
+  if (current_ac_servo_angle &lt; target_ac_servo_angle) {
+    for (int pos = current_ac_servo_angle; pos &lt;= target_ac_servo_angle; pos++) {
+      acServoObj.write(pos);
+      delay(ac_servo_step_delay_ms);
+    }
+  } else {
+    for (int pos = current_ac_servo_angle; pos &gt;= target_ac_servo_angle; pos--) {
+      acServoObj.write(pos);
+      delay(ac_servo_step_delay_ms);
+    }
+  }
+  Serial.print("Current pot val: ");
+  Serial.print(current_pot_val);
+  Serial.print(", Current ac servo angle: ");
+  Serial.println(ac_servo_angle);
+}
+
+void setup() {
+  Serial.begin(74880);
+  acServoObj.attach(servo_signal_pin);
+  pinMode(pot_input_pin, INPUT);
+}
+
+void loop() {
+  updateServoPosition();
+  delay(100);
+}</code></pre>
+
+    <h2>Automating the Knob Itself</h2>
+    <p>The long-term plan is a temperature sensor and PID loop that set the blend door automatically, i.e., automatic climate control. But then the dashboard knob would stop matching what the system is actually doing, since it is not being physically turned.</p>
+    <p>So I made the knob turn itself, using a motorized potentiometer salvaged from a broken Sony radio.</p>
+    <div class="figure-grid cols-2" style="--cols: 1.096fr 0.904fr; --row-h: 231px;">
+        <figure><img src="images/motorized-pot-top.jpg" alt="The salvaged motorized rotary potentiometer, top view." loading="lazy"><figcaption>The salvaged motorized potentiometer, top view.</figcaption></figure>
+        <figure><img src="images/motorized-pot-bottom.jpg" alt="The salvaged motorized rotary potentiometer, bottom view." loading="lazy"><figcaption>Bottom view.</figcaption></figure>
+    </div>
+    <p>This part did need cutting and drilling into the dashboard-side actuator body, the one part of this build that wasn't fully reversible.</p>
+    <div class="figure-grid cols-3" style="--cols: 0.963fr 0.894fr 1.143fr;">
+        <figure><img src="images/motorized-pot-installed-top.jpg" alt="The motorized potentiometer installed on the AC actuator, top view." loading="lazy"><figcaption>Motorized potentiometer installed on the AC dashboard actuator, top view.</figcaption></figure>
+        <figure><img src="images/motorized-pot-installed-bottom.jpg" alt="The motorized potentiometer installed on the AC actuator, bottom view." loading="lazy"><figcaption>Bottom view.</figcaption></figure><figure>
+        <img src="images/motorized-pot-shaft-seal.jpg" alt="Front view showing the motorized potentiometer's shaft sealing against the actuator body." loading="lazy">
+        <figcaption>The potentiometer shaft sealing against the dashboard actuator body (front view).</figcaption>
+    </figure>
+    </div>
+    
+    <p>With the motorized potentiometer in place, the knob can now be driven to any position on command. I wrote the firmware to accept single-character serial commands and dispatch them to the matching function. Sending <code>H</code>, for instance, calls <code>heatCar()</code>. A DRV8833CPWR (dual H-bridge, 3–10 V, 1.5 A) drives the knob motor, which is plenty for its current draw. I built a different custom PCB to house the driver alongside an ESP8266 NodeMCU:</p>
+    <div class="figure-grid cols-2" style="--cols: 0.679fr 1.321fr;">
+        <figure><img src="images/drv8833-module.jpg" alt="The DRV8833 motor driver module used to drive the motorized knob." loading="lazy"><figcaption>The DRV8833CPWR dual H-bridge driver.</figcaption></figure>
+        <figure><img src="images/pcb2-installed.jpg" alt="The second custom PCB with the ESP8266 NodeMCU and DRV8833 installed." loading="lazy"><figcaption>The second custom board, with extended functionality: NodeMCU (ESP8266) plus DRV8833.</figcaption></figure>
+    </div>
+    <figure class="figure-wide">
+        <img src="images/wiring-motorized-knob.jpg" alt="Wiring diagram for the full system including the DRV8833 motor driver and motorized potentiometer." loading="lazy">
+        <figcaption>Wiring diagram for the full system with the motorized knob.</figcaption>
+    </figure>
+    
+    <p>For this version, I kept the same calibrated lookup-table servo control as before and added open-loop motor control for the knob itself. It drives the knob toward a target extreme while polling the potentiometer to know when to stop, with a timeout in case the motor stalls against something:</p>
+    <pre><code>// As explained in the text/video, I have used two microcontroller boards here for two separate builds, one an Arduino Nano, and the second, an ESP8266 NodeMCU. This sketch doesn't use Wi-Fi, so it runs on either.
+// To run code on an Arduino Nano:
+//   1. Use plain pin numbers for digital pins. The Nano has no "D5"/"D7" names, so the servo and the
+//      DRV8833's IN1, IN2 and enable pins (D7, D5, D2, D6) become 7, 5, 2, 6 (or whichever pins you wire).
+// However, A0 doesn't have to be changed.
+//   2. Change Serial.begin(74880) to Serial.begin(9600) and set the Serial Monitor to match.
+//      (74880 is the ESP8266's boot baud rate, so its startup messages stay readable.)
+//   3. Redo the calibration (lookup table). Both ADCs read 0-1023, but the Nano has a full scale voltage 0-5 V and the NodeMCU only has 0-3.3 V, so the bin edges in ac_pot_trig_vals and the knob end-stops (ac_pot_max_heat_val, ac_pot_max_cold_val) will shift.
+
+// The following three pins control the direction/activation of the motor driver for the motorized knob
+#define control_knob_motor_driver_in_1_pin D5
+#define control_knob_motor_driver_in_2_pin D2
+#define control_knob_motor_driver_enable_pin D6
+
+long ac_control_knob_turn_timeout_ms = 15000;  // In case the motor can't reach the target (blockage, etc.)
+int ac_pot_max_heat_val = 350;
+int ac_pot_max_cold_val = 950;
+
+// Compares a character received via serial against presets to trigger heating or cooling.
+void handleSerialInputForACKnobControlSystem(char c){
+    if (c == 'H') { Serial.println("Heating Car"); heatCar(); }
+    else if (c == 'C') { Serial.println("Cooling Car"); coolCar(); }
+}
+
+// Turns the motorized knob toward max heat, open loop, until the potentiometer confirms arrival (or timeout).
+void heatCar(){
+  enableACKnobMotorDriver();
+  turnACKnobMotorClockwise();
+  long start_time = millis();
+  while ((current_pot_val &gt; ac_pot_max_heat_val) &amp;&amp; ((millis() - start_time) &lt; ac_control_knob_turn_timeout_ms)){
+    current_pot_val = getACKnobPotValue();
+    delay(1);
+  }
+  stopACKnobMotor();
+  disableACKnobMotorDriver();
+  if (current_pot_val &gt; ac_pot_max_heat_val) {
+    Serial.println("WARNING: heatCar() timed out before reaching target position.");
+  }
+}
+
+// Mirror of heatCar() toward max cool.
+void coolCar(){
+  enableACKnobMotorDriver();
+  turnACKnobMotorCounterClockwise();
+  long start_time = millis();
+  while ((current_pot_val &lt; ac_pot_max_cold_val) &amp;&amp; ((millis() - start_time) &lt; ac_control_knob_turn_timeout_ms)){
+    current_pot_val = getACKnobPotValue();
+    delay(1);
+  }
+  stopACKnobMotor();
+  disableACKnobMotorDriver();
+  if (current_pot_val &lt; ac_pot_max_cold_val) {
+    Serial.println("WARNING: coolCar() timed out before reaching target position.");
+  }
+}
+
+void turnACKnobMotorClockwise() {
+  digitalWrite(control_knob_motor_driver_in_1_pin, LOW);
+  digitalWrite(control_knob_motor_driver_in_2_pin, HIGH);
+}
+void turnACKnobMotorCounterClockwise() {
+  digitalWrite(control_knob_motor_driver_in_1_pin, HIGH);
+  digitalWrite(control_knob_motor_driver_in_2_pin, LOW);
+}
+void stopACKnobMotor(){
+  digitalWrite(control_knob_motor_driver_in_1_pin, HIGH);
+  digitalWrite(control_knob_motor_driver_in_2_pin, HIGH);
+}
+void disableACKnobMotorDriver(){ digitalWrite(control_knob_motor_driver_enable_pin, LOW); }
+void enableACKnobMotorDriver(){ digitalWrite(control_knob_motor_driver_enable_pin, HIGH); }
+
+void loop() {
+  if (Serial.available() &gt; 0) {
+    char c = Serial.read();
+    Serial.print("Received Serial Code ");
+    Serial.println(c);
+    handleSerialInputForACKnobControlSystem(c);
+    handleSerialInputForACServo(c);
+  }
+  updateServoPosition();  // Poll the (now motorized) potentiometer and keep the servo in sync with it.
+  delay(100);
+}</code></pre>
+    <p>The full sketch (linked below) also exposes a manual <code>S</code> serial command that forces an immediate servo re-sync, on top of the automatic polling in <code>loop()</code>.</p>
+
+    <h2>Firmware Downloads</h2>
+    <div class="quick-facts downloads-box">
+        <h4>Firmware</h4>
+        <p style="margin-top:0;">The download links to the two Arduino sketches.</p>
+        <a class="btn" href="code/servo-with-pot-calibration.ino" download="">⇩ Calibrated Servo-Only Firmware (.ino)</a>
+        <a class="btn" href="code/full-motorized-knob.ino" download="">⇩ Full Firmware incl. Motorized Knob (.ino)</a>
+    </div>
+
+    <h2>What's Next</h2>
+    <p>The servo loop, the reinforced shaft and the motorized knob are all in the car and working. What's left is a cabin temperature sensor and a PID loop so it holds a set temperature by itself. The ESP8266 is already there to put the setpoint on Wi-Fi.</p>
+    <p>I have since put that same control board to a second use: its ESP8266 now also drives the car's remote start, locks and trunk by voice. See <a href="../voice-activated-car-control/voice-activated-car-control.html">“Alexa, Start My Car”: Voice-Controlled Remote Start on a 2003 Mitsubishi Lancer</a>.</p>
+
+</div>
+
+<script src="../assets/three.min.js"></script>
+<script src="js/3d-models.js"></script>
+
+
+<script src="../assets/zoom.js"></script>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

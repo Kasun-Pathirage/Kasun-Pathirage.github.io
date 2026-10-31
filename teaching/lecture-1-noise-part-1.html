@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 1: Noise Part 1: Introduction | Kasun Pathirage</title>
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #e60000;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 2rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .course-meta {
+            font-size: 0.95rem;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 2rem 0;
+        }
+        .lecture-card {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .lecture-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            color: var(--primary);
+            line-height: 1.35;
+        }
+        .lecture-topics {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.25rem;
+        }
+        .lecture-card h4 {
+            font-size: 1.02rem;
+            color: var(--primary);
+            margin: 1.5rem 0 0.5rem 0;
+        }
+        .lecture-card h4:first-of-type {
+            margin-top: 0.5rem;
+        }
+        .lecture-card p, .lecture-card li {
+            font-size: 0.95rem;
+        }
+        .lecture-card ul {
+            padding-left: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        .lecture-card li {
+            margin-bottom: 0.35rem;
+        }
+        .formula-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0;
+            font-family: Cambria, "Times New Roman", serif;
+            font-size: 1rem;
+            color: #222;
+        }
+        .formula-box .label {
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 0.2rem;
+        }
+        .worked-example {
+            background: #fbfbfb;
+            border-left: 3px solid var(--secondary);
+            padding: 0.9rem 1.1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .worked-example p { margin: 0.4rem 0; }
+        .callout {
+            background: #fff8e6;
+            border: 1px solid #f0e0b0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #5a4a1a;
+        }
+        .diagram-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem 0.75rem 0.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .diagram-box svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            min-width: 560px;
+        }
+        .diagram-caption {
+            font-size: 0.78rem;
+            color: #888;
+            text-align: center;
+            margin: 0.5rem 0 0.25rem;
+        }
+        .media-box {
+            background: #eee;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            margin: 1rem 0;
+            color: #888;
+            font-size: 0.95rem;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: #fff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: normal;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn:hover {
+            background-color: var(--secondary);
+            color: #fff;
+            text-decoration: none;
+        }
+        .btn.disabled {
+            background-color: #ccc;
+            cursor: default;
+            pointer-events: none;
+        }
+    
+        .lead { font-size: 1.02rem; color: #333; }
+        .page-nav { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem 1rem; margin-bottom:1.5rem; }
+        .page-nav .back-link { margin-bottom:0; }
+        .chips { display:flex; flex-wrap:wrap; gap:.4rem .5rem; margin:.25rem 0 1.25rem; }
+        .chip { font-size:.78rem; background:#f1f1f5; color:#444; border-radius:12px; padding:.2rem .65rem; }
+        .toc { background:#fafafa; border:1px solid #e5e5e5; border-radius:6px; padding:.85rem 1.25rem; margin:1.25rem 0 .5rem; font-size:.92rem; }
+        .toc ol { margin:.45rem 0 0; padding-left:1.25rem; columns:2; column-gap:2rem; }
+        .toc li { margin-bottom:.2rem; break-inside:avoid; }
+        .toc a { color:#333; text-decoration:none; } .toc a:hover { color:var(--secondary); text-decoration:underline; }
+        .lecture-page h2 { font-size:1.3rem; margin:2.25rem 0 .6rem; padding-top:.5rem; border-top:1px solid #e8e8e8; color:var(--primary); scroll-margin-top:1rem; }
+        .lecture-page h3 { font-size:1.05rem; margin:1.5rem 0 .4rem; color:var(--primary); }
+        .lecture-page p, .lecture-page li { font-size:.97rem; line-height:1.6; }
+        .lecture-page ul, .lecture-page ol { padding-left:1.3rem; }
+        .lecture-page li { margin-bottom:.4rem; }
+        .formula-box { overflow-x:auto; line-height:1.75; }
+        .worked-example, .callout { font-size:.95rem; }
+        .small { font-size:.82rem !important; color:#777; }
+        table.cmp { width:100%; border-collapse:collapse; font-size:.86rem; margin:1rem 0; display:block; overflow-x:auto; }
+        table.cmp th, table.cmp td { border:1px solid #e0e0e0; padding:.45rem .65rem; text-align:left; vertical-align:top; line-height:1.45; }
+        table.cmp th { background:#f4f4f6; font-weight:600; }
+        table.cmp td.hl { background:#fff0f0; font-weight:600; color:#a00000; }
+        .diagram-box { padding:1rem .75rem .5rem; }
+        .diagram-box svg { min-width:560px; }
+        .download-bar { display:flex; flex-wrap:wrap; gap:.6rem; align-items:center; margin:1.25rem 0 0; }
+        .btn.alt { background:#fff; color:var(--primary); border:1px solid #bbb; }
+        .btn.alt:hover { background:var(--secondary); color:#fff; border-color:var(--secondary); }
+        .lecture-nav { display:flex; justify-content:space-between; gap:1rem; margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid #ddd; flex-wrap:wrap; }
+        .lecture-nav a { color:var(--secondary); text-decoration:none; font-weight:600; font-size:.92rem; max-width:48%; }
+        .lecture-nav a:hover { text-decoration:underline; }
+        .lecture-nav .next { margin-left:auto; text-align:right; }
+        .series-label { font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:#888; font-weight:600; margin:2rem 0 .75rem; }
+        .lecture-row .num { display:inline-block; min-width:2rem; color:var(--secondary); font-weight:700; }
+        .lecture-row .btn-row { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.75rem; }
+        @media (max-width:640px){ .container{margin:1rem;padding:1.25rem;} .toc ol{columns:1;} .lecture-nav a{max-width:100%;} }
+    
+        /* stacked fractions and radicals for equations */
+        .frac { display:inline-flex; flex-direction:column; align-items:stretch; vertical-align:middle; margin:0 .18em; text-align:center; line-height:1.25; }
+        .frac > .num { padding:0 .3em .1em; border-bottom:1.4px solid currentColor; }
+        .frac > .den { padding:.1em .3em 0; }
+        sup .frac, sub .frac { font-size:1em; }
+        .rad { display:inline-block; position:relative; padding-left:.72em; white-space:nowrap; }
+        .rad > .rs { position:absolute; left:0; top:0; width:.72em; height:100%; overflow:visible; }
+        .rad > .rb { display:inline-block; border-top:1.4px solid currentColor; padding:0 .15em; line-height:1.3; }
+        .rad.tall { vertical-align:middle; }
+        .rad.tall > .rb { display:block; padding-top:.15em; }
+        .par { font-size:1.7em; font-weight:200; line-height:0; vertical-align:-.1em; }
+        .formula-box .frac, .worked-example .frac { font-size:1.02em; }
+    </style>
+
+</head>
+<body>
+    <div class="container ">
+        <div class="page-nav"><a href="teaching.html" class="back-link">&larr; All lectures</a><a href="../index.html" class="back-link">Portfolio &rarr;</a></div>
+        <div class="series-label">BM3110 Electronic Instrumentation &middot; Lecture 1 of 7</div>
+        <h1>Noise and Interference in Instrumentation, Part 1: Introduction</h1>
+        <div class="course-meta">University of Moratuwa &middot; Dept. of Biomedical Engineering &middot; Semester 5 &middot; Fall 2026 &middot; 42 slides</div>
+        <div class="chips"><span class="chip">where noise comes from</span><span class="chip">modelling noisy devices (1-port &amp; 2-port)</span><span class="chip">RMS, mean &amp; power spectral density</span><span class="chip">when noise powers add</span><span class="chip">noise through a frequency-dependent system</span><span class="chip">noise figure</span></div>
+        <div class="download-bar"><a href="noise-in-instrumentation-part-1.pdf" class="btn">Download slides (PDF) &darr;</a></div>
+        <hr>
+        <div class="lecture-page">
+
+            <p>This first lecture covers the basics that Part 2 builds on: how to represent noise sources in a circuit, how to quantify them, when they can simply be added together, how they pass through a frequency-dependent system, and how to compare a system's own noise against a standard reference.</p>
+
+            <h2>1. Where noise comes from</h2>
+            <ul>
+                <li><strong>Inherent (transmitted) noise:</strong> noise that is already present in the physical quantity the sensor measures, before the signal reaches the instrument.</li>
+                <li><strong>Intrinsic noise:</strong> noise generated inside the instrument itself. Every practical component adds noise to the signal it carries (e.g. thermal noise in a resistor, shot noise in a diode).</li>
+                <li><strong>Interference:</strong> noise coupled in from external sources that have no connection to the signal of interest (e.g. powerline hum, solar flares, lightning). It is separate from intrinsic noise, although how much of it couples in depends on the system's design.</li>
+            </ul>
+            <p>Modeling noise this way, instead of treating it as one unstructured nuisance, makes design optimization possible: better source/load matching, component choice, filtering and bandwidth decisions, and a realistic uncertainty floor for measurements.</p>
+
+            <h2>2. Modeling a noisy device</h2>
+            <p>For a simple two-terminal (1-port) device, such as a resistor, a non-ideal capacitor or inductor, a diode or a battery, the noise it generates can be modeled with a <strong>single</strong> source added to an otherwise ideal, noiseless version of the device:</p>
+
+            <div class="diagram-box">
+                <svg viewBox="0 0 700 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flow diagram: a real device that generates noise is modelled as either an ideal noiseless device in series with a voltage noise source, or an ideal noiseless device in parallel with a current noise source.">
+                    <g fill="none" stroke="#8a99a3" stroke-width="1.5">
+                        <line x1="350" y1="60" x2="350" y2="90"/>
+                        <line x1="150" y1="90" x2="550" y2="90"/>
+                        <line x1="150" y1="90" x2="150" y2="125"/>
+                        <line x1="550" y1="90" x2="550" y2="125"/>
+                    </g>
+                    <rect x="175" y="10" width="350" height="50" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+                    <g font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" text-anchor="middle">
+                        <text x="350" y="30" font-size="13.5" font-weight="600" fill="#1a1a1a">Real device that generates noise</text>
+                        <text x="350" y="47" font-size="10.5" fill="#555">(e.g. resistor, diode, non&#8209;ideal capacitor)</text>
+
+                        <text x="350" y="112" font-size="11" font-style="italic" fill="#888">Modelled as (OR)</text>
+
+                        <rect x="20" y="125" width="260" height="58" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+                        <text x="150" y="149" font-size="12.5" font-weight="600" fill="#1a1a1a">Ideal noiseless device</text>
+                        <text x="150" y="167" font-size="12.5" fill="#1a1a1a">in series with v&#8345;(t)</text>
+
+                        <rect x="420" y="125" width="260" height="58" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+                        <text x="550" y="149" font-size="12.5" font-weight="600" fill="#1a1a1a">Ideal noiseless device</text>
+                        <text x="550" y="167" font-size="12.5" fill="#1a1a1a">in parallel with i&#8345;(t)</text>
+                    </g>
+                </svg>
+                <div class="diagram-caption">Fig. 1: A noisy 1-port device modelled as a Thevenin (series voltage) or Norton (parallel current) equivalent (redrawn from the lecture slides)</div>
+            </div>
+
+            <p>The two forms are equivalent (Thevenin &harr; Norton), but one is often more convenient depending
+            on the device: a series voltage source suits a resistor, while a diode's current-driven physics often
+            makes a current source the more natural choice.</p>
+
+            <h2>3. Multi-terminal devices: the input-referred noise model</h2>
+            <p>A 3- or 4-terminal (2-port) device, such as a transistor or an op-amp, can't be modeled with a single noise source. A BJT alone has separate noise contributions from its base, base&ndash;emitter junction and collector&ndash;emitter junction, and every device topology places them differently. Instead of tracking each source individually, all the noise sources inside the 2-port device are combined into one equivalent <strong>series voltage source and one parallel current source at the input</strong>. This is the <strong>input-referred noise model</strong>, and it lets noise calculations be done without knowing what is actually inside the device.</p>
+
+            <h2>4. Quantifying noise: RMS, mean, variance and PSD</h2>
+            <p>Noise voltage and current have zero mean by definition, so the quantity that matters is the noise <em>power</em>, found through the RMS value. Real systems only pass a limited band of frequencies, so noise power also needs a description per frequency: the <strong>power spectral density</strong> (PSD). The PSD is the average noise power measured through a very narrow bandpass filter centered at each frequency, normalized per Hz of bandwidth.</p>
+            <div class="formula-box">
+                <span class="label">Total noise power in a band [f<sub>L</sub>, f<sub>H</sub>]</span>
+                P<sub>total</sub> = &int;<sub>f<sub>L</sub></sub><sup>f<sub>H</sub></sup> S(f)&thinsp;df &emsp;|&emsp; flat (white) PSD: P = S&middot;(f<sub>H</sub>&minus;f<sub>L</sub>) = S&middot;B
+            </div>
+            <p>This is why Part 2's thermal-noise formulas multiply a flat PSD by a bandwidth &Delta;f to get a power: it is this integral, simplified for white noise.</p>
+
+            <h2>5. When can noise powers simply add?</h2>
+            <p>Not always. Writing the instantaneous power of two combined noise voltages across a resistance R and averaging over time gives a cross term in addition to the two individual power terms:</p>
+            <div class="formula-box">
+                <span class="label">Average combined noise power</span>
+                P<sub>AVG</sub> = P<sub>1,AVG</sub> + P<sub>2,AVG</sub> + <span class="frac"><span class="num">2</span><span class="den">T</span></span>&int;v<sub>1</sub>(t)v<sub>2</sub>(t)&thinsp;dt
+            </div>
+            <p>That cross term goes to zero, leaving the simple P<sub>AVG</sub>&nbsp;=&nbsp;P<sub>1,AVG</sub>+P<sub>2,AVG</sub> rule used throughout Part 2, only when the two sources are <strong>independent</strong> (their instantaneous product averages to zero over time). When the sources are correlated, the cross term remains and the simple sum underestimates the true noise power.</p>
+            <div class="callout"><strong>Real-world example:</strong> two amplifiers powered from the same noisy supply rail each pick up that rail's ripple noise. Their own intrinsic noise sources are independent of each other, but both outputs share the <em>same</em> ripple term (scaled by each amplifier's PSRR). That shared part is correlated, so it can't be summed as an independent power term the way each amplifier's intrinsic noise can.</div>
+
+            <h2>6. Noise through a frequency-dependent system</h2>
+            <p>A linear system with transfer function H(f) scales a noise PSD at its input by the squared
+            magnitude of the transfer function:</p>
+            <div class="formula-box">
+                <span class="label">Output PSD through a linear system</span>
+                S<sub>out</sub>(f) = |H(f)|<sup>2</sup>&middot;S<sub>in</sub>(f)
+            </div>
+            <div class="worked-example">
+                <p><strong>Worked example:</strong> thermal noise from a resistor R (white PSD S<sub>in</sub>)
+                filtered by its own RC low-pass network, |H(f)|&sup2; = <span class="frac"><span class="num">1</span><span class="den">1+(2&pi;fRC)&sup2;</span></span>.</p>
+                <p>P<sub>out,AVG</sub> = &int;<sub>0</sub><sup>&infin;</sup> <span class="frac"><span class="num">S<sub>in</sub></span><span class="den">1+(2&pi;fRC)&sup2;</span></span>&thinsp;df = S<sub>in</sub>&middot;<span class="frac"><span class="num">&pi;</span><span class="den">2RC</span></span></p>
+                <p>Rewriting in terms of the filter's actual &minus;3&nbsp;dB cutoff f<sub>&minus;3</sub>&nbsp;=&nbsp;<span class="frac"><span class="num">1</span><span class="den">2&pi;RC</span></span>:</p>
+                <p>P<sub>out,AVG</sub> = S<sub>in</sub> &times; <span class="frac"><span class="num">&pi;</span><span class="den">2</span></span>&middot;f<sub>&minus;3</sub></p>
+            </div>
+            <p>So a real (rounded-off) filter passes exactly as much noise power as an ideal "brick-wall" filter whose width, the <strong>effective noise bandwidth</strong>, is <em>&pi;/2</em> times the filter's own &minus;3&nbsp;dB cutoff frequency, not the cutoff frequency itself. Because of this equal-area argument, a filter's noise bandwidth is always somewhat wider than its 3&nbsp;dB bandwidth.</p>
+
+            <h2>7. Noise figure: comparing against a standard reference</h2>
+            <p>To judge how much noise a system itself adds, separately from any noise its input signal already carries, every source resistance is assigned a standardized reference noise, using a fixed reference temperature T<sub>0</sub>&nbsp;=&nbsp;290&nbsp;K (the maximum available thermal noise power a source resistance can deliver, by the maximum power transfer theorem):</p>
+            <div class="formula-box">
+                <span class="label">Standardized reference noise &amp; noise factor</span>
+                P<sub>N,ref</sub> = k<sub>B</sub>T<sub>0</sub>&Delta;f &emsp;|&emsp; F = 1 + <span class="frac"><span class="num">excess input&#8209;referred noise power</span><span class="den">k<sub>B</sub>T<sub>0</sub>&Delta;f</span></span>
+            </div>
+            <p>The noise factor F is independent of the input signal itself and depends only on the system's intrinsic noise characteristics, which makes it a fair way to compare the noise performance of two different systems. Expressed in decibels, NF&nbsp;=&nbsp;10log<sub>10</sub>(F).</p>
+
+            
+        </div>
+        <div class="download-bar"><a href="noise-in-instrumentation-part-1.pdf" class="btn">Download slides (PDF) &darr;</a><a href="teaching.html" class="btn alt">All lectures</a></div>
+        <div class="lecture-nav"><span></span><a class="next" href="lecture-2-noise-part-2.html">Lecture 2: Classification of Noise &rarr;</a></div>
+    </div>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+</body>
+</html>

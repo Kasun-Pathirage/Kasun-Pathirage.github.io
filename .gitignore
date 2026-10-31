@@ -1,0 +1,30 @@
+# ------------------------------------------------------------
+# Working files from editing the site (not part of the live site)
+# ------------------------------------------------------------
+_edit-backups/
+Claude outputs/
+assets/suggestions/
+
+# Unpacked copy of the Blinds SolidWorks source.
+# The page links to automated-blinds/cad/pulley-cad-v2-solidworks.zip instead.
+automated-blinds/cad/pulley-cad-v2-solidworks/
+
+# ------------------------------------------------------------
+# Google Drive, Windows and macOS clutter
+# ------------------------------------------------------------
+desktop.ini
+Thumbs.db
+ehthumbs.db
+.DS_Store
+._*
+~$*
+*.tmp
+.tmp.drivedownload/
+.tmp.driveupload/
+*.gdoc
+*.gsheet
+*.gslides
+
+# Editor / tool folders
+.vscode/
+.idea/

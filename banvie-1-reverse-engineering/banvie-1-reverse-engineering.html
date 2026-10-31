@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Reverse-engineered a BANVIE 1 aftermarket remote-start/keyless entry unit down to its two onboard microcontrollers, and decoded its key fob&#x27;s RF protocol bit-by-bit by analyzing oscilloscope data in Python.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Reverse-Engineering the Banvie 1 Remote Start &amp; Keyless Entry Unit | Kasun Pathirage">
+<meta property="og:description" content="Reverse-engineered a BANVIE 1 aftermarket remote-start/keyless entry unit down to its two onboard microcontrollers, and decoded its key fob&#x27;s RF protocol bit-by-bit by analyzing oscilloscope data in Python.">
+<meta property="og:site_name" content="Kasun Pathirage">
+<meta name="twitter:card" content="summary_large_image">
+<title>Reverse-Engineering the Banvie 1 Remote Start &amp; Keyless Entry Unit | Kasun Pathirage</title>
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f6f8;
+        color: #333;
+        line-height: 1.6;
+    }
+    .container {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    h1 { color: #1a1a1a; margin-top: 0; }
+    h2 {
+        color: #1a1a1a;
+        margin-top: 2.5rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid #eee;
+    }
+    h3 { color: #1a1a1a; margin-top: 1.8rem; }
+    .back-link { display: inline-block; margin-bottom: 2rem; color: #e60000; text-decoration: none; font-weight: bold; }
+    .back-link:hover { text-decoration: underline; }
+    .meta { color: #555; }
+    a { color: #e60000; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+    .table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+    th, td { border: 1px solid #ddd; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background-color: #1a1a1a; color: #fff; }
+    tr:nth-child(even) { background-color: #f8f8f8; }
+    figure { margin: 1.2rem 0; text-align: center; }
+    figure img { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); display: block; margin: 0 auto; }
+    figure.figure-wide img { max-width: 620px; }
+    figcaption { font-size: 0.85rem; color: #777; margin-top: 0.5rem; }
+    .figure-grid { display: grid; gap: 1rem; margin: 1.2rem 0; }
+    .figure-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .figure-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .figure-grid figure { margin: 0; }
+    @media (max-width: 640px) {
+        .figure-grid.cols-2, .figure-grid.cols-3 { grid-template-columns: 1fr; }
+    }
+    .quick-facts {
+        background: #fafafa;
+        border: 1px solid #eee;
+        border-left: 4px solid #e60000;
+        border-radius: 6px;
+        padding: 1.2rem 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .quick-facts h4 { margin: 0 0 0.6rem 0; color: #1a1a1a; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .quick-facts ul { margin: 0; padding-left: 1.2rem; }
+    .quick-facts li { margin-bottom: 0.35rem; }
+    .video-badge {
+        display: inline-block;
+        background: #1a1a1a;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        margin-bottom: 0.6rem;
+    }
+    .video-series-box a.video-thumb { display: block; position: relative; border-radius: 6px; overflow: hidden; }
+    .video-series-box a.video-thumb img { display: block; width: 100%; height: auto; transition: transform 0.2s ease; }
+    .video-series-box a.video-thumb:hover img { transform: scale(1.03); }
+    .video-series-box figcaption { font-size: 0.8rem; }
+    .video-series-box .playlist-link { margin: 1rem 0 0 0; font-weight: 600; }
+    pre {
+        background: #1a1a1a;
+        color: #e8e8e8;
+        padding: 1rem 1.2rem;
+        border-radius: 6px;
+        overflow: auto;
+        max-height: 340px;
+        font-size: 0.76rem;
+        line-height: 1.4;
+    }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+    p code, li code, td code { background: #eee; color: #a30000; padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.88em; }
+    .step-list { padding-left: 1.3rem; }
+    .step-list li { margin-bottom: 0.6rem; }
+    .obs-list { padding-left: 1.3rem; }
+    .obs-list li { margin-bottom: 0.7rem; }
+    .obs-list strong { color: #a30000; }
+</style>
+<style id="single-figure-size">
+    /* Standalone images: keep them from filling the whole screen so the text stays readable. Click to zoom. */
+    .container > figure img { max-width: min(100%, 560px); max-height: 400px; width: auto; }
+    .container > figure.figure-wide img { max-width: min(100%, 680px); max-height: 460px; }
+    .container > figure.figure-narrow img { max-width: min(100%, 380px); max-height: 360px; }
+</style>
+<style id="compact-tables">
+    /* Tables: size to their content instead of the full column, and cap long ones with a scroll + sticky header. */
+    .container .table-wrap { max-height: 460px; overflow: auto; border-radius: 6px; }
+    .container .table-wrap table { width: auto; max-width: 100%; margin: 0 auto; font-size: 0.85rem; }
+    .container .table-wrap th, .container .table-wrap td { padding: 0.32rem 0.6rem; }
+    .container .table-wrap th { position: sticky; top: 0; z-index: 1; }
+</style>
+<style id="img-sizing">
+    /* Image rows with custom column widths, set by dragging in edit mode. Phones still stack them. */
+    @media (min-width: 641px) {
+        .figure-grid[style*="--cols"] { grid-template-columns: var(--cols) !important; }
+        .figure-grid[style*="--cols"] > figure img, .figure-grid[style*="--cols"] > figure video { width: 100%; height: auto; max-height: none; }
+    }
+    /* Image rows with a height cap, set by dragging the handle under a row in edit mode. */
+    .figure-grid[style*="--row-h"] > figure img, .figure-grid[style*="--row-h"] > figure video { max-height: var(--row-h) !important; width: auto !important; max-width: 100%; }
+</style></head>
+<body>
+
+<div class="container">
+    <a href="../index.html" class="back-link">← Back to Portfolio</a>
+
+    <h1>Reverse-Engineering the Banvie 1 Remote Start &amp; Keyless Entry Unit</h1>
+    <p class="meta"><strong>Date:</strong> March 2026 &nbsp;|&nbsp; <strong>Tech:</strong> Holtek HT66F004 &amp; ChipOn C61F133D OEM Microcontrollers, MRF310R RF Receiver, ULN2003G Darlington Arrays, NodeMCU (ESP8266), Oscilloscope Reverse Engineering, Python Signal Analysis</p>
+
+    <hr style="border: 0; border-top: 1px solid #ddd; margin: 2rem 0;">
+
+    <div class="quick-facts video-series-box">
+        <h4>🎥 Watch the Build: 5-Part Video Series</h4>
+        <div class="figure-grid cols-3">
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/gaNq2AkMLPA" target="_blank" rel="noopener">
+                    <img src="https://img.youtube.com/vi/gaNq2AkMLPA/hqdefault.jpg" alt="Part 1 video thumbnail" loading="lazy">
+                </a>
+                <figcaption>Part 1: Overview</figcaption>
+            </figure>
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/tIhH5WFl9L8" target="_blank" rel="noopener">
+                    <img src="https://img.youtube.com/vi/tIhH5WFl9L8/hqdefault.jpg" alt="Part 2 video thumbnail" loading="lazy">
+                </a>
+                <figcaption>Part 2: Mapping Microcontroller Pins</figcaption>
+            </figure>
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/LDur6ppEie0" target="_blank" rel="noopener">
+                    <img src="https://img.youtube.com/vi/LDur6ppEie0/hqdefault.jpg" alt="Part 3 video thumbnail" loading="lazy">
+                </a>
+                <figcaption>Part 3: Remote Code Measurement</figcaption>
+            </figure>
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/9DcpjcyMR_o" target="_blank" rel="noopener">
+                    <img src="https://img.youtube.com/vi/9DcpjcyMR_o/hqdefault.jpg" alt="Part 4 video thumbnail" loading="lazy">
+                </a>
+                <figcaption>Part 4: Decoding the RF Protocol in Python</figcaption>
+            </figure>
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/Inx7_RVSyEI" target="_blank" rel="noopener">
+                    <img src="https://img.youtube.com/vi/Inx7_RVSyEI/hqdefault.jpg" alt="Part 5 video thumbnail" loading="lazy">
+                </a>
+                <figcaption>Part 5: Injecting Key Fob Codes via Arduino</figcaption>
+            </figure>
+        </div>
+        <p class="playlist-link"><a href="https://www.youtube.com/playlist?list=PLdhMo-92UOj0" target="_blank" rel="noopener">▶ Watch the full playlist on YouTube</a></p>
+    </div>
+
+    <h2>Overview</h2>
+    <p>I bought a <strong>BANVIE 1</strong> aftermarket remote-start and alarm kit, one of those $50 universal keyless-entry boxes meant to add remote start to almost any car. The plan was to wire it into my 2003 Mitsubishi Lancer and eventually control it by voice through Alexa. The kit ships with two key fobs, a push-to-start button, a shock sensor, a siren, and a control unit that already knows how to run a full arm/disarm and remote-start sequence, complete with theft detection on the brake pedal, the doors, and the ignition button.</p>
+    <figure class="figure">
+        <img src="images/image01.jpg" alt="The complete BANVIE 1 kit: siren, control module, harnesses, shock sensor, push-to-start button, and two remotes." loading="lazy">
+        <figcaption>The complete BANVIE 1 kit: siren, control module, harnesses, shock sensor, push-to-start button, and two remotes.</figcaption>
+    </figure>
+    <p>The question was how to get Alexa into the loop without breaking what the kit already does. I had <b>three options</b>:</p>
+    <ol class="step-list">
+        <li><strong>Reflash the onboard microcontrollers</strong> to add wireless control natively: Difficult without a datasheet or a way to dump the existing firmware, and easy to brick the only unit I had.</li>
+        <li><strong>Connect a Wi-Fi/BLE microcontroller</strong> (an ESP32 or ESP8266) wired directly to the relays and power transistors, driving them myself: Simple in principle, but it would mean re-implementing the arming sequence, theft detection, and start-up logic that the BANVIE box already handles.</li>
+        <li><strong>Embed a microcontroller inside a spare remote key</strong> to fake button presses electronically: workable, but it sacrifices one of only two remotes I own.</li>
+    </ol>
+    <p>I went with a fourth option: leave the BANVIE microcontrollers alone and <strong>make them think I pressed a button on the real remote</strong>. If I could decode the radio protocol between the remote and the control unit, a NodeMCU could generate the same signal and inject it on the wire the RF receiver already uses. No firmware changes to the BANVIE board at all.</p>
+    <p>That took a lot of multimeter, oscilloscope and continuity-testing time (also covered in the five-part video series).<br></p>
+
+    <div class="quick-facts">
+        <h4>Quick Facts</h4>
+        <ul>
+            <li>Two onboard microcontrollers: a <strong>Holtek HT66F004</strong> running security/arming logic, and a <strong>ChipOn C61F133D</strong> running the engine start/stop sequencer, each driving its own <strong>ULN2003G</strong> Darlington array.</li>
+            <li>RF reception handled by an <strong>MRF310R</strong>-family receiver IC feeding directly into the Holtek chip.</li>
+            <li>The remote uses a fixed (non-rolling) 24-bit code, on-off keyed with two pulse widths (effectively PWM).</li>
+            <li>A NodeMCU (ESP8266) reproduces that bitstream in software and injects it straight onto the receiver line, with no changes to the BANVIE firmware.</li></ul></div>
+
+    <h2>Inside the Control Unit</h2>
+    <p>Inside the control unit is a dense little board with two 8-bit microcontrollers, each handling half of the system. Each microcontroller has its own ULN2003G Darlington Array IC. Additionally, there is an RF receiver and decoder IC on the PCB. There are five electro-mechanical relays and four ZX520 power transistors handling the higher-current loads.</p>
+    <figure><img src="images/image02.jpg" alt="The PCB Overview: Five important ICs, Five electro-mechanical relays and four ZX520 power transistors." loading="lazy"><figcaption>The PCB Overview: Five important ICs, Five electro-mechanical relays and four ZX520 power transistors.</figcaption></figure>
+    <p>A small <strong>KIA 8A140</strong> linear regulator (similar to an AMS1117) drops the car's 12 V down to 5 V for both microcontrollers.</p>
+    <figure><img src="images/image11.jpg" alt="KIA 8A140 regulator, stepping 12 V down to the 5 V logic rail." loading="lazy"><figcaption>KIA 8A140 regulator, stepping 12&nbsp;V down to the 5&nbsp;V logic rail.</figcaption></figure>
+    
+    <h3>Holtek HT66F004: Security, Alarm, Mechanical Actuation</h3><figure><img src="images/image03.jpg" alt="The Holtek HT66F004 microcontroller (left) and its ULN2003G Darlington Array IC (right)." loading="lazy"><figcaption>The Holtek HT66F004 microcontroller (left) and its ULN2003G Darlington Array IC (right).</figcaption></figure><div>The first microcontroller is a <b>Holtek HT66F004 </b>and it runs the security/alarm system, and handles actuating the door locks, the trunk release, the turn-indicator lamps, and the horn. The microcontroller drives a ULN2003G Darlington Array, which in turn drives several electromechanical relays.</div><h3>ChipOn C61F133D: Push-to-Start Button, and Remote Start Sequence Handling</h3><figure><img src="images/image05.jpg" alt="The ChipOn C61F133D (left): the second onboard microcontroller, and its ULN2003G Darlington Array IC (right)." loading="lazy"><figcaption>The ChipOn C61F133D (left): the second onboard microcontroller, and its ULN2003G Darlington Array IC (right).</figcaption></figure><div>The second microcontroller is a <b>ChipOn C61F133D.</b>&nbsp;It initializes the engine start sequence in response to the push-to-start button presses or remote start request issued via the Holtek microcontroller. It stays powered whenever the system is armed, so it's built for low quiescent current. It has its own Darlington array which drives power transistors for the engine start sequence lines.</div><div><br></div><div>Basically, the Holtek decides whether the car is allowed to start and the ChipOn does the starting.</div>
+    
+    <h3>RF Receiver &amp; Supporting Peripherals</h3>
+    <p>I found the RF receiver by following the antenna trace into the board and checking the pinout against datasheets. It's an <strong>MRF310R</strong> (a generic part usually matched to the SYN470 family) and needs an external oscillator for timing.</p>
+    <figure><img src="images/image08.jpg" alt="MRF310R RF receiver IC." loading="lazy"><figcaption>MRF310R RF receiver IC.</figcaption></figure>
+
+    <h2>Step 1: Mapping the Pins on the ULN2003G with an Oscilloscope</h2>
+    <figure class="figure-wide"><img src="images/image12.jpg" alt="The wiring diagram from the Amazon listing. Useful as a start, but nowhere near a full pinout." loading="lazy"><figcaption>The wiring diagram from the Amazon listing. Useful as a start, but nowhere near a full pinout.</figcaption></figure><p>The wiring diagram from the Banvie product page on Amazon covers the high-level connector layout, but says nothing about which pin on the ULN2003G actually corresponds to which function. For this particular ULN2003G package, every pin except the bottom-left and bottom-right is part of an input/output Darlington pair, so the plan was to probe each pair while pressing keys on the remote and match the response to what I already knew the car should physically do.</p>
+    <figure class="figure"><img src="images/image13.jpg" alt="The pinout of ULN2003G from the datasheet." loading="lazy"><figcaption>The pinout of ULN2003G from the datasheet.</figcaption></figure>
+    <p>The remote key has 4 buttons, lock, trunk release, unlock, and mute keys.</p><figure><img src="images/image14.jpg" alt="The remote key." loading="lazy"><figcaption>The remote key.</figcaption></figure><p>Probing the ULN2003G pins while pressing different keys to figure out the pin mapping wasn't straightforward. This was because several relays fire together on a single key press. Knowing how the car's alarm, indicator lamps, and horn behaved in response to these different key presses helped a lot to infer the pin mappings on the ULN2003G connected to the Holtek microcontroller.</p>
+    <ul class="step-list">
+        <li><strong>Unlock:</strong> doors unlock, indicators blink twice, horn honks twice - three relays firing, two of which pulse in sync, twice.</li>
+        <li><strong>Lock:</strong> doors lock, indicators flash once, horn honks once - the same three relays, but each pulsing only once.</li>
+        <li><strong>Muted Lock/Unlock</strong> (Mute pressed first): identical behavior to the above, <em>except</em> the horn stays silent - which immediately isolates the horn relay from the indicator relay, since only the indicator output still pulses twice/once accordingly.</li>
+        <li><strong>Trunk release:</strong> its own dedicated key with no overlap with any other function, making it trivial to isolate.</li>
+    </ul>
+    <p>The activations on each pin as observed via an oscilloscope matched these expected behaviors.</p><figure><img src="images/image15.jpg" alt="Oscilloscope probe connected to pin 10 on the Holtek microcontroller (connected to pin 1 on the corresponding darlington array)." loading="lazy"><figcaption>Oscilloscope probe connected to pin 10 on the Holtek microcontroller (connected to pin 1 on the corresponding darlington array).</figcaption></figure>
+    <p>Probing pin 1 on the darlington array IC (connected to pin 10 on the Holtek microcontroller):</p>
+    <div class="figure-grid cols-2" style="--cols: 1.045fr 0.955fr;">
+        <figure><img src="images/image16.jpg" alt="Two pulses on pressing unlock key." loading="lazy"><figcaption>Two pulses on pressing <b>unlock </b>key.</figcaption></figure>
+        <figure><img src="images/image17.jpg" alt="Single pulse on the same pin on pressing lock key." loading="lazy"><figcaption>Single pulse on the same pin on pressing <b>lock </b>key.</figcaption></figure>
+    </div>
+    <p>On pressing unlock, the pin showed two pulses, and a single pulse on pressing lock.</p><p>A line that pulses on both lock and unlock has to be either the indicator or the horn. The muted test settled it: still one pulse on muted lock and two on muted unlock. Mute silences the horn, so this had to be the <strong>indicator lamp</strong> output.</p>
+    <div class="figure-grid cols-2" style="--cols: 1.012fr 0.988fr;">
+        
+        <figure><img src="images/image19.jpg" alt="Muted unlock: two pulses still present." loading="lazy"><figcaption>Muted <b>unlock</b>:&nbsp;two pulses still present.</figcaption></figure><figure><img src="images/image18.jpg" alt="Muted lock: single pulse still present, confirming the indicator output." loading="lazy"><figcaption>Muted <b>lock</b>: single pulse still present, confirming the indicator output.</figcaption></figure>
+    </div>
+    <p>Repeating this pin by pin (a single pulse on lock with nothing on unlock, and the reverse) identified the dedicated lock and unlock actuator lines directly:</p>
+    <div class="figure-grid cols-2" style="--cols: 0.99fr 1.01fr;">
+        <figure><img src="images/image20.jpg" alt="Single pulse on lock: this pin drives the lock actuator relay." loading="lazy"><figcaption>Single pulse on lock: this pin drives the <strong>lock actuator</strong> relay.</figcaption></figure>
+        <figure><img src="images/image21.jpg" alt="No response on unlock, confirming this line is lock-only." loading="lazy"><figcaption>No response on unlock, confirming this line is lock-only.</figcaption></figure>
+    </div>
+    <figure><img src="images/image22.jpg" alt="A separate pin pulsing on unlock but staying quiet on lock: the unlock actuator." loading="lazy"><figcaption>A separate pin pulsing on unlock but staying quiet on lock: the <strong>unlock actuator</strong>.</figcaption></figure>
+    <figure><img src="images/image23.jpg" alt="The final, fully marked-up ULN2003G pin-to-function mapping." loading="lazy"><figcaption>The final, fully marked-up ULN2003G pin-to-function mapping.</figcaption></figure><p>I did the same for the remaining pins (listen for the relay click, then confirm on the scope) and ended up with this map of the actuation Darlington array:</p>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Pin</th><th>Function (Relay Activation For)</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>Indicator lights</td></tr>
+                <tr><td>2</td><td>Lock</td></tr>
+                <tr><td>3</td><td>Lock</td></tr>
+                <tr><td>4</td><td>Unlock</td></tr>
+                <tr><td>5</td><td>Not connected</td></tr>
+                <tr><td>6</td><td>Trunk release</td></tr>
+                <tr><td>7</td><td>Horn / siren</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Step 2: Mapping the Holtek HT66F004 Microcontroller</h2>
+    <p>Next was the Holtek HT66F004, which handles the alarm and security state in addition to driving the previously pin-mapped ULN2003G. From the factory logic, theft should be flagged whenever the brake is pressed, a door is opened, or the push-to-start button is pressed <em>while the security system is armed.</em>&nbsp;Therefore, the brake pedal, push-to-start, and door-switch signals should all terminate at this chip. I started from a simplified version of the wiring diagram and its connector:</p>
+    <div class="figure-grid cols-2" style="--cols: 0.843fr 1.157fr;">
+        <figure><img src="images/image25.jpg" alt="Simplified wiring diagram for the signals feeding the security system." loading="lazy"><figcaption>Simplified wiring diagram for the signals feeding the security system.</figcaption></figure>
+        <figure><img src="images/image26.jpg" alt="The corresponding physical connector." loading="lazy"><figcaption>The corresponding physical connector.</figcaption></figure>
+    </div>
+    <p>Working from the expected voltage behavior of each signal (documented on the wiring diagram) and probing every pin around the two microcontrollers while manually toggling each input:</p>
+    <ul class="step-list">
+        <li><strong>Brake pedal</strong> expects +12&nbsp;V when pressed. I pulsed the brake line between 12 V and ground while watching every pin, and found <strong>pin 14</strong> going HIGH exactly when the brake was pressed.</li>
+        <li><strong>Door switch</strong> expects a pull to ground when a door opens. <strong>Pin 16</strong> went LOW exactly when I grounded the door line.</li>
+        <li><strong>Push-to-start button</strong>: pressing the physical button and watching for any pin change isolated <strong>pin 17</strong>, which went HIGH once for ACC and again for Ignition.</li>
+        <li><strong>Armed-status indicator</strong>: the system's blue LED blinks once armed, implying a dedicated status pin. <strong>Pin 18</strong> stayed LOW while disarmed, but went HIGH briefly and then into a square wave once the car was locked, revealing a clean match for the armed/disarmed indicator.</li>
+    </ul>
+    <figure class="figure"><img src="images/image27.jpg" alt="Summary of the mapped Holtek pin functions." loading="lazy"><figcaption>Summary of the mapped Holtek pin functions.</figcaption></figure>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Pin</th><th>Default State</th><th>Function</th></tr></thead>
+            <tbody>
+                <tr><td>2</td><td>LOW</td><td>Activation signal for the trunk release relay</td></tr>
+                <tr><td>8</td><td>LOW</td><td>Activation signal for the door unlock relay</td></tr>
+                <tr><td>9</td><td>LOW</td><td>Activation signal for the door lock relay</td></tr>
+                <tr><td>10</td><td>LOW</td><td>Activation signal for the indicator lights relay</td></tr>
+                <tr><td>14</td><td>LOW</td><td>Goes HIGH when the brake pedal input line goes to 12 V (brake pressed signal)</td></tr>
+                <tr><td>16</td><td>HIGH</td><td>Goes LOW when the side door switch sensor goes to GND (door open signal)</td></tr>
+                <tr><td>17</td><td>LOW</td><td>Goes HIGH when the push-to-start button is pressed once (ACC) or twice (Ignition)</td></tr>
+                <tr><td>18</td><td>LOW (when unlocked)</td><td>Alarm-armed signal: Stays LOW while unlocked (disarmed). Goes HIGH briefly, then square-waves, once locked (armed)</td></tr>
+                <tr><td>19</td><td>LOW</td><td>Activation signal for the horn/siren relay</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Step 3: Mapping the ChipOn C61F133D Microcontroller (Engine Start/Stop)</h2>
+    <p>My guess was that the start/stop logic lived on the ChipOn C61F133D and waited for a go-ahead from the Holtek chip. The push-to-start button was the easiest way to see how that sequencer behaved.</p>
+    <div class="figure-grid cols-2" style="--cols: 0.833fr 1.167fr;">
+        <figure><img src="images/image28.jpg" alt="Simplified wiring diagram of the push-to-start components." loading="lazy"><figcaption>Simplified wiring diagram of the push-to-start components.</figcaption></figure>
+        <figure><img src="images/image29.jpg" alt="Flowchart of the observed push-to-start behavior." loading="lazy"><figcaption>Flowchart of the observed push-to-start behavior.</figcaption></figure>
+    </div>
+    <p>I went through the startup sequence one step at a time and probed for pin changes at each stage:</p>
+    <ol class="obs-list">
+        <li><strong>Obs. 1:</strong> Every press of the push-to-start button momentarily pulsed <code>pin 13</code> HIGH, so this had to be the button's raw press-detection input.</li>
+        <li><strong>Obs. 2:</strong> Pressing once (no brake) enters ACC mode; <code>pin 10</code> went HIGH, identifying it as the ACC-line driver.</li>
+        <li><strong>Obs. 3:</strong> During ACC, the push-button's LED blinks; <code>pin 7</code> generated a matching square wave, identifying it as the LED driver (fed through an adjoining ULN2003G that inverts the signal, so the Darlington output is used as the LED's ground return).</li>
+        <li><strong>Obs. 4 &amp; 5:</strong> A second press enters Ignition mode; <code>pin 10</code> stayed HIGH while <code>pins 9</code> and <code>11</code> also went HIGH, so these had to drive the <code>ON1</code>/<code>ON2</code> ignition lines.</li>
+        <li><strong>Obs. 6:</strong> The LED continues its square-wave blink through Ignition mode as well.</li>
+        <li><strong>Obs. 7:</strong> Pressing the brake pedal before starting makes the LED go solid; correspondingly <code>pin 7</code> stopped square-waving and held solid HIGH for as long as the brake stayed pressed.</li>
+        <li><strong>Obs. 8:</strong> <code>Pin 4</code> goes and stays HIGH for as long as the brake is pressed, so this had to be the brake-pedal-press registration pin.</li>
+        <li><strong>Obs. 9:</strong> Pressing the push-to-start button with the brake held down runs the full startup sequence; <code>pin 8</code> pulsed HIGH momentarily, identifying the starter-motor trigger (routed through the adjoining ULN2003G's pin 7).</li>
+        <li><strong>Obs. 10:</strong> After the engine starts, <code>pin 10</code> (ACC) and <code>pin 9</code> stayed HIGH, as expected for a running engine.</li>
+    </ol>
+    <figure class="figure"><img src="images/image30.jpg" alt="The push-to-start button lit solid blue." loading="lazy"><figcaption>The push-to-start button lit solid blue.</figcaption></figure>
+
+    <h3>The Remote Engine Start Sequence</h3>
+    <p>The remote-start path adds a handful of additional steps and components on top of the manual push-to-start logic.</p>
+    <div class="figure-grid cols-2" style="--cols: 0.888fr 1.112fr;">
+        <figure><img src="images/image31.jpg" alt="Simplified wiring diagram for the remote-start path." loading="lazy"><figcaption>Simplified wiring diagram for the remote-start path.</figcaption></figure>
+        <figure><img src="images/image32.jpg" alt="The corresponding connectors." loading="lazy"><figcaption>The corresponding connectors.</figcaption></figure></div>
+    <p>The ignition sequence for an engine has several timed steps. Once the remote start command is received, the microcontroller must:</p>
+    <ol class="step-list" type="i" style="list-style-type: lower-roman;">
+        <li>Power the <code>ON1</code> and <code>ON2</code> ignition lines.</li>
+        <li>Power the starter motor while simultaneously pulling <code>ON2</code> to ground during cranking.</li>
+        <li>Check whether the engine actually started, by monitoring the oil pressure sensor.</li>
+        <li>Power the ACC line for accessories (ground → stable 12&nbsp;V).</li>
+        <li>Retry cranking if the oil pressure sensor doesn't confirm a start.</li>
+    </ol>
+    <figure class="figure"><img src="images/image33.jpg" alt="The engine ignition sequence timing diagram." loading="lazy"><figcaption>The engine ignition sequence timing diagram.</figcaption></figure><p>Remote start also has two extra conditions: the handbrake has to be engaged, and unlock has to be pressed three times quickly.</p>
+    <ol class="obs-list" start="11">
+        <li><strong>Obs. 11:</strong> Toggling the handbrake input between ground and 12&nbsp;V found <code>pin 3</code> on the ChipOn IC registering it. This pin was normally HIGH, but went LOW when the handbrake engaged.</li>
+        <li><strong>Obs. 12:</strong> Toggling the oil pressure sensor line found <code>pin 12</code> registering it, going HIGH once the engine was confirmed running.</li>
+        <li><strong>Obs. 13:</strong> Every time the remote's unlock button was pressed, <code>pin 5</code>&nbsp;which is normally HIGH, briefly pulled down to ground. Three such consecutive negative pulses were what actually triggered the remote-start sequence, strongly suggesting the ChipOn microcontroller is simply counting these pulses. I found no direct line running from the Holtek IC to this pin, so it's likely sampling the same output the door-unlock relay uses.</li>
+    </ol>
+    
+    <p>All of this consolidated into a complete pin map for the ChipOn microcontroller:</p>
+    <figure class="figure"><img src="images/image34.jpg" alt="Summary of the mapped ChipOn pin functions." loading="lazy"><figcaption>Summary of the mapped ChipOn pin functions.</figcaption></figure>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Pin</th><th>Default State</th><th>Function &amp; Behavior</th></tr></thead>
+            <tbody>
+                <tr><td>3</td><td>HIGH</td><td>Goes LOW when the handbrake input goes to GND (handbrake engaged)</td></tr>
+                <tr><td>4</td><td>LOW</td><td>Goes HIGH when the brake pedal is pressed</td></tr>
+                <tr><td>5</td><td>HIGH</td><td>Momentarily pulses to GND when the remote's unlock button is pressed. Three consecutive pulses begin the remote-start sequence.</td></tr>
+                <tr><td>7</td><td>LOW</td><td>Drives the push-to-start button's LEDs. Solid HIGH when the brake is pressed outside ACC/Ignition; square-waves (blinks the LED) while ACC or Ignition is active.</td></tr>
+                <tr><td>8</td><td>LOW</td><td>Briefly HIGH when the starter motor is activated (the starter trigger output)</td></tr>
+                <tr><td>9</td><td>LOW</td><td>Drives an ignition line (ON1/ON2); HIGH once Ignition is engaged; stays HIGH after the engine starts</td></tr>
+                <tr><td>10</td><td>LOW</td><td>Drives the ACC line; HIGH on ACC or Ignition; stays HIGH after the engine starts</td></tr>
+                <tr><td>11</td><td>LOW</td><td>Drives an ignition line (ON1/ON2); HIGH once Ignition is engaged</td></tr>
+                <tr><td>12</td><td>LOW</td><td>Goes HIGH when the oil pressure sensor input is HIGH (engine started)</td></tr>
+                <tr><td>13</td><td>LOW</td><td>Pulses HIGH on every physical press of the push-to-start button</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Hacking the Remote-Start Sequence</h2>
+    <p>With the important pins mapped, I tried triggering remote start electronically. To simulate the handbrake requirement, I manually grounded its input pin:</p>
+    <figure class="figure"><img src="images/image35.jpg" alt="Manually grounding the handbrake input to simulate it being engaged." loading="lazy"><figcaption>Manually grounding the handbrake input to simulate it being engaged.</figcaption></figure>
+    <p><strong>Failed Attempt:</strong> Since three consecutive negative pulses on ChipOn's pin 5 are what starts the remote sequence, I tried pulsing that pin manually. The engine cranked and started, then shut off right away because the security system tripped.</p>
+    <p>If I first pressed unlock once on the real remote and then pulsed pin 5 twice by hand, remote start worked. So the ChipOn microcontroller depends on the Holtek microcontroller having already disarmed the car, and there must be some link between the two tied to that disarm. However, upon inspection, I couldn't find any serial link between the two chips. The only signal the ChipOn gets from the Holtek side comes from a real unlock press, and only the remote can produce that. So I had to disarm the system the way the car expects it: decode and replay the RF signal the remote sends for unlock.</p>
+
+    <h2 id="cracking-the-key-fobs-rf-protocol">Cracking the Key Fob's RF Protocol</h2>
+    <p>The Holtek IC is the only chip connected to the RF front-end, so it must be receiving the modulated pulses directly. Some kind of pulse-width modulation seemed most likely. To check, I opened the remote and probed what it sends.</p>
+    <figure><img src="images/image37.jpg" alt="The remote's internal PCB with an 8-pin SOP encoder IC: HS1530." loading="lazy"><figcaption>The remote's internal PCB with an 8-pin SOP encoder IC: HS1530.</figcaption></figure>
+    <p>The remote has four push buttons, each wired to its own pin on an HS1530 encoder IC (with the buttons' other terminals common to the 3&nbsp;V coin-cell supply). A single diode bridges pins 5 and 6, pin 1 is 3&nbsp;V, pin 3 is ground, and a small RC network off pin 4 (through a component marked <code>B22</code> and a three-terminal part marked <code>R25</code>) forms what is almost certainly the timing network for the internal oscillator that clocks the encoder.</p>
+    <p>Probing the antenna trace directly with the oscilloscope showed the transmitted output: normally HIGH, pulled down in a distinct pattern whenever a button is pressed.</p>
+    <div class="figure-grid cols-2" style="--cols: 1.029fr 0.971fr;">
+        <figure><img src="images/image39.jpg" alt="Probing the antenna region of the remote directly (Bottom view)." loading="lazy"><figcaption>Probing the antenna region of the remote directly (Bottom view).</figcaption></figure>
+        <figure><img src="images/image40.jpg" alt="Probing the antenna region of the remote directly (Top view)." loading="lazy"><figcaption>Probing the antenna region of the remote directly (Top view).</figcaption></figure>
+    </div>
+    <p>Holding a button repeated the same pulse train with a fixed gap. Every repeat looked the same, so the codes were probably <strong>static rather than rolling</strong>, with no encryption or hopping to deal with.</p>
+    <div class="figure-grid cols-2" style="--cols: 0.967fr 1.033fr;">
+        <figure><img src="images/image41.jpg" alt="A pulse train in response to a key press." loading="lazy"><figcaption>A pulse train in response to a key press.</figcaption></figure><figure><img src="images/image42.jpg" alt="Comparing consecutive repeats for consistency." loading="lazy"><figcaption>Comparing consecutive repeats for consistency.</figcaption></figure>
+    </div>
+    <p>Zooming into a single pulse train to count pulses and measure their durations gave a first rough estimate: a short-pulse width of about <strong>0.46&nbsp;ms</strong> (≈2.17&nbsp;kHz), and a total train length around <strong>39.1&nbsp;ms</strong>.</p>
+    <figure><img src="images/image44.jpg" alt="Zoomed in on a single pulse train to measure individual pulse durations." loading="lazy"><figcaption>Zoomed in on a single pulse train to measure individual pulse durations.</figcaption></figure>
+    <p>Reading pulses off the scope screen is error-prone, and I couldn't tell yet whether a long pulse was a single wide bit or several narrow ones back to back. So I decided to export the raw waveforms and analyze them in Python.</p>
+
+    <h2>Tapping a Cleaner Signal at the Receiver</h2>
+    <p>The antenna only gave me the raw, noisy RF envelope. The receiver's decoded output should be much cleaner, and I traced it to <strong>pin 11 of the Holtek IC</strong>.</p>
+    <div class="figure-grid cols-2" style="--cols: 0.92fr 1.08fr;">
+        
+        <figure><img src="images/image46.jpg" alt="The RF receiver region on the PCB." loading="lazy"><figcaption>The RF receiver region on the PCB.</figcaption></figure><figure class="figure"><img src="images/image47-pin11.jpg" alt="RF IC talks only to pin 11 on the Holtek microcontroller." loading="lazy"><figcaption>RF IC talks only to pin 11 on the Holtek microcontroller.</figcaption></figure>
+    </div>
+    
+    <p>Instead of soldering to the tiny IC pin, I tapped the resistor at the start of that trace which was easier and safer than soldering to the IC pin.</p>
+    <div class="figure-grid cols-2" style="--cols: 1.046fr 0.954fr;">
+        <figure><img src="images/image48.jpg" alt="Location where the tap wire was soldered" loading="lazy"><figcaption>Location where the tap wire was soldered</figcaption></figure>
+        <figure><img src="images/image49.jpg" alt="After soldering the tap wire." loading="lazy"><figcaption>After soldering the tap wire.</figcaption></figure>
+    </div>
+    <p>I routed the tap wire to the outside of the enclosure, so I could close the case back up while still leaving the injection point accessible:</p>
+    <div class="figure-grid cols-2" style="--cols: 0.702fr 1.298fr;">
+        <figure><img src="images/image50.jpg" alt="Closed enclosure, injection wire accessible from outside (top view)." loading="lazy"><figcaption>Closed enclosure, injection wire accessible from outside (top view).</figcaption></figure>
+        <figure><img src="images/image51.jpg" alt="Closed enclosure, injection wire accessible from outside (side view)." loading="lazy"><figcaption>Closed enclosure, injection wire accessible from outside (side view).</figcaption></figure>
+    </div>
+    <p>The signal here was much cleaner than tapping onto the antenna of the key fob. The line was HIGH at idle, and pulled down to ground when a code arrived. I also observed occasional glitches where the line was pulled down to ground for short, random durations.</p>
+    <div class="figure-grid cols-2" style="--cols: 0.794fr 1.206fr;">
+        <figure><img src="images/image52.jpg" alt="A much cleaner capture at the new tap point." loading="lazy"><figcaption>A much cleaner capture at the new tap point.</figcaption></figure>
+        <figure><img src="images/image53.jpg" alt="An example noise glitch, unrelated to any button press." loading="lazy"><figcaption>An example noise glitch, unrelated to any button press.</figcaption></figure>
+    </div>
+
+    <h2>Decoding the Protocol in Python</h2>
+    <p>I wanted to know four things:</p><ol class="step-list">
+        <li>Whether the system uses rolling or fixed codes</li>
+        <li>The modulation scheme</li>
+        <li>The number of bits per code</li>
+        <li>The bit and train durations</li>
+    </ol><p>I set the scope trigger to <strong>Normal</strong> mode so it only updates on a real trigger, which let me freeze and save a waveform right after releasing a button. I captured each of the four functions (Lock, Unlock, Muted Lock, Trunk Release) three times, exported them to Excel, and pulled them into a pandas/NumPy/Matplotlib pipeline for analysis.</p>
+    <figure class="figure"><img src="images/image54.jpg" alt="Capturing the raw oscilloscope data: 3 repeats each for Lock, Trunk Release, Unlock, and Muted Lock." loading="lazy"><figcaption>Capturing the raw oscilloscope data: 3 repeats each for Lock, Trunk Release, Unlock, and Muted Lock.</figcaption></figure>
+    <p>The analysis pipeline, in outline:</p>
+    <ol class="step-list">
+        <li>Load the raw scope capture (20&nbsp;kHz sample rate, i.e. 50&nbsp;µs per sample) into a NumPy array, one column per captured trace.</li>
+        <li>Truncate each trace's leading partial pulse train (this is an artifact of pressing and holding the button before the scope actually triggered).</li>
+        <li>Detect edges via <code>np.diff()</code> against an amplitude threshold, discard anything narrower than 3 samples as noise, then align every trace to its first genuine pulse so all repetitions share a common time origin.</li>
+        <li>Overlay the three repeats of each function to check repeatability, then overlay all twelve traces together to compare timing across different buttons.</li>
+        <li>Re-run edge detection on the aligned traces to measure every pulse's width and the cycle period between consecutive pulses. This gives the raw bit-timing for each key fob code.</li>
+        <li>Histogram all pulse widths and cycle periods across every trace to reveal the small number of fixed durations the protocol is actually built from.</li>
+    </ol>
+    <p>The complete analysis script (<a href="code/rf_protocol_analysis.py" download="">⬇ Download rf_protocol_analysis.py</a>):</p>
+    <pre><code>import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+# Load Excel file and convert tp numpy
+df = pd.read_excel("key_fob_codes_no_headers.xls")
+
+data = df.to_numpy()
+
+# region Parameters and initial setup
+sampling_interval = 50e-6  # 50 microseconds
+min_true_pulse_width_n_samples = 3
+half_pulse_height = 60
+sync_start_index = [400, 400, 400] + [400, 400, 400] + [300, 300, 300] + [300, 300, 300]
+max_aligned_len = 1000
+n_reps_per_trace = 3
+n_trace_types = 4
+
+n_samples = data.shape[0]
+n_traces = data.shape[1]
+
+time_vec = np.arange(n_samples) * sampling_interval * 1e3  # In milliseconds
+
+# Assign names and colors to traces
+trace_names = ([f'Unlock: rep {i}' for i in range(n_reps_per_trace)] +
+               [f'Muted Lock: rep {i}' for i in range(n_reps_per_trace)] +
+               [f'Trunk Release: rep {i}' for i in range(n_reps_per_trace)] +
+               [f'Lock: rep {i}' for i in range(n_reps_per_trace)])
+trace_colors = ['r'] * n_reps_per_trace + ['g'] * n_reps_per_trace + ['b'] * n_reps_per_trace + ['m'] * n_reps_per_trace
+# endregion
+
+# region Plot raw data to see what they look like
+fig_raws, axs_raws = plt.subplots(n_traces, 1, sharex=True, constrained_layout=True, figsize=(20, 10))
+axs_raws[-1].set_xlabel('Time (ms)')
+for i, (trace, trace_name, trace_color, ax_aligned) in enumerate(zip(data.T, trace_names, trace_colors, axs_raws)):
+    ax_aligned.plot(time_vec, trace, color=trace_color)
+    ax_aligned.set_title(trace_name)
+# endregion
+
+# region Truncate off partial pulse train that precedes the main, complete pulse train)
+fig_truncated, axs_truncated = plt.subplots(n_traces, 1, sharex=True, constrained_layout=True, figsize=(20, 10))
+axs_truncated[-1].set_xlabel('Time (ms)')
+truncated_data = []
+for i, (trace, trace_name, trace_color, ax_truncated,  start_ind) in enumerate(zip(data.T, trace_names, trace_colors, axs_truncated, sync_start_index)):
+
+    truncated_trace = trace[start_ind:]
+    truncated_data.append(truncated_trace)
+    truncated_time_vec = np.arange(len(truncated_trace)) * sampling_interval * 1e3  # In ms
+
+    ax_truncated.plot(truncated_time_vec, truncated_trace, color=trace_color)
+    ax_truncated.set_title(trace_name)
+# endregion
+
+# region Find the start index of the first positive edge (that is not noise) of the truncated traces and align all
+#   traces at this sample.
+fig_aligned, axs_aligned = plt.subplots(n_traces, 1, sharex=True, constrained_layout=True, figsize=(20, 10))
+axs_aligned[-1].set_xlabel('Time (ms)')
+aligned_traces = []
+for i, (trace_name, trace_color, ax_aligned, truncated_trace) in enumerate(zip(trace_names, trace_colors, axs_aligned, truncated_data)):
+
+    positive_pulse_start_inds = np.argwhere(np.diff(truncated_trace) &gt;= half_pulse_height).squeeze()
+    positive_pulse_end_inds = np.argwhere(np.diff(truncated_trace) &lt;= -1 * half_pulse_height).squeeze()
+
+    # Handles situations where there are pulses that do not have two edges
+    if positive_pulse_end_inds[0] &lt; positive_pulse_start_inds[0]:
+        positive_pulse_end_inds = positive_pulse_end_inds[1:]
+    if positive_pulse_start_inds[-1] &gt; positive_pulse_end_inds[-1]:
+        positive_pulse_start_inds = positive_pulse_start_inds[:-1]
+
+    positive_pulse_widths = positive_pulse_end_inds - positive_pulse_start_inds
+    true_first_pulse_start_ind = positive_pulse_start_inds[np.argwhere(positive_pulse_widths &gt; min_true_pulse_width_n_samples).squeeze()][0]
+
+    time_aligned_trace = truncated_trace[true_first_pulse_start_ind:max_aligned_len]
+    aligned_traces.append(time_aligned_trace)
+    time_aligned_time_vec = np.arange(len(time_aligned_trace)) * sampling_interval * 1e3  # In milliseconds
+
+    ax_aligned.plot(time_aligned_time_vec, time_aligned_trace, color=trace_color)
+    ax_aligned.set_title(trace_name)
+
+# endregion
+
+# region Overlay all repeats for a given function on top of each other to see if they are similar
+fig_overlay, axs_overlay = plt.subplots(n_trace_types + 1, 1, sharex=True, constrained_layout=True, figsize=(20, 10))
+axs_overlay[-1].set_xlabel('Time (ms)')
+for i, (time_aligned_trace, trace_name, trace_color) in enumerate(zip(aligned_traces, trace_names, trace_colors)):
+
+    time_aligned_time_vec = np.arange(len(time_aligned_trace)) * sampling_interval * 1e3  # In milliseconds
+
+    axs_overlay[int(i / 3)].plot(time_aligned_time_vec, time_aligned_trace, color=trace_color)
+    axs_overlay[int(i / 3)].set_title(trace_name.split(':')[0])
+
+    axs_overlay[-1].plot(time_aligned_time_vec, time_aligned_trace, color=trace_color)
+    axs_overlay[-1].set_title('All traces overlain')
+
+# endregion
+
+# region Get all pulse widths per key fob function repeat as a sequence.
+all_pulse_widths_store = []
+cycle_periods_store = []
+positive_pulse_width_sequences = [[] for _ in range(n_trace_types)]
+for i, (trace_name, aligned_trace) in enumerate(zip(trace_names, aligned_traces)):
+
+    positive_pulse_start_inds = np.argwhere(np.diff(aligned_trace) &gt;= half_pulse_height).squeeze()
+    positive_pulse_end_inds = np.argwhere(np.diff(aligned_trace) &lt;= -1 * half_pulse_height).squeeze()
+
+    # Handles situations where there are pulses that do not have two edges
+    if positive_pulse_end_inds[0] &lt; positive_pulse_start_inds[0]:
+        positive_pulse_end_inds = positive_pulse_end_inds[1:]
+    if positive_pulse_start_inds[-1] &gt; positive_pulse_end_inds[-1]:
+        positive_pulse_start_inds = positive_pulse_start_inds[:-1]
+
+    positive_pulse_widths = positive_pulse_end_inds - positive_pulse_start_inds
+    indices_of_true_positive_pulses_in_positive_pulse_inds = np.argwhere(positive_pulse_widths &gt; min_true_pulse_width_n_samples).squeeze()
+    true_positive_pulse_widths = positive_pulse_widths[indices_of_true_positive_pulses_in_positive_pulse_inds] * sampling_interval * 1e6    # In microseconds
+    start_indices_of_true_positive_pulses = positive_pulse_start_inds[indices_of_true_positive_pulses_in_positive_pulse_inds]
+    cycle_period_sample_counts = np.diff(start_indices_of_true_positive_pulses)
+    cycle_periods = cycle_period_sample_counts  * sampling_interval * 1e6  # In microseconds
+
+    num_pulses_per_sequence = len(true_positive_pulse_widths)
+    print(f"\n\n{trace_name}: \n Number of pulses (bits) per sequence: {num_pulses_per_sequence}; "
+          f"\nPulse widths sequence: {true_positive_pulse_widths};"
+          f"\nPulse cycle periods: {cycle_periods}.")
+
+    all_pulse_widths_store = all_pulse_widths_store + true_positive_pulse_widths.tolist()
+    cycle_periods_store = cycle_periods_store + cycle_periods.tolist()
+    positive_pulse_width_sequences[int(i/n_reps_per_trace)].append(true_positive_pulse_widths.tolist())
+
+
+# endregion
+
+
+# region Print the average pulse train per key fob function
+print(f"\n======================Average Pulse Widths Sequences Per Fob Function=======================\n")
+average_positive_pulse_width_sequence_per_fob_function = np.mean(np.array(positive_pulse_width_sequences), axis=1)
+for trace_name, pulse_sequence in zip(trace_names, average_positive_pulse_width_sequence_per_fob_function):
+    pulse_sequence_str = str(pulse_sequence.astype(int)).replace('\n', '')
+    print(f"{trace_name.split(':')[0]}: {pulse_sequence_str}\n")
+
+print(f"\n=============================================\n")
+
+# endregion
+
+
+
+# region Plot the distribution of pulse widths and cycle periods
+fig_pulse_widths, axs_pulse_widths = plt.subplots(2, 1, constrained_layout=True, figsize=(20, 10), sharex=True)
+axs_pulse_widths[-1].set_xlabel('Time (uS)')
+
+axs_pulse_widths[0].hist(all_pulse_widths_store, bins=50)
+axs_pulse_widths[0].set_title('Pulse widths histogram')
+
+axs_pulse_widths[1].hist(cycle_periods_store, bins=50)
+axs_pulse_widths[1].set_title('Cycle periods histograms')
+# endregion
+
+
+plt.show()</code></pre>
+    <p>Plotting every raw trace stacked vertically made the leading partial pulse train (an artifact of pressing-and-holding before the trigger point) obvious at the start of each one:</p>
+    <figure class="figure"><img src="images/image58.jpg" alt="All twelve raw traces, before any truncation or alignment." loading="lazy"><figcaption>All twelve raw traces, before any truncation or alignment.</figcaption></figure>
+    <p>After truncating that leading section, I also cut the traces off at a fixed 1000-sample window (the <code>max_aligned_len</code> parameter). This removed the beginning portion of the trailing repeat due to pressing-and-holding of the key fob button.</p>
+    <div class="figure-grid cols-2">
+        <figure><img src="images/image59.jpg" alt="After removing the leading partial pulse train." loading="lazy"><figcaption>After removing the leading partial pulse train.</figcaption></figure>
+        <figure><img src="images/image60.jpg" alt="After removing trailing partial pulses and fully aligning to a common time origin." loading="lazy"><figcaption>After removing trailing partial pulses and fully aligning to a common time origin.</figcaption></figure>
+    </div>
+    <p>Every pulse train was <strong>24 bits</strong>. The three repeats of each function overlapped almost perfectly apart from noise, so the remote used a <strong>static, non-rolling code</strong>.</p>
+    <figure class="figure"><img src="images/image61.jpg" alt="Repeats of each function overlaid - near-perfect agreement confirms static, non-rolling codes." loading="lazy"><figcaption>Repeats of each function overlaid - near-perfect agreement confirms static, non-rolling codes.</figcaption></figure>
+    <p>Where the traces disagreed, it was noise. Everywhere else the pulses lined up:</p>
+    <figure class="figure"><img src="images/image62.jpg" alt="One of the few noisy spots where the overlaid traces diverge." loading="lazy"><figcaption>One of the few noisy spots where the overlaid traces diverge.</figcaption></figure>
+    <p>Overlaying every trace from all four functions together showed the pulses agreeing up through roughly the first 20 bits, then diverging, meaning only the <strong>last few bits actually distinguish which button was pressed</strong>, with the rest acting as a shared preamble/device ID.</p>
+    <figure class="figure"><img src="images/image63.jpg" alt="All functions overlaid: agreement breaks down only in the last handful of bits." loading="lazy"><figcaption>All functions overlaid: agreement breaks down only in the last handful of bits.</figcaption></figure>
+    <p>The pulse-width histogram showed two clear clusters, around <b>0.2 ms</b>, and&nbsp;&nbsp;<strong>2.3 ms.</strong> These correspond to two fixed pulse widths encoding 0 and 1. There is a third small peak resembling noise (glitches).</p>
+    <figure class="figure"><img src="images/image64.jpg" alt="Pulse-width histogram: two dominant clusters; the protocol's HIGH and LOW bit durations." loading="lazy"><figcaption>Pulse-width histogram: two dominant clusters; the protocol's HIGH and LOW bit durations.</figcaption></figure>
+    <p>Since pin 11 on the Holtek IC idles HIGH and gets pulled down by the incoming code, the negative (GND) pulses are the actual data of interest. Long low-going pulses (≈2300&nbsp;µs) represent one bit value, short ones (≈200&nbsp;µs) the other, though which is logically "1" versus "0" is ultimately an arbitrary labeling choice.</p>
+    <figure class="figure"><img src="images/image65.jpg" alt="Isolating the negative-going (GND) pulses that actually carry the data." loading="lazy"><figcaption>Isolating the negative-going (GND) pulses that actually carry the data.</figcaption></figure>
+    <p>Averaging the three repeats of each function gave a clean pulse-width sequence I could load straight into a microcontroller:</p>
+    <figure class="figure"><img src="images/image66.jpg" alt="The averaged, denoised pulse-width sequence for each fob function; the exact bitstream to reproduce." loading="lazy"><figcaption>The averaged, denoised pulse-width sequence for each fob function; the exact bitstream to reproduce.</figcaption></figure>
+
+    <div class="quick-facts">
+        <h4>Protocol Summary</h4>
+        <ul>
+            <li>On-off keyed, fixed (non-rolling) code: the same 24 bit pulse train every time a given button is pressed.</li>
+            <li>Two pulse durations encode the bits: a long pulse (≈1150–2300&nbsp;µs) and a short pulse (≈200–450&nbsp;µs), within a roughly fixed cycle period.</li>
+            <li>Only the last several bits differ between the four button functions. This indicates that the rest may form a shared preamble/device-ID prefix.</li>
+        </ul>
+    </div>
+
+    <h2>Injecting the Codes with an ESP8266 (NodeMCU)</h2>
+    <p>The last step was reproducing those sequences in hardware. I programmed a NodeMCU (ESP8266) to toggle a single digital pin between LOW and HIGH according to each pulse-width sequence, injecting the signal directly onto the same wire I tapped earlier at Holtek pin 11. Its onboard Wi-Fi would later let Alexa trigger these functions remotely.</p>
+    <figure class="figure"><img src="images/image67-pin11.jpg" alt="Injection wiring: the microcontroller's GPIO drives the tap wire directly, sharing a common ground with the BANVIE board." loading="lazy"><figcaption>Injection wiring: the microcontroller's GPIO drives the tap wire directly, sharing a common ground with the BANVIE board.</figcaption></figure>
+    <p>I wrote the injector to define a 25-element boolean array per function (24 real bits plus a leading edge), each one with precise microsecond timing, and to listen on the serial port for a single character (<code>L</code>/<code>T</code>/<code>U</code>/<code>M</code>) to decide which sequence to fire. The complete NodeMCU sketch is below (<a href="code/banvie_code_injector.ino" download="">⬇ Download banvie_code_injector.ino</a>).</p>
+    <pre><code>#include &lt;Arduino.h&gt;
+#include &lt;ESP8266WiFi.h&gt;
+
+
+////////////////////////////////////////////////////////////////////////////
+// BANVIE SYSTEM CONTROL VARIABLES
+#define banvie_pin D1  // The digital pin that interfaces with the Banvie System
+
+volatile long startTime = 0;  // A timing variable
+const int num_positive_pulses = 25; // 25 positive pulse edges because we want 24 pull downs.
+const int num_repeats_per_train = 10;  // In case you want to re-issue the same pulse train multiple times (mimicks press and hold)
+const int trunk_release_key_press_hold_time_s = 4;  // Mimicks Press and hold this long for trunk release.
+
+const uint16_t period_us = 1500;  // The cycle period per pulse
+const uint16_t long_pulse_length_us = 1200;  // Duration of a HIGH bit
+const uint16_t short_pulse_length_us = period_us - long_pulse_length_us;  // Duration of a LOW bit
+
+////////////////////////////////////////////////////////////////////////////
+// PULSE TRAINS PER FOB FUNCTION
+bool lockPulseWidths[num_positive_pulses] = {1,0,0,1,0,0,1,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0};  // Lock sequence
+bool mutedLockPulseWidths[num_positive_pulses] = {1,0,0,1,0,0,1,1,0,0,1,0,1,0,0,0,0,0,0,0,0,1,0,0,0};  // Muted Lock sequence
+bool unlockPulseWidths[num_positive_pulses] = {1,0,0,1,0,0,1,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,0};  // Unlock sequence
+bool trunkReleasePulseWidths[num_positive_pulses] = {1,0,0,1,0,0,1,1,0,0,1,0,1,0,0,0,0,0,0,0,1,1,0,0,0};  // Trunk release sequence
+
+
+////////////////////////////////////////////////////////////////////////////
+// BANVIE SYSTEM CONTROL FUNCTIONS
+
+void issuePulses(bool pulseWidths[], int pulse_count){
+
+  pinMode(banvie_pin, OUTPUT);  // Set the communication pin as an output because we are forcefully driving the line.
+  digitalWrite(banvie_pin, LOW);  // Initiate communication by pulling the line LOW
+
+  for (int r = 0; r &lt; num_repeats_per_train; r++){  // Outer loop for repeating pulse trains (mimicks press and hold of a fob key)
+    for (int i = 0; i &lt; pulse_count; i++) {  // Inner loop handles a single pulse sequence
+
+      // If a bit must be HIGH, assign the long pulse length to the highTime, and if the bit is low, the highTime must be set to low.
+      uint16_t highTime = pulseWidths[i] == 1? long_pulse_length_us: short_pulse_length_us;
+
+      // The lowTime is simply the remainder of the time period on the cycle after allocating time for the high portion.
+      uint16_t lowTime = pulseWidths[i] == 1? short_pulse_length_us: long_pulse_length_us;
+
+      // HIGH portion
+      digitalWrite(banvie_pin, HIGH);
+      startTime = micros();
+      while ((micros() - startTime) &lt; highTime){};
+
+
+      // LOW portion
+      digitalWrite(banvie_pin, LOW);
+      startTime = micros();
+      while ((micros() - startTime) &lt; lowTime){};
+    }
+
+    delay(12);  // gap between trains
+  }
+
+  // Important: We should set the pin back to a floating state so that an external remote too can shift the logic levels to communicate with the Banvie.
+  pinMode(banvie_pin, INPUT);
+
+}
+
+////////////////////////////////////////////////////////////////////////////
+// METHODS THAT SEND THE APPROPRIATE SEQUENCE PER KEY FOB FUNCTION
+void lockCar(){
+  Serial.println("Locking car");
+  issuePulses(lockPulseWidths, num_positive_pulses);
+}
+
+void mutedLockCar(){
+  Serial.println("Muted Lock Activated");
+  issuePulses(mutedLockPulseWidths, num_positive_pulses);
+}
+
+void unlockCar(){
+  Serial.println("Unlocking Car");
+  issuePulses(unlockPulseWidths, num_positive_pulses);
+}
+
+void releaseTrunk(){
+  Serial.println("Releasing Trunk Door");
+  long trunk_start_time = millis();
+  while ((millis() - trunk_start_time) &lt; (trunk_release_key_press_hold_time_s * 1000)){
+    issuePulses(trunkReleasePulseWidths, num_positive_pulses);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////
+// COMPARE THE CHARACTERS RECEIVED VIA SERIAL INPUT TO CALL APPROPRIATE FOB FUNCTION
+void handleSerialInputForBanvieSystem(char c){
+
+    if (c == 'L') {
+      lockCar();
+    }
+    else if (c == 'T') {
+      releaseTrunk();
+    }
+    else if (c == 'U') {
+      unlockCar();
+    }
+    else if (c == 'M') {
+      mutedLockCar();
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+// SETUP THE SYSTEM
+void setupBanviewSystem(){
+    pinMode(banvie_pin, INPUT); // This should be set to floating whenever we do NOT issue any command so that the normal remote can also work.
+    Serial.println("Banvie system initialized.");
+    Serial.println("Press 'L', 'T', 'U', 'M' for 'Lock', 'Trunk release', 'Unlock', and 'Muted Lock' respectively.");
+}
+
+void setup() {
+  Serial.begin(74880);
+  setupBanviewSystem();
+}
+
+
+void loop() {
+  // Repeatedly poll for characters received via the serial input and call the appropriate fob function
+  if (Serial.available() &gt; 0) {
+    char c = Serial.read();
+    Serial.println("Received Serial Code " + String(c));
+    handleSerialInputForBanvieSystem(c);
+  }
+
+  delay(100);
+
+}</code></pre>
+    <p>Two things made this code reliable. First, I set the pin back to a floating <code>INPUT</code> after every transmission, so the real remote still works when the NodeMCU is idle. Second, the timing doesn't have to be exact, just <em>close enough</em>.</p>
+    <p>I swept the short-pulse duration while watching the relays actually click, and found it stayed reliable anywhere from <strong>250&nbsp;µs to 650&nbsp;µs.</strong>&nbsp;Outside that range, the BANVIE receiver stopped recognizing the bit. Doing the same sweep for the long pulse (while keeping the short pulse inside its valid range), I found a working window of roughly <strong>800&nbsp;µs to 1400&nbsp;µs</strong>. That's a lot of margin for a protocol with no error correction, which should help once this is in a noisy car instead of on the bench.</p>
+    <p>With the injector proven on lock, unlock, muted lock, and trunk release, the last test was the original goal: firing three consecutive unlock pulses to trigger a full remote engine start. The push-to-start LED lit up on cue. The BANVIE microcontrollers ran through disarm, ignition and cranking just as they would for the real fob, with the stock firmware untouched.</p>
+
+    <h2>What's Next</h2>
+    <p>I used this injector for the rest of the build: wiring it into the Lancer, adding DC–DC conversion to keep standby draw low while the car is armed, and exposing lock, unlock, remote start and trunk release to Alexa. That build is written up separately: see <a href="../voice-activated-car-control/voice-activated-car-control.html">Voice-Controlled Remote Start on a 2003 Mitsubishi Lancer</a>.</p>
+
+</div>
+
+<script src="../assets/zoom.js"></script>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

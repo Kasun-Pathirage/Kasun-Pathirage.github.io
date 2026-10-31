@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teaching: BM3110 Electronic Instrumentation | Kasun Pathirage</title>
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #e60000;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 2rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .course-meta {
+            font-size: 0.95rem;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 2rem 0;
+        }
+        .lecture-card {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .lecture-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            color: var(--primary);
+            line-height: 1.35;
+        }
+        .lecture-topics {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.25rem;
+        }
+        .lecture-card h4 {
+            font-size: 1.02rem;
+            color: var(--primary);
+            margin: 1.5rem 0 0.5rem 0;
+        }
+        .lecture-card h4:first-of-type {
+            margin-top: 0.5rem;
+        }
+        .lecture-card p, .lecture-card li {
+            font-size: 0.95rem;
+        }
+        .lecture-card ul {
+            padding-left: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        .lecture-card li {
+            margin-bottom: 0.35rem;
+        }
+        .formula-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0;
+            font-family: Cambria, "Times New Roman", serif;
+            font-size: 1rem;
+            color: #222;
+        }
+        .formula-box .label {
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 0.2rem;
+        }
+        .worked-example {
+            background: #fbfbfb;
+            border-left: 3px solid var(--secondary);
+            padding: 0.9rem 1.1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .worked-example p { margin: 0.4rem 0; }
+        .callout {
+            background: #fff8e6;
+            border: 1px solid #f0e0b0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #5a4a1a;
+        }
+        .diagram-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem 0.75rem 0.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .diagram-box svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            min-width: 560px;
+        }
+        .diagram-caption {
+            font-size: 0.78rem;
+            color: #888;
+            text-align: center;
+            margin: 0.5rem 0 0.25rem;
+        }
+        .media-box {
+            background: #eee;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            margin: 1rem 0;
+            color: #888;
+            font-size: 0.95rem;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: #fff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: normal;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn:hover {
+            background-color: var(--secondary);
+            color: #fff;
+            text-decoration: none;
+        }
+        .btn.disabled {
+            background-color: #ccc;
+            cursor: default;
+            pointer-events: none;
+        }
+    
+        .lead { font-size: 1.02rem; color: #333; }
+        .page-nav { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem 1rem; margin-bottom:1.5rem; }
+        .page-nav .back-link { margin-bottom:0; }
+        .chips { display:flex; flex-wrap:wrap; gap:.4rem .5rem; margin:.25rem 0 1.25rem; }
+        .chip { font-size:.78rem; background:#f1f1f5; color:#444; border-radius:12px; padding:.2rem .65rem; }
+        .toc { background:#fafafa; border:1px solid #e5e5e5; border-radius:6px; padding:.85rem 1.25rem; margin:1.25rem 0 .5rem; font-size:.92rem; }
+        .toc ol { margin:.45rem 0 0; padding-left:1.25rem; columns:2; column-gap:2rem; }
+        .toc li { margin-bottom:.2rem; break-inside:avoid; }
+        .toc a { color:#333; text-decoration:none; } .toc a:hover { color:var(--secondary); text-decoration:underline; }
+        .lecture-page h2 { font-size:1.3rem; margin:2.25rem 0 .6rem; padding-top:.5rem; border-top:1px solid #e8e8e8; color:var(--primary); scroll-margin-top:1rem; }
+        .lecture-page h3 { font-size:1.05rem; margin:1.5rem 0 .4rem; color:var(--primary); }
+        .lecture-page p, .lecture-page li { font-size:.97rem; line-height:1.6; }
+        .lecture-page ul, .lecture-page ol { padding-left:1.3rem; }
+        .lecture-page li { margin-bottom:.4rem; }
+        .formula-box { overflow-x:auto; line-height:1.75; }
+        .worked-example, .callout { font-size:.95rem; }
+        .small { font-size:.82rem !important; color:#777; }
+        table.cmp { width:100%; border-collapse:collapse; font-size:.86rem; margin:1rem 0; display:block; overflow-x:auto; }
+        table.cmp th, table.cmp td { border:1px solid #e0e0e0; padding:.45rem .65rem; text-align:left; vertical-align:top; line-height:1.45; }
+        table.cmp th { background:#f4f4f6; font-weight:600; }
+        table.cmp td.hl { background:#fff0f0; font-weight:600; color:#a00000; }
+        .diagram-box { padding:1rem .75rem .5rem; }
+        .diagram-box svg { min-width:560px; }
+        .download-bar { display:flex; flex-wrap:wrap; gap:.6rem; align-items:center; margin:1.25rem 0 0; }
+        .btn.alt { background:#fff; color:var(--primary); border:1px solid #bbb; }
+        .btn.alt:hover { background:var(--secondary); color:#fff; border-color:var(--secondary); }
+        .lecture-nav { display:flex; justify-content:space-between; gap:1rem; margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid #ddd; flex-wrap:wrap; }
+        .lecture-nav a { color:var(--secondary); text-decoration:none; font-weight:600; font-size:.92rem; max-width:48%; }
+        .lecture-nav a:hover { text-decoration:underline; }
+        .lecture-nav .next { margin-left:auto; text-align:right; }
+        .series-label { font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:#888; font-weight:600; margin:2rem 0 .75rem; }
+        .lecture-row .num { display:inline-block; min-width:2rem; color:var(--secondary); font-weight:700; }
+        .lecture-row .btn-row { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.75rem; }
+        @media (max-width:640px){ .container{margin:1rem;padding:1.25rem;} .toc ol{columns:1;} .lecture-nav a{max-width:100%;} }
+    </style>
+</head>
+<body>
+    <div class="container ">
+        <a href="../index.html" class="back-link">&larr; Back to Portfolio</a>
+
+        <h1>Guest Lecturer, BM3110: Electronic Instrumentation</h1>
+        <div class="course-meta">Dept. of Biomedical Engineering &middot; University of Moratuwa, Sri Lanka &middot; Semester 5 Undergraduates &middot; Fall 2026</div>
+
+        <p>In Fall 2026, I gave a series of guest lectures on electronic instrumentation to third-year Biomedical Engineering undergraduates at the University of Moratuwa. The series focused on one problem that every biomedical measurement system has: <em>how to recover a microvolt-level signal when the noise and interference around it are much larger.</em> I started with the fundamentals of noise, moved on to transistor and op-amp noise models and the physics of interference, and finished with PCB layout and a complete ECG front-end design. Each lecture below has a written summary (key equations, worked examples and diagrams) and the full slides as a PDF.</p>
+        <p class="small">7 lectures &middot; 264 slides in total</p>
+
+        <hr>
+
+        <div class="series-label">Noise &amp; interference in instrumentation</div>
+        <div class="lecture-card lecture-row">
+            <h3><span class="num">1</span>Part 1: Introduction</h3>
+            <div class="chips"><span class="chip">where noise comes from</span><span class="chip">modelling noisy devices (1-port &amp; 2-port)</span><span class="chip">RMS, mean &amp; power spectral density</span><span class="chip">when noise powers add</span><span class="chip">noise through a frequency-dependent system</span><span class="chip">noise figure</span></div>
+            <p>Covers the basics used in the rest of the series: how to represent noise sources in a circuit, how to quantify them, when they can be added, how they pass through a filter, and how the noise figure compares a system against a reference.</p>
+            <div class="btn-row"><a href="lecture-1-noise-part-1.html" class="btn">Read lecture summary &rarr;</a><a href="noise-in-instrumentation-part-1.pdf" class="btn alt">Slides (PDF, 42 slides)</a></div>
+        </div>
+        <div class="lecture-card lecture-row">
+            <h3><span class="num">2</span>Part 2: Classification of Noise</h3>
+            <div class="chips"><span class="chip">thermal (Johnson&ndash;Nyquist) noise</span><span class="chip">combining noise sources</span><span class="chip">RC filter noise bandwidth</span><span class="chip">shot noise</span><span class="chip">1/f (flicker) noise</span><span class="chip">burst (popcorn) noise</span></div>
+            <p>Covers where random noise in an instrumentation circuit comes from, grouped by the physical mechanism behind it, and how to combine the different sources correctly.</p>
+            <div class="btn-row"><a href="lecture-2-noise-part-2.html" class="btn">Read lecture summary &rarr;</a><a href="noise-in-instrumentation-part-2.pdf" class="btn alt">Slides (PDF, 38 slides)</a></div>
+        </div>
+        <div class="lecture-card lecture-row">
+            <h3><span class="num">3</span>Part 3: Modelling Diode and BJT Noise</h3>
+            <div class="chips"><span class="chip">diode small-signal model</span><span class="chip">diode shot, flicker and thermal noise</span><span class="chip">BJT hybrid-&pi; model</span><span class="chip">the six BJT noise sources</span><span class="chip">input-referred noise</span><span class="chip">effect of source impedance</span></div>
+            <p>Applies the noise basics to transistors: small-signal models for the diode and BJT, their noise sources, and how to refer them to the input. The main takeaway is that a two-port needs <em>both</em> a voltage and a current noise source, and that the two can be correlated.</p>
+            <div class="btn-row"><a href="lecture-3-noise-part-3.html" class="btn">Read lecture summary &rarr;</a><a href="noise-in-instrumentation-part-3.pdf" class="btn alt">Slides (PDF, 49 slides)</a></div>
+        </div>
+        <div class="lecture-card lecture-row">
+            <h3><span class="num">4</span>Part 4: The Op-Amp Noise Model</h3>
+            <div class="chips"><span class="chip">op-amp as a multi-port</span><span class="chip">the standard noise model</span><span class="chip">datasheet noise values</span><span class="chip">total output noise of an inverting amplifier</span><span class="chip">the effect of source impedance</span><span class="chip">choosing a low-noise amplifier</span></div>
+            <p>Replaces the transistor-level detail with the standard three-source op-amp noise model. It then works through a full inverting-amplifier example and shows how the source resistance decides which noise term dominates, and therefore which amplifier to choose.</p>
+            <div class="btn-row"><a href="lecture-4-noise-part-4.html" class="btn">Read lecture summary &rarr;</a><a href="noise-in-instrumentation-part-4.pdf" class="btn alt">Slides (PDF, 22 slides)</a></div>
+        </div>
+        <div class="lecture-card lecture-row">
+            <h3><span class="num">5</span>Part 5: Interference, Coupling and Mitigation</h3>
+            <div class="chips"><span class="chip">source&ndash;coupling&ndash;receiver model</span><span class="chip">capacitive, inductive and conductive coupling</span><span class="chip">shielding</span><span class="chip">twisted pairs</span><span class="chip">ground loops and grounding</span><span class="chip">isolation</span><span class="chip">CMRR and differential signalling</span><span class="chip">power-line interference</span><span class="chip">ADC noise</span></div>
+            <p>The longest lecture in the series, covering interference that enters from outside the circuit. I modelled each coupling mechanism quantitatively and paired it with a way to reduce it. The lecture ends with power-line filters, data-acquisition noise and ADC quantisation noise.</p>
+            <div class="btn-row"><a href="lecture-5-noise-part-5.html" class="btn">Read lecture summary &rarr;</a><a href="noise-in-instrumentation-part-5.pdf" class="btn alt">Slides (PDF, 58 slides)</a></div>
+        </div>
+        <div class="lecture-card lecture-row">
+            <h3><span class="num">6</span>Part 6: Best Practices for PCB Design</h3>
+            <div class="chips"><span class="chip">layout process</span><span class="chip">crosstalk</span><span class="chip">traces</span><span class="chip">shared ground impedance</span><span class="chip">guard rings</span><span class="chip">decoupling capacitors</span><span class="chip">splitting analog and digital</span><span class="chip">ECG PCB assignment and power-tree design rationale</span></div>
+            <p>Turns the interference theory from Part 5 into layout rules, then applies them to a graded group assignment: a battery-powered wearable ECG board. I also explained the reasoning behind its power tree, ADC choice and reference voltage.</p>
+            <div class="btn-row"><a href="lecture-6-noise-part-6-pcb-design.html" class="btn">Read lecture summary &rarr;</a><a href="noise-in-instrumentation-part-6-pcb-design.pdf" class="btn alt">Slides (PDF, 15 slides)</a></div>
+        </div>
+
+        <div class="series-label">Signal conditioning</div>
+        <div class="lecture-card lecture-row">
+            <h3><span class="num">7</span>Signal Conditioning: Designing an ECG Front-End</h3>
+            <div class="chips"><span class="chip">displacement currents</span><span class="chip">mains coupling into the human body</span><span class="chip">common-mode and differential interference in an ECG</span><span class="chip">electrode offset voltage</span><span class="chip">difference amplifier vs instrumentation amplifier</span><span class="chip">driven-right-leg circuit</span></div>
+            <p>A full case study of an ECG front end: how 50 Hz mains reaches an ECG through capacitive coupling, why each effect shows up as common-mode or differential interference, and how the instrumentation amplifier and driven-right-leg circuit deal with them.</p>
+            <div class="btn-row"><a href="lecture-7-ecg-front-end.html" class="btn">Read lecture summary &rarr;</a><a href="signal-conditioning-ecg-front-end.pdf" class="btn alt">Slides (PDF, 40 slides)</a></div>
+        </div>
+
+        <p class="small">Slides are PDF exports of the original PowerPoint decks.</p>
+
+    </div>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+</body>
+</html>

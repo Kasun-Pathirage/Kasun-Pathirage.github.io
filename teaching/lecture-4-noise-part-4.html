@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 4: Noise Part 4: Op-Amp Noise Model | Kasun Pathirage</title>
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #e60000;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 2rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .course-meta {
+            font-size: 0.95rem;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 2rem 0;
+        }
+        .lecture-card {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .lecture-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            color: var(--primary);
+            line-height: 1.35;
+        }
+        .lecture-topics {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.25rem;
+        }
+        .lecture-card h4 {
+            font-size: 1.02rem;
+            color: var(--primary);
+            margin: 1.5rem 0 0.5rem 0;
+        }
+        .lecture-card h4:first-of-type {
+            margin-top: 0.5rem;
+        }
+        .lecture-card p, .lecture-card li {
+            font-size: 0.95rem;
+        }
+        .lecture-card ul {
+            padding-left: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        .lecture-card li {
+            margin-bottom: 0.35rem;
+        }
+        .formula-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0;
+            font-family: Cambria, "Times New Roman", serif;
+            font-size: 1rem;
+            color: #222;
+        }
+        .formula-box .label {
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 0.2rem;
+        }
+        .worked-example {
+            background: #fbfbfb;
+            border-left: 3px solid var(--secondary);
+            padding: 0.9rem 1.1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .worked-example p { margin: 0.4rem 0; }
+        .callout {
+            background: #fff8e6;
+            border: 1px solid #f0e0b0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #5a4a1a;
+        }
+        .diagram-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem 0.75rem 0.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .diagram-box svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            min-width: 560px;
+        }
+        .diagram-caption {
+            font-size: 0.78rem;
+            color: #888;
+            text-align: center;
+            margin: 0.5rem 0 0.25rem;
+        }
+        .media-box {
+            background: #eee;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            margin: 1rem 0;
+            color: #888;
+            font-size: 0.95rem;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: #fff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: normal;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn:hover {
+            background-color: var(--secondary);
+            color: #fff;
+            text-decoration: none;
+        }
+        .btn.disabled {
+            background-color: #ccc;
+            cursor: default;
+            pointer-events: none;
+        }
+    
+        .lead { font-size: 1.02rem; color: #333; }
+        .page-nav { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem 1rem; margin-bottom:1.5rem; }
+        .page-nav .back-link { margin-bottom:0; }
+        .chips { display:flex; flex-wrap:wrap; gap:.4rem .5rem; margin:.25rem 0 1.25rem; }
+        .chip { font-size:.78rem; background:#f1f1f5; color:#444; border-radius:12px; padding:.2rem .65rem; }
+        .toc { background:#fafafa; border:1px solid #e5e5e5; border-radius:6px; padding:.85rem 1.25rem; margin:1.25rem 0 .5rem; font-size:.92rem; }
+        .toc ol { margin:.45rem 0 0; padding-left:1.25rem; columns:2; column-gap:2rem; }
+        .toc li { margin-bottom:.2rem; break-inside:avoid; }
+        .toc a { color:#333; text-decoration:none; } .toc a:hover { color:var(--secondary); text-decoration:underline; }
+        .lecture-page h2 { font-size:1.3rem; margin:2.25rem 0 .6rem; padding-top:.5rem; border-top:1px solid #e8e8e8; color:var(--primary); scroll-margin-top:1rem; }
+        .lecture-page h3 { font-size:1.05rem; margin:1.5rem 0 .4rem; color:var(--primary); }
+        .lecture-page p, .lecture-page li { font-size:.97rem; line-height:1.6; }
+        .lecture-page ul, .lecture-page ol { padding-left:1.3rem; }
+        .lecture-page li { margin-bottom:.4rem; }
+        .formula-box { overflow-x:auto; line-height:1.75; }
+        .worked-example, .callout { font-size:.95rem; }
+        .small { font-size:.82rem !important; color:#777; }
+        table.cmp { width:100%; border-collapse:collapse; font-size:.86rem; margin:1rem 0; display:block; overflow-x:auto; }
+        table.cmp th, table.cmp td { border:1px solid #e0e0e0; padding:.45rem .65rem; text-align:left; vertical-align:top; line-height:1.45; }
+        table.cmp th { background:#f4f4f6; font-weight:600; }
+        table.cmp td.hl { background:#fff0f0; font-weight:600; color:#a00000; }
+        .diagram-box { padding:1rem .75rem .5rem; }
+        .diagram-box svg { min-width:560px; }
+        .download-bar { display:flex; flex-wrap:wrap; gap:.6rem; align-items:center; margin:1.25rem 0 0; }
+        .btn.alt { background:#fff; color:var(--primary); border:1px solid #bbb; }
+        .btn.alt:hover { background:var(--secondary); color:#fff; border-color:var(--secondary); }
+        .lecture-nav { display:flex; justify-content:space-between; gap:1rem; margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid #ddd; flex-wrap:wrap; }
+        .lecture-nav a { color:var(--secondary); text-decoration:none; font-weight:600; font-size:.92rem; max-width:48%; }
+        .lecture-nav a:hover { text-decoration:underline; }
+        .lecture-nav .next { margin-left:auto; text-align:right; }
+        .series-label { font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:#888; font-weight:600; margin:2rem 0 .75rem; }
+        .lecture-row .num { display:inline-block; min-width:2rem; color:var(--secondary); font-weight:700; }
+        .lecture-row .btn-row { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.75rem; }
+        @media (max-width:640px){ .container{margin:1rem;padding:1.25rem;} .toc ol{columns:1;} .lecture-nav a{max-width:100%;} }
+    
+        /* stacked fractions and radicals for equations */
+        .frac { display:inline-flex; flex-direction:column; align-items:stretch; vertical-align:middle; margin:0 .18em; text-align:center; line-height:1.25; }
+        .frac > .num { padding:0 .3em .1em; border-bottom:1.4px solid currentColor; }
+        .frac > .den { padding:.1em .3em 0; }
+        sup .frac, sub .frac { font-size:1em; }
+        .rad { display:inline-block; position:relative; padding-left:.72em; white-space:nowrap; }
+        .rad > .rs { position:absolute; left:0; top:0; width:.72em; height:100%; overflow:visible; }
+        .rad > .rb { display:inline-block; border-top:1.4px solid currentColor; padding:0 .15em; line-height:1.3; }
+        .rad.tall { vertical-align:middle; }
+        .rad.tall > .rb { display:block; padding-top:.15em; }
+        .par { font-size:1.7em; font-weight:200; line-height:0; vertical-align:-.1em; }
+        .formula-box .frac, .worked-example .frac { font-size:1.02em; }
+    </style>
+
+</head>
+<body>
+    <div class="container ">
+        <div class="page-nav"><a href="teaching.html" class="back-link">&larr; All lectures</a><a href="../index.html" class="back-link">Portfolio &rarr;</a></div>
+        <div class="series-label">BM3110 Electronic Instrumentation &middot; Lecture 4 of 7</div>
+        <h1>Noise and Interference in Instrumentation, Part 4: The Op-Amp Noise Model</h1>
+        <div class="course-meta">University of Moratuwa &middot; Dept. of Biomedical Engineering &middot; Semester 5 &middot; Fall 2026 &middot; 22 slides</div>
+        <div class="chips"><span class="chip">op-amp as a multi-port</span><span class="chip">the standard noise model</span><span class="chip">datasheet noise values</span><span class="chip">total output noise of an inverting amplifier</span><span class="chip">the effect of source impedance</span><span class="chip">choosing a low-noise amplifier</span></div>
+        <div class="download-bar"><a href="noise-in-instrumentation-part-4.pdf" class="btn">Download slides (PDF) &darr;</a></div>
+        <hr>
+        <div class="lecture-page">
+
+<p class="lead">Part 3 showed how complicated the noise of a single transistor gets. An op-amp contains many such devices, so modelling each one is impractical. This lecture introduces the <strong>standard op-amp noise model</strong>, made of the three equivalent input-referred sources that manufacturers specify on datasheets. It then uses the model to calculate the output noise of a real circuit and to explain how to select an amplifier for a given source impedance.</p>
+
+<div class="toc"><strong>On this page</strong>
+<ol>
+<li><a href="#s1">How many ports does an op-amp have?</a></li>
+<li><a href="#s2">The standard noise model</a></li>
+<li><a href="#s3">Where the numbers come from: the datasheet</a></li>
+<li><a href="#s4">Worked example: noise of an inverting amplifier</a></li>
+<li><a href="#s5">The impact of source impedance</a></li>
+<li><a href="#s6">Choosing the right amplifier</a></li>
+<li><a href="#s7">Homework and take-homes</a></li>
+</ol></div>
+
+<h2 id="s1">1. How many ports does an op-amp have?</h2>
+<p>An op-amp is generally a 5-terminal device (<i>V</i><sub>+</sub>, <i>V</i><sub>&minus;</sub>, <i>V<sub>SS</sub></i>, <i>V<sub>DD</sub></i>, <i>V<sub>OUT</sub></i>). Each terminal forms a port with respect to ground, so in principle noise can be fed in through all of them, including the power rails. For this analysis the PSRR is assumed infinite, so noise leaking through the supplies is ignored. That brings the port count down to <strong>three</strong>.</p>
+<p>An inverting amplifier can be treated as a 2-port (input referenced to ground, and output), but other applications, such as a difference amplifier, need independent inputs at both terminals. In the general case the op-amp must be analysed as a <strong>3-port</strong> device, so we can no longer represent all its noise with just a single input voltage source and a parallel current source.</p>
+
+<h2 id="s2">2. The standard noise model</h2>
+<p>The standard op-amp noise model therefore uses <strong>three</strong> noise sources around an otherwise noiseless op-amp:</p>
+<ul>
+<li><strong>One voltage noise source</strong> <i>v&#772;<sub>n</sub></i> in series with either input (conventionally the non-inverting one). It represents the differential input-referred voltage noise.</li>
+<li><strong>One current noise source into the inverting input</strong> <i>i&#772;<sub>n&minus;</sub></i>. Its effect is a voltage created when this current flows through the source impedance (or whatever impedance) seen looking out of the inverting terminal.</li>
+<li><strong>One current noise source into the non-inverting input</strong> <i>i&#772;<sub>n+</sub></i>, likewise.</li>
+</ul>
+<div class="diagram-box"><svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Standard op-amp input-referred noise model: one voltage noise source in series with the non-inverting input and a current noise source from each input to ground, around a noiseless op-amp."><polyline points="30,88.0 110,120 30,152.0 30,88.0" fill="#fff" stroke="#333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><text x="38" y="112.0" text-anchor="start" font-size="14" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">&minus;</text><text x="38" y="140.0" text-anchor="start" font-size="14" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">+</text><line x1="10.0" y1="102.0" x2="30.0" y2="102.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="10.0" y1="138.0" x2="30.0" y2="138.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="110.0" y1="120.0" x2="135.0" y2="120.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><text x="70" y="205" text-anchor="middle" font-size="12" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Noisy op-amp</text><line x1="150.0" y1="120.0" x2="216.0" y2="120.0" stroke="#8a99a3" stroke-width="2" stroke-linecap="round"/><polygon points="225,120 216.0,124.05 216.0,115.95" fill="#8a99a3"/><text x="188" y="108" text-anchor="middle" font-size="11" fill="#777" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">input-referred</text><text x="188" y="152" text-anchor="middle" font-size="11" fill="#777" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">noise model</text><rect x="245" y="18" width="455" height="205" rx="4" fill="none" stroke="#8a99a3" stroke-width="1.4" stroke-dasharray="6 4"/><polyline points="500,86.0 590,120 500,154.0 500,86.0" fill="#fff" stroke="#333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><text x="508" y="110.0" text-anchor="start" font-size="14" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">&minus;</text><text x="508" y="142.0" text-anchor="start" font-size="14" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">+</text><line x1="590.0" y1="120.0" x2="640.0" y2="120.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><text x="545" y="162" text-anchor="middle" font-size="10.5" fill="#777" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">noiseless</text><line x1="262.0" y1="102.0" x2="500.0" y2="102.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="420" cy="102" r="3" fill="#333"/><line x1="343.0" y1="138.0" x2="500.0" y2="138.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="330" cy="138" r="13" fill="#fff" stroke="#e60000" stroke-width="1.6"/><text x="330" y="137" text-anchor="middle" font-size="10" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">+</text><text x="330" y="147" text-anchor="middle" font-size="10" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">&minus;</text><line x1="262.0" y1="138.0" x2="318.0" y2="138.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="430" cy="138" r="3" fill="#333"/><line x1="420.0" y1="66.0" x2="420.0" y2="102.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="420" cy="52" r="0" fill="#fff" stroke="#333" stroke-width="1.6"/><circle cx="420" cy="66" r="12" fill="#fff" stroke="#e60000" stroke-width="1.6"/><line x1="420.0" y1="63.0" x2="420.0" y2="75.0" stroke="#e60000" stroke-width="1.6" stroke-linecap="round"/><polygon points="420,57 422.7,63.0 417.3,63.0" fill="#e60000"/><line x1="420.0" y1="38.0" x2="420.0" y2="54.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="410.0" y1="38.0" x2="430.0" y2="38.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="414.0" y1="34.0" x2="426.0" y2="34.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="417.5" y1="30.0" x2="422.5" y2="30.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="430.0" y1="138.0" x2="430.0" y2="166.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="430" cy="178" r="12" fill="#fff" stroke="#e60000" stroke-width="1.6"/><line x1="430.0" y1="170.0" x2="430.0" y2="180.0" stroke="#e60000" stroke-width="1.6" stroke-linecap="round"/><polygon points="430,186 427.3,180.0 432.7,180.0" fill="#e60000"/><line x1="430.0" y1="190.0" x2="430.0" y2="206.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="420.0" y1="206.0" x2="440.0" y2="206.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="424.0" y1="210.0" x2="436.0" y2="210.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="427.5" y1="214.0" x2="432.5" y2="214.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><text x="330" y="118" text-anchor="middle" font-size="14" font-family="Cambria,Times New Roman,serif" font-style="italic" fill="#e60000">v<tspan font-size="10" dy="3">n</tspan><tspan font-size="10" dy="-9">2</tspan></text><text x="396" y="70" text-anchor="end" font-size="14" font-family="Cambria,Times New Roman,serif" font-style="italic" fill="#e60000">i<tspan font-size="10" dy="3">n&minus;</tspan><tspan font-size="10" dy="-9">2</tspan></text><text x="454" y="182" text-anchor="start" font-size="14" font-family="Cambria,Times New Roman,serif" font-style="italic" fill="#e60000">i<tspan font-size="10" dy="3">n+</tspan><tspan font-size="10" dy="-9">2</tspan></text></svg><div class="diagram-caption">Fig. 1: The standard input-referred noise model of an op-amp (redrawn from the lecture slides)</div></div>
+<p><strong>Why two current sources but only one voltage source?</strong> Each input can see a different source impedance, so each needs its own current noise source to create its own voltage. The op-amp, however, works in differential mode, amplifying (<i>V</i><sub>+</sub> &minus; <i>V</i><sub>&minus;</sub>), so even separate voltage noise sources at the two terminals would act, once transferred to the output, as a single one.</p>
+<p>Datasheets typically list a single input current noise value <i>i<sub>n</sub></i> even though the model has two sources. By symmetry of the underlying differential-pair input stage, <i>i&#772;<sub>n+</sub></i> and <i>i&#772;<sub>n&minus;</sub></i> have equal magnitudes (unless the datasheet gives separate values).</p>
+
+<h2 id="s3">3. Where the numbers come from: the datasheet</h2>
+<p>An op-amp is a complex device with many internal resistors, capacitors and BJTs/MOSFETs, each of which can generate thermal, shot and flicker noise. For example, a BJT-based op-amp has two independent bias currents flowing into the two input BJTs, and that alone generates shot noise at the input. Because modelling all of this is impractical, we use the <strong>input-referred voltage and current noise</strong> values measured or calculated by the manufacturer.</p>
+<p>These are specified as a curve (e.g. voltage noise density versus frequency, which rises at low frequency because of 1/<i>f</i> noise) and/or as typical values at specific frequencies; in the TLV2772 datasheet example used in the lecture the current noise is given only as a single value. The input-referred sources are usually assumed to be <strong>uncorrelated</strong>. This is a good approximation for a simple input differential pair, but in op-amps with input bias-current cancellation the two input current noises can be significantly correlated.</p>
+
+<h2 id="s4">4. Worked example: noise of an inverting amplifier</h2>
+<p>The intrinsic sources are only part of the total: the external biasing and gain resistors add their own thermal noise, and the current noise terms create extra voltage noise as they flow through those resistors. (The lecture points to TI application note SLVA043B for a step-by-step treatment.)</p>
+<div class="worked-example">
+<p><strong>Problem.</strong> An inverting op-amp amplifier has a signal source of impedance <i>R<sub>S</sub></i> feeding input resistor <i>R</i><sub>1</sub>, with feedback resistor <i>R<sub>f</sub></i>. Derive the total output noise.</p>
+<p><strong>Set-up.</strong> Replace the op-amp with its input-referred noise model and add a thermal noise source to each resistor. The signal source is grounded for the noise calculation (superposition). Two gains matter:</p>
+<p style="margin-left:1rem">Noise entering the <em>inverting</em> path sees <i>G<sub>I</sub></i> = &minus;<span class="frac"><span class="num"><i>R<sub>f</sub></i></span><span class="den"><i>R<sub>S</sub></i>+<i>R</i><sub>1</sub></span></span>.<br>
+Noise entering the <em>non-inverting</em> terminal sees <i>G<sub>N</sub></i> = 1 + <span class="frac"><span class="num"><i>R<sub>f</sub></i></span><span class="den"><i>R<sub>S</sub></i>+<i>R</i><sub>1</sub></span></span>.</p>
+<p>Note that both depend on the source impedance, so the effective gain can change significantly if <i>R<sub>S</sub></i> is large.</p>
+<p><strong>External resistors.</strong> The thermal noise of <i>R<sub>S</sub></i> and <i>R</i><sub>1</sub> is in series with the inverting path, so each is amplified by <i>G<sub>I</sub></i>; the thermal noise of <i>R<sub>f</sub></i> is felt directly at the output:</p>
+<div class="formula-box"><i>v&#772;<sub>nout,ext</sub></i><sup>2</sup> = <span class="par">(</span><span class="frac"><span class="num"><i>R<sub>f</sub></i></span><span class="den"><i>R<sub>S</sub></i>+<i>R</i><sub>1</sub></span></span><span class="par">)</span><sup>2</sup> (<i>v&#772;<sub>nRS</sub></i><sup>2</sup> + <i>v&#772;<sub>nR1</sub></i><sup>2</sup>) + <i>v&#772;<sub>nRf</sub></i><sup>2</sup></div>
+<p><strong>Intrinsic sources.</strong> The voltage noise <i>v&#772;<sub>n</sub></i> sits at the non-inverting terminal and is amplified by <i>G<sub>N</sub></i>. The current noise <i>i&#772;<sub>n&minus;</sub></i>: because of negative feedback the inverting and non-inverting inputs are a virtual short, so no current flows through (<i>R<sub>S</sub></i>+<i>R</i><sub>1</sub>) and <em>all</em> of it flows through <i>R<sub>f</sub></i>. The current noise <i>i&#772;<sub>n+</sub></i>, on the other hand, sees no resistance on the non-inverting leg and so has no effect at the output (if there were a resistor there, it would).</p>
+<div class="formula-box"><i>v&#772;<sub>nout,int</sub></i><sup>2</sup> = <i>G<sub>N</sub></i><sup>2</sup> <i>v&#772;<sub>n</sub></i><sup>2</sup> + <i>R<sub>f</sub></i><sup>2</sup> <i>i&#772;<sub>n&minus;</sub></i><sup>2</sup></div>
+<p><strong>Total.</strong> All the output noise sources are added, and with all resistors at the same temperature the thermal terms combine:</p>
+<div class="formula-box"><span class="frac"><span class="num"><i>v&#772;<sub>nout</sub></i><sup>2</sup></span><span class="den">&Delta;<i>f</i></span></span> = 4<i>k<sub>B</sub>T R<sub>f</sub> G<sub>N</sub></i> + <i>G<sub>N</sub></i><sup>2</sup> <i>v&#772;<sub>n</sub></i><sup>2</sup> + <i>R<sub>f</sub></i><sup>2</sup> <i>i&#772;<sub>n&minus;</sub></i><sup>2</sup></div>
+<p>Here <i>v&#772;<sub>n</sub></i><sup>2</sup> and <i>i&#772;<sub>n&minus;</sub></i><sup>2</sup> are the datasheet spectral densities (V<sup>2</sup>/Hz and A<sup>2</sup>/Hz), which is how they enter the &Delta;<i>f</i> expressions above.</p>
+</div>
+<p>Referring the intrinsic noise back to the input (dividing by <i>G<sub>I</sub></i><sup>2</sup>) gives a quantity that makes the effect of source impedance explicit:</p>
+<div class="formula-box"><i>v&#772;<sub>nout,int&minus;ir</sub></i><sup>2</sup> = <i>v&#772;<sub>n</sub></i><sup>2</sup> &#8201;<span class="par">(</span><span class="frac"><span class="num"><i>R<sub>S</sub></i>+<i>R</i><sub>1</sub>+<i>R<sub>f</sub></i></span><span class="den"><i>R<sub>f</sub></i></span></span><span class="par">)</span><sup>2</sup> + <i>i&#772;<sub>n&minus;</sub></i><sup>2</sup> (<i>R<sub>S</sub></i>+<i>R</i><sub>1</sub>)<sup>2</sup></div>
+<p>The second term grows with the square of the source resistance: the SNR drops as <i>R<sub>S</sub></i> increases.</p>
+
+<h2 id="s5">5. The impact of source impedance</h2>
+<p>The term above points to a general rule. Plotting the total amplifier input-referred noise density against source resistance shows <strong>three regimes</strong>:</p>
+<div class="diagram-box"><svg viewBox="0 0 720 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Log-log plot of input-referred noise density versus source resistance for an illustrative op-amp: voltage noise dominates at low source resistance, the resistor thermal noise in the middle, and current noise times resistance at high source resistance."><line x1="70.0" y1="20.0" x2="70.0" y2="278.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="70.0" y="296" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">10 &Omega;</text><line x1="173.333" y1="20.0" x2="173.333" y2="278.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="173.33333333333331" y="296" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">100 &Omega;</text><line x1="276.667" y1="20.0" x2="276.667" y2="278.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="276.66666666666663" y="296" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">1k&Omega;</text><line x1="380.0" y1="20.0" x2="380.0" y2="278.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="380.0" y="296" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">10k&Omega;</text><line x1="483.333" y1="20.0" x2="483.333" y2="278.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="483.3333333333333" y="296" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">100k&Omega;</text><line x1="586.667" y1="20.0" x2="586.667" y2="278.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="586.6666666666667" y="296" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">1M&Omega;</text><line x1="690.0" y1="20.0" x2="690.0" y2="278.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="690.0" y="296" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">10M&Omega;</text><line x1="70.0" y1="278.0" x2="690.0" y2="278.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="282.0" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">0.1</text><line x1="70.0" y1="226.4" x2="690.0" y2="226.4" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="230.4" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">1</text><line x1="70.0" y1="174.8" x2="690.0" y2="174.8" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="178.79999999999998" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">10</text><line x1="70.0" y1="123.2" x2="690.0" y2="123.2" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="127.2" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">100</text><line x1="70.0" y1="71.6" x2="690.0" y2="71.6" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="75.6" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">1000</text><line x1="70.0" y1="20.0" x2="690.0" y2="20.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="24.0" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">10000</text><line x1="70.0" y1="20.0" x2="70.0" y2="278.0" stroke="#999" stroke-width="1.2" stroke-linecap="round"/><line x1="70.0" y1="278.0" x2="690.0" y2="278.0" stroke="#999" stroke-width="1.2" stroke-linecap="round"/><text transform="rotate(-90 18 149.0)" x="18" y="149.0" text-anchor="middle" font-size="11.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Input-referred noise density (nV/&radic;Hz)</text><text x="380.0" y="322" text-anchor="middle" font-size="12" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Source resistance R<tspan font-size="9" dy="3">S</tspan></text><polyline points="70.0,190.33314777626143 75.16666666666667,190.33314777626143 80.33333333333334,190.33314777626143 85.49999999999999,190.33314777626143 90.66666666666666,190.33314777626143 95.83333333333333,190.33314777626143 101.0,190.33314777626143 106.16666666666669,190.33314777626143 111.33333333333331,190.33314777626143 116.5,190.33314777626143 121.66666666666666,190.33314777626143 126.83333333333334,190.33314777626143 132.0,190.33314777626143 137.16666666666666,190.33314777626143 142.33333333333331,190.33314777626143 147.5,190.33314777626143 152.66666666666669,190.33314777626143 157.83333333333334,190.33314777626143 163.0,190.33314777626143 168.16666666666666,190.33314777626143 173.33333333333331,190.33314777626143 178.49999999999997,190.33314777626143 183.66666666666669,190.33314777626143 188.83333333333331,190.33314777626143 194.00000000000003,190.33314777626143 199.16666666666669,190.33314777626143 204.33333333333331,190.33314777626143 209.5,190.33314777626143 214.66666666666666,190.33314777626143 219.83333333333334,190.33314777626143 225.0,190.33314777626143 230.16666666666666,190.33314777626143 235.33333333333334,190.33314777626143 240.49999999999997,190.33314777626143 245.66666666666669,190.33314777626143 250.83333333333334,190.33314777626143 256.0,190.33314777626143 261.1666666666667,190.33314777626143 266.3333333333333,190.33314777626143 271.5,190.33314777626143 276.66666666666663,190.33314777626143 281.8333333333333,190.33314777626143 287.0,190.33314777626143 292.16666666666663,190.33314777626143 297.33333333333337,190.33314777626143 302.5,190.33314777626143 307.66666666666663,190.33314777626143 312.83333333333337,190.33314777626143 318.0,190.33314777626143 323.1666666666667,190.33314777626143 328.33333333333337,190.33314777626143 333.5,190.33314777626143 338.6666666666667,190.33314777626143 343.8333333333333,190.33314777626143 349.0,190.33314777626143 354.16666666666663,190.33314777626143 359.3333333333333,190.33314777626143 364.5,190.33314777626143 369.6666666666667,190.33314777626143 374.83333333333337,190.33314777626143 380.0,190.33314777626143 385.16666666666663,190.33314777626143 390.3333333333333,190.33314777626143 395.5,190.33314777626143 400.6666666666667,190.33314777626143 405.8333333333333,190.33314777626143 410.99999999999994,190.33314777626143 416.16666666666663,190.33314777626143 421.33333333333337,190.33314777626143 426.50000000000006,190.33314777626143 431.6666666666667,190.33314777626143 436.8333333333333,190.33314777626143 442.0,190.33314777626143 447.1666666666667,190.33314777626143 452.33333333333337,190.33314777626143 457.5,190.33314777626143 462.66666666666663,190.33314777626143 467.8333333333333,190.33314777626143 473.0,190.33314777626143 478.1666666666667,190.33314777626143 483.3333333333333,190.33314777626143 488.49999999999994,190.33314777626143 493.66666666666663,190.33314777626143 498.83333333333337,190.33314777626143 504.00000000000006,190.33314777626143 509.1666666666667,190.33314777626143 514.3333333333333,190.33314777626143 519.5,190.33314777626143 524.6666666666667,190.33314777626143 529.8333333333334,190.33314777626143 535.0,190.33314777626143 540.1666666666666,190.33314777626143 545.3333333333333,190.33314777626143 550.5,190.33314777626143 555.6666666666667,190.33314777626143 560.8333333333333,190.33314777626143 566.0,190.33314777626143 571.1666666666666,190.33314777626143 576.3333333333334,190.33314777626143 581.5,190.33314777626143 586.6666666666667,190.33314777626143 591.8333333333334,190.33314777626143 597.0,190.33314777626143 602.1666666666667,190.33314777626143 607.3333333333334,190.33314777626143 612.5,190.33314777626143 617.6666666666666,190.33314777626143 622.8333333333333,190.33314777626143 628.0,190.33314777626143 633.1666666666666,190.33314777626143 638.3333333333333,190.33314777626143 643.5,190.33314777626143 648.6666666666666,190.33314777626143 653.8333333333334,190.33314777626143 659.0,190.33314777626143 664.1666666666667,190.33314777626143 669.3333333333334,190.33314777626143 674.5,190.33314777626143 679.6666666666667,190.33314777626143 684.8333333333334,190.33314777626143 690.0,190.33314777626143" fill="none" stroke="#1f5fa8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 4"/><polyline points="70.0,246.5414792827811 75.16666666666667,245.2514792827811 80.33333333333334,243.96147928278114 85.49999999999999,242.6714792827811 90.66666666666666,241.38147928278113 95.83333333333333,240.0914792827811 101.0,238.80147928278112 106.16666666666669,237.51147928278112 111.33333333333331,236.2214792827811 116.5,234.9314792827811 121.66666666666666,233.64147928278112 126.83333333333334,232.3514792827811 132.0,231.0614792827811 137.16666666666666,229.7714792827811 142.33333333333331,228.48147928278112 147.5,227.1914792827811 152.66666666666669,225.9014792827811 157.83333333333334,224.61147928278112 163.0,223.3214792827811 168.16666666666666,222.0314792827811 173.33333333333331,220.7414792827811 178.49999999999997,219.4514792827811 183.66666666666669,218.1614792827811 188.83333333333331,216.87147928278114 194.00000000000003,215.58147928278112 199.16666666666669,214.2914792827811 204.33333333333331,213.0014792827811 209.5,211.71147928278114 214.66666666666666,210.42147928278112 219.83333333333334,209.1314792827811 225.0,207.8414792827811 230.16666666666666,206.55147928278112 235.33333333333334,205.26147928278112 240.49999999999997,203.97147928278113 245.66666666666669,202.68147928278108 250.83333333333334,201.39147928278112 256.0,200.10147928278113 261.1666666666667,198.8114792827811 266.3333333333333,197.5214792827811 271.5,196.23147928278112 276.66666666666663,194.9414792827811 281.8333333333333,193.6514792827811 287.0,192.36147928278112 292.16666666666663,191.0714792827811 297.33333333333337,189.7814792827811 302.5,188.4914792827811 307.66666666666663,187.2014792827811 312.83333333333337,185.9114792827811 318.0,184.6214792827811 323.1666666666667,183.33147928278112 328.33333333333337,182.0414792827811 333.5,180.7514792827811 338.6666666666667,179.46147928278114 343.8333333333333,178.17147928278112 349.0,176.8814792827811 354.16666666666663,175.5914792827811 359.3333333333333,174.30147928278112 364.5,173.01147928278112 369.6666666666667,171.7214792827811 374.83333333333337,170.43147928278108 380.0,169.14147928278112 385.16666666666663,167.85147928278113 390.3333333333333,166.5614792827811 395.5,165.2714792827811 400.6666666666667,163.98147928278112 405.8333333333333,162.6914792827811 410.99999999999994,161.4014792827811 416.16666666666663,160.11147928278112 421.33333333333337,158.8214792827811 426.50000000000006,157.5314792827811 431.6666666666667,156.2414792827811 436.8333333333333,154.9514792827811 442.0,153.6614792827811 447.1666666666667,152.3714792827811 452.33333333333337,151.08147928278112 457.5,149.7914792827811 462.66666666666663,148.5014792827811 467.8333333333333,147.2114792827811 473.0,145.9214792827811 478.1666666666667,144.6314792827811 483.3333333333333,143.3414792827811 488.49999999999994,142.05147928278112 493.66666666666663,140.76147928278112 498.83333333333337,139.4714792827811 504.00000000000006,138.1814792827811 509.1666666666667,136.89147928278112 514.3333333333333,135.6014792827811 519.5,134.31147928278114 524.6666666666667,133.02147928278112 529.8333333333334,131.7314792827811 535.0,130.44147928278113 540.1666666666666,129.1514792827811 545.3333333333333,127.86147928278112 550.5,126.5714792827811 555.6666666666667,125.2814792827811 560.8333333333333,123.99147928278111 566.0,122.70147928278111 571.1666666666666,121.41147928278112 576.3333333333334,120.12147928278111 581.5,118.8314792827811 586.6666666666667,117.5414792827811 591.8333333333334,116.25147928278112 597.0,114.96147928278111 602.1666666666667,113.67147928278109 607.3333333333334,112.3814792827811 612.5,111.09147928278111 617.6666666666666,109.80147928278112 622.8333333333333,108.51147928278112 628.0,107.22147928278109 633.1666666666666,105.93147928278111 638.3333333333333,104.6414792827811 643.5,103.35147928278111 648.6666666666666,102.06147928278112 653.8333333333334,100.7714792827811 659.0,99.4814792827811 664.1666666666667,98.19147928278112 669.3333333333334,96.90147928278111 674.5,95.61147928278112 679.6666666666667,94.3214792827811 684.8333333333334,93.0314792827811 690.0,91.74147928278111" fill="none" stroke="#7a8791" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 4"/><polyline points="204.33333333333331,278.0531477762614 209.5,275.47314777626144 214.66666666666666,272.8931477762614 219.83333333333334,270.3131477762614 225.0,267.73314777626143 230.16666666666666,265.15314777626145 235.33333333333334,262.57314777626146 240.49999999999997,259.9931477762614 245.66666666666669,257.41314777626144 250.83333333333334,254.83314777626143 256.0,252.25314777626144 261.1666666666667,249.67314777626146 266.3333333333333,247.09314777626142 271.5,244.5131477762614 276.66666666666663,241.93314777626145 281.8333333333333,239.35314777626144 287.0,236.7731477762614 292.16666666666663,234.1931477762614 297.33333333333337,231.61314777626143 302.5,229.03314777626142 307.66666666666663,226.45314777626146 312.83333333333337,223.87314777626142 318.0,221.29314777626143 323.1666666666667,218.71314777626142 328.33333333333337,216.13314777626144 333.5,213.55314777626145 338.6666666666667,210.97314777626144 343.8333333333333,208.39314777626143 349.0,205.81314777626145 354.16666666666663,203.23314777626143 359.3333333333333,200.65314777626142 364.5,198.07314777626144 369.6666666666667,195.49314777626142 374.83333333333337,192.9131477762614 380.0,190.33314777626143 385.16666666666663,187.75314777626144 390.3333333333333,185.17314777626146 395.5,182.59314777626142 400.6666666666667,180.0131477762614 405.8333333333333,177.43314777626145 410.99999999999994,174.85314777626144 416.16666666666663,172.27314777626145 421.33333333333337,169.6931477762614 426.50000000000006,167.11314777626143 431.6666666666667,164.53314777626142 436.8333333333333,161.95314777626146 442.0,159.37314777626145 447.1666666666667,156.7931477762614 452.33333333333337,154.21314777626142 457.5,151.63314777626144 462.66666666666663,149.05314777626145 467.8333333333333,146.47314777626144 473.0,143.8931477762614 478.1666666666667,141.31314777626142 483.3333333333333,138.73314777626143 488.49999999999994,136.15314777626145 493.66666666666663,133.57314777626146 498.83333333333337,130.99314777626142 504.00000000000006,128.41314777626144 509.1666666666667,125.83314777626144 514.3333333333333,123.25314777626144 519.5,120.67314777626144 524.6666666666667,118.09314777626142 529.8333333333334,115.51314777626142 535.0,112.93314777626144 540.1666666666666,110.35314777626144 545.3333333333333,107.77314777626145 550.5,105.19314777626141 555.6666666666667,102.61314777626143 560.8333333333333,100.03314777626143 566.0,97.45314777626145 571.1666666666666,94.87314777626145 576.3333333333334,92.29314777626142 581.5,89.71314777626142 586.6666666666667,87.13314777626142 591.8333333333334,84.55314777626144 597.0,81.97314777626146 602.1666666666667,79.39314777626142 607.3333333333334,76.81314777626142 612.5,74.23314777626143 617.6666666666666,71.65314777626145 622.8333333333333,69.07314777626145 628.0,66.49314777626141 633.1666666666666,63.913147776261425 638.3333333333333,61.333147776261434 643.5,58.75314777626144 648.6666666666666,56.17314777626145 653.8333333333334,53.59314777626142 659.0,51.01314777626142 664.1666666666667,48.433147776261436 669.3333333333334,45.853147776261444 674.5,43.27314777626145 679.6666666666667,40.69314777626141 684.8333333333334,38.11314777626142 690.0,35.53314777626143" fill="none" stroke="#e60000" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 4"/><polyline points="70.0,190.25911627993983 75.16666666666667,190.25011493999855 80.33333333333334,190.2400234776313 85.49999999999999,190.22871098460033 90.66666666666666,190.21603111750846 95.83333333333333,190.2018203507123 101.0,190.18589605012104 106.16666666666669,190.16805435435356 111.33333333333331,190.1480678500362 116.5,190.12568302880567 121.66666666666666,190.1006175149703 126.83333333333334,190.07255705495214 132.0,190.04115226277884 137.16666666666666,190.00601512024875 142.33333333333331,189.96671523622007 147.5,189.92277587706843 152.66666666666669,189.87366979003335 157.83333333333334,189.8188148532575 163.0,189.75756960113688 168.16666666666666,189.68922869141232 173.33333333333331,189.6130184014536 178.49999999999997,189.52809226545986 183.66666666666669,189.4335269916836 188.83333333333331,189.32831882880728 194.00000000000003,189.21138058241442 199.16666666666669,189.08153951469856 204.33333333333331,188.93753639113638 209.5,188.77802596406815 214.66666666666666,188.60157920147165 219.83333333333334,188.40668757544353 225.0,188.19176971419725 230.16666666666666,187.95518068868017 235.33333333333334,187.69522414537548 240.49999999999997,187.41016740664935 245.66666666666669,187.09825953712635 250.83333333333334,186.7577522199066 256.0,186.38692310463048 261.1666666666667,185.98410108962423 266.3333333333333,185.5476927964816 271.5,185.0762093054978 276.66666666666663,184.56829206517335 281.8333333333333,184.02273678980586 287.0,183.4385141347034 292.16666666666663,182.81478600171997 297.33333333333337,182.15091648292116 302.5,181.44647669105137 307.66666666666663,180.70124303521948 312.83333333333337,179.91518885291 318.0,179.08846967337809 323.1666666666667,178.2214027297175 328.33333333333337,177.31444162781025 333.5,176.36814729778465 338.6666666666667,175.38315648533745 343.8333333333333,174.3601490848513 349.0,173.29981558188803 354.16666666666663,172.20282577481257 359.3333333333333,171.06979980346347 364.5,169.90128234709042 369.6666666666667,168.69772068223196 374.83333333333337,167.4594471276421 380.0,166.18666625635436 385.16666666666663,164.8794471276421 390.3333333333333,163.53772068223196 395.5,162.16128234709038 400.6666666666667,160.74979980346347 405.8333333333333,159.30282577481253 410.99999999999994,157.81981558188804 416.16666666666663,156.30014908485134 421.33333333333337,154.74315648533744 426.50000000000006,153.14814729778462 431.6666666666667,151.51444162781024 436.8333333333333,149.84140272971752 442.0,148.1284696733781 447.1666666666667,146.37518885291001 452.33333333333337,144.58124303521947 457.5,142.74647669105138 462.66666666666663,140.8709164829212 467.8333333333333,138.95478600171998 473.0,136.99851413470338 478.1666666666667,135.00273678980585 483.3333333333333,132.96829206517333 488.49999999999994,130.89620930549782 493.66666666666663,128.78769279648162 498.83333333333337,126.64410108962421 504.00000000000006,124.46692310463048 509.1666666666667,122.25775221990664 514.3333333333333,120.01825953712638 519.5,117.75016740664935 524.6666666666667,115.45522414537548 529.8333333333334,113.13518068868015 535.0,110.79176971419726 540.1666666666666,108.42668757544351 545.3333333333333,106.04157920147168 550.5,103.63802596406812 555.6666666666667,101.21753639113636 560.8333333333333,98.78153951469855 566.0,96.33138058241444 571.1666666666666,93.86831882880732 576.3333333333334,91.39352699168359 581.5,88.90809226545984 586.6666666666667,86.41301840145357 591.8333333333334,83.90922869141235 597.0,81.3975696011369 602.1666666666667,78.87881485325748 607.3333333333334,76.35366979003334 612.5,73.82277587706848 617.6666666666666,71.28671523622008 622.8333333333333,68.74601512024876 628.0,66.2011522627788 633.1666666666666,63.65255705495212 638.3333333333333,61.1006175149703 643.5,58.54568302880569 648.6666666666666,55.988067850036195 653.8333333333334,53.42805435435353 659.0,50.86589605012104 664.1666666666667,48.3018203507123 669.3333333333334,45.736031117508475 674.5,43.16871098460035 679.6666666666667,40.60002347763128 684.8333333333334,38.030114939998555 690.0,35.459116279939835" fill="none" stroke="#1a1a1a" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><line x1="295.1238083594458" y1="20" x2="295.1238083594458" y2="278" stroke="#8a99a3" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 3"/><line x1="464.8761916405542" y1="20" x2="464.8761916405542" y2="278" stroke="#8a99a3" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 3"/><text x="121.66666666666666" y="36" text-anchor="middle" font-size="11.5" fill="#1f5fa8" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">voltage noise</text><text x="121.66666666666666" y="50" text-anchor="middle" font-size="11.5" fill="#1f5fa8" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">dominates</text><text x="380.0" y="36" text-anchor="middle" font-size="11.5" fill="#4b5961" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">resistor thermal</text><text x="380.0" y="50" text-anchor="middle" font-size="11.5" fill="#4b5961" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">noise dominates</text><text x="643.5" y="-1837.6000000000001" text-anchor="middle" font-size="11.5" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">current noise</text><text x="643.5" y="-1822.6000000000001" text-anchor="middle" font-size="11.5" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">&times; R<tspan font-size="9" dy="3">S</tspan><tspan dy="-3"> dominates</tspan></text><text x="299.1238083594458" y="270" text-anchor="start" font-size="10.5" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">e<tspan font-size="9" dy="3">n</tspan><tspan dy="-3">&sup2;/4kT</tspan></text><text x="468.8761916405542" y="270" text-anchor="start" font-size="10.5" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">4kT/i<tspan font-size="9" dy="3">n</tspan><tspan dy="-3">&sup2;</tspan></text><rect x="472" y="192" width="218" height="70" rx="4" fill="#fff" stroke="#ddd" stroke-width="1"/><line x1="480" y1="206" x2="506" y2="206" stroke="#1f5fa8" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="6 4"/><text x="514" y="210" text-anchor="start" font-size="11" fill="#444" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">e<tspan font-size="9" dy="3">n</tspan><tspan dy="-3"> (amplifier voltage noise)</tspan></text><line x1="480" y1="221" x2="506" y2="221" stroke="#7a8791" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="2 4"/><text x="514" y="225" text-anchor="start" font-size="11" fill="#444" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">&radic;(4kT R<tspan font-size="9" dy="3">S</tspan><tspan dy="-3">) (source thermal)</tspan></text><line x1="480" y1="236" x2="506" y2="236" stroke="#e60000" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="6 4"/><text x="514" y="240" text-anchor="start" font-size="11" fill="#444" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">i<tspan font-size="9" dy="3">n</tspan><tspan dy="-3"> R</tspan><tspan font-size="9" dy="3">S</tspan><tspan dy="-3"> (current noise)</tspan></text><line x1="480.0" y1="251.0" x2="506.0" y2="251.0" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round"/><text x="514" y="255" text-anchor="start" font-size="11" fill="#444" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Total</text></svg><div class="diagram-caption">Fig. 2: Input-referred noise density versus source resistance, for an illustrative op-amp with <i>e<sub>n</sub></i> = 5 nV/&radic;Hz and <i>i<sub>n</sub></i> = 0.5 pA/&radic;Hz at 300 K. The three regimes follow the lecture; the values are illustrative, not taken from a specific datasheet.</div></div>
+<ul>
+<li><strong>Low <i>R<sub>S</sub></i>:</strong> the intrinsic voltage noise (<i>e<sub>n</sub></i><sup>2</sup>) dominates. The intrinsic current noise is &ldquo;downscaled&rdquo; (it flows through a small resistance). Pick a low-<i>e<sub>n</sub></i> (voltage-noise-optimised) amplifier.</li>
+<li><strong>Intermediate <i>R<sub>S</sub></i>,</strong> <span class="frac"><span class="num"><i>e<sub>n</sub></i><sup>2</sup></span><span class="den">4<i>k<sub>B</sub>T</i></span></span> &lt; <i>R<sub>S</sub></i> &lt; <span class="frac"><span class="num">4<i>k<sub>B</sub>T</i></span><span class="den"><i>i<sub>n</sub></i><sup>2</sup></span></span>: the Johnson noise of <i>R<sub>S</sub></i> itself dominates. The amplifier is already good enough; no amplifier choice can remove this noise floor.</li>
+<li><strong>High <i>R<sub>S</sub></i>:</strong> the intrinsic current noise flowing through <i>R<sub>S</sub></i> is scaled up in proportion to <i>R<sub>S</sub></i> (<i>i<sub>n</sub></i><i>R<sub>S</sub></i>), whereas the source&rsquo;s thermal noise voltage grows only as <span class="rad"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb"><i>R<sub>S</sub></i></span></span>. Pick a low-<i>i<sub>n</sub></i> amplifier (typically MOSFET- or JFET-input) to push the crossover to very high <i>R<sub>S</sub></i>.</li>
+</ul>
+<p>The lecture illustrates this with an Analog Devices example: the OP27 (voltage noise 3 nV/&radic;Hz, current noise 1 pA/&radic;Hz, 25 &deg;C), neglecting the noise of the gain-setting resistors:</p>
+<table class="cmp">
+<thead><tr><th>Contribution (nV/&radic;Hz, referred to input)</th><th><i>R</i> = 0</th><th><i>R</i> = 3 k&Omega;</th><th><i>R</i> = 300 k&Omega;</th></tr></thead>
+<tbody>
+<tr><td>Amplifier voltage noise</td><td class="hl">3</td><td>3</td><td>3</td></tr>
+<tr><td>Amplifier current noise flowing in <i>R</i></td><td>0</td><td>3</td><td class="hl">300</td></tr>
+<tr><td>Johnson noise of <i>R</i></td><td>0</td><td class="hl">7</td><td>70</td></tr>
+</tbody></table>
+<p class="small">Highlighted cells mark the dominant noise source for each resistance, as in the slide (source: Analog Devices).</p>
+
+<h2 id="s6">6. Choosing the right amplifier</h2>
+<p>The lecture&rsquo;s general noise guidance for component selection:</p>
+<ul>
+<li><strong>A &ldquo;low-noise&rdquo; op-amp is not automatically low-noise in every application.</strong> Low input-referred voltage and current noise values are independent of the source, but how they transfer to the output <em>does</em> depend on the source impedance.</li>
+<li>A low-<i>current</i>-noise op-amp only helps when the signal source&rsquo;s impedance is high (because the amplifier&rsquo;s low-current-noise advantage would otherwise be buried). If instead the source already has a low impedance, a low-current-noise part may not help at all, because the thermal noise of the external resistors or the op-amp&rsquo;s intrinsic <em>voltage</em> noise dominates instead.</li>
+<li>Even a perfect amplifier cannot remove the source&rsquo;s own thermal noise (spectral density 4<i>k<sub>B</sub>TR<sub>S</sub></i>); the thermal noise of external components also sets a floor.</li>
+<li>Source impedance also modifies the <strong>gain</strong> of the amplifier, as the expressions for <i>G<sub>I</sub></i> and <i>G<sub>N</sub></i> show.</li>
+<li>Different amplifiers are best at different source impedances: the lecture compares noise-versus-frequency curves for op-amps such as the 741, OP07, OP27 and others at <i>R<sub>S</sub></i> = 100 &Omega;, 10 k&Omega; and 1 M&Omega; (Analog Devices data).</li>
+</ul>
+
+<h2 id="s7">7. Homework and take-homes</h2>
+<div class="worked-example">
+<p><strong>Homework (from the lecture).</strong> A sensor is modelled as an ideal voltage source <i>v<sub>S</sub></i> (<i>V</i><sub>S,RMS</sub> = 25 &micro;V) with source resistance <i>R<sub>S</sub></i> = 1 k&Omega;, driving a non-inverting amplifier with <i>R</i><sub>1</sub> = 1 k&Omega;, <i>R<sub>F</sub></i> = 10 k&Omega; and <i>C<sub>F</sub></i> = 1 nF. The op-amp has <i>e<sub>n</sub></i> = 10 nV/&radic;Hz and <i>i<sub>n</sub></i> = 0.1 pA/&radic;Hz (white; capacitors noiseless; <i>T</i> = 300 K; all noise sources uncorrelated). Tasks include: the transfer function, DC gain and corner frequency; the effective noise bandwidth; the SNR of the source and of the output in dB; drawing and referring every noise source to the input; the input-referred noise and noise figure; which source dominates; and finally repeating the analysis for a 100 k&Omega; source (e.g. a dry ECG electrode). Does the noise figure get better or worse, and why do the SNR and noise-figure answers point in different directions?</p>
+</div>
+<p><strong>Important take-homes:</strong></p>
+<ul>
+<li>Op-amps are multi-port devices with many linear and non-linear components inside. We simplify the noise model to <strong>two input current noise sources and one voltage noise source</strong>.</li>
+<li>External resistors added to an op-amp add their own thermal noise on top of the intrinsic noise.</li>
+<li>Choosing a low-noise amplifier means considering the <em>source impedance</em>: low voltage noise does not help when the source impedance is high (there, low current noise is what matters).</li>
+<li>Despite choosing a low-noise amplifier, the source&rsquo;s own thermal noise (4<i>k<sub>B</sub>TR<sub>S</sub></i>) and that of external components will still set a noise floor that cannot be removed by swapping amplifiers.</li>
+<li>The source impedance can also modify the <strong>gain</strong> of an amplifier.</li>
+</ul>
+
+        </div>
+        <div class="download-bar"><a href="noise-in-instrumentation-part-4.pdf" class="btn">Download slides (PDF) &darr;</a><a href="teaching.html" class="btn alt">All lectures</a></div>
+        <div class="lecture-nav"><a href="lecture-3-noise-part-3.html">&larr; Lecture 3: Diode and BJT Noise Models</a><a class="next" href="lecture-5-noise-part-5.html">Lecture 5: Interference, Coupling and Mitigation &rarr;</a></div>
+    </div>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+</body>
+</html>

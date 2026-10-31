@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 5: Noise Part 5: Interference, Coupling and Mitigation | Kasun Pathirage</title>
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #e60000;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 2rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .course-meta {
+            font-size: 0.95rem;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 2rem 0;
+        }
+        .lecture-card {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .lecture-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            color: var(--primary);
+            line-height: 1.35;
+        }
+        .lecture-topics {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.25rem;
+        }
+        .lecture-card h4 {
+            font-size: 1.02rem;
+            color: var(--primary);
+            margin: 1.5rem 0 0.5rem 0;
+        }
+        .lecture-card h4:first-of-type {
+            margin-top: 0.5rem;
+        }
+        .lecture-card p, .lecture-card li {
+            font-size: 0.95rem;
+        }
+        .lecture-card ul {
+            padding-left: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        .lecture-card li {
+            margin-bottom: 0.35rem;
+        }
+        .formula-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0;
+            font-family: Cambria, "Times New Roman", serif;
+            font-size: 1rem;
+            color: #222;
+        }
+        .formula-box .label {
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 0.2rem;
+        }
+        .worked-example {
+            background: #fbfbfb;
+            border-left: 3px solid var(--secondary);
+            padding: 0.9rem 1.1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .worked-example p { margin: 0.4rem 0; }
+        .callout {
+            background: #fff8e6;
+            border: 1px solid #f0e0b0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #5a4a1a;
+        }
+        .diagram-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem 0.75rem 0.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .diagram-box svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            min-width: 560px;
+        }
+        .diagram-caption {
+            font-size: 0.78rem;
+            color: #888;
+            text-align: center;
+            margin: 0.5rem 0 0.25rem;
+        }
+        .media-box {
+            background: #eee;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            margin: 1rem 0;
+            color: #888;
+            font-size: 0.95rem;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: #fff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: normal;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn:hover {
+            background-color: var(--secondary);
+            color: #fff;
+            text-decoration: none;
+        }
+        .btn.disabled {
+            background-color: #ccc;
+            cursor: default;
+            pointer-events: none;
+        }
+    
+        .lead { font-size: 1.02rem; color: #333; }
+        .page-nav { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem 1rem; margin-bottom:1.5rem; }
+        .page-nav .back-link { margin-bottom:0; }
+        .chips { display:flex; flex-wrap:wrap; gap:.4rem .5rem; margin:.25rem 0 1.25rem; }
+        .chip { font-size:.78rem; background:#f1f1f5; color:#444; border-radius:12px; padding:.2rem .65rem; }
+        .toc { background:#fafafa; border:1px solid #e5e5e5; border-radius:6px; padding:.85rem 1.25rem; margin:1.25rem 0 .5rem; font-size:.92rem; }
+        .toc ol { margin:.45rem 0 0; padding-left:1.25rem; columns:2; column-gap:2rem; }
+        .toc li { margin-bottom:.2rem; break-inside:avoid; }
+        .toc a { color:#333; text-decoration:none; } .toc a:hover { color:var(--secondary); text-decoration:underline; }
+        .lecture-page h2 { font-size:1.3rem; margin:2.25rem 0 .6rem; padding-top:.5rem; border-top:1px solid #e8e8e8; color:var(--primary); scroll-margin-top:1rem; }
+        .lecture-page h3 { font-size:1.05rem; margin:1.5rem 0 .4rem; color:var(--primary); }
+        .lecture-page p, .lecture-page li { font-size:.97rem; line-height:1.6; }
+        .lecture-page ul, .lecture-page ol { padding-left:1.3rem; }
+        .lecture-page li { margin-bottom:.4rem; }
+        .formula-box { overflow-x:auto; line-height:1.75; }
+        .worked-example, .callout { font-size:.95rem; }
+        .small { font-size:.82rem !important; color:#777; }
+        table.cmp { width:100%; border-collapse:collapse; font-size:.86rem; margin:1rem 0; display:block; overflow-x:auto; }
+        table.cmp th, table.cmp td { border:1px solid #e0e0e0; padding:.45rem .65rem; text-align:left; vertical-align:top; line-height:1.45; }
+        table.cmp th { background:#f4f4f6; font-weight:600; }
+        table.cmp td.hl { background:#fff0f0; font-weight:600; color:#a00000; }
+        .diagram-box { padding:1rem .75rem .5rem; }
+        .diagram-box svg { min-width:560px; }
+        .download-bar { display:flex; flex-wrap:wrap; gap:.6rem; align-items:center; margin:1.25rem 0 0; }
+        .btn.alt { background:#fff; color:var(--primary); border:1px solid #bbb; }
+        .btn.alt:hover { background:var(--secondary); color:#fff; border-color:var(--secondary); }
+        .lecture-nav { display:flex; justify-content:space-between; gap:1rem; margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid #ddd; flex-wrap:wrap; }
+        .lecture-nav a { color:var(--secondary); text-decoration:none; font-weight:600; font-size:.92rem; max-width:48%; }
+        .lecture-nav a:hover { text-decoration:underline; }
+        .lecture-nav .next { margin-left:auto; text-align:right; }
+        .series-label { font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:#888; font-weight:600; margin:2rem 0 .75rem; }
+        .lecture-row .num { display:inline-block; min-width:2rem; color:var(--secondary); font-weight:700; }
+        .lecture-row .btn-row { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.75rem; }
+        @media (max-width:640px){ .container{margin:1rem;padding:1.25rem;} .toc ol{columns:1;} .lecture-nav a{max-width:100%;} }
+    
+        /* stacked fractions and radicals for equations */
+        .frac { display:inline-flex; flex-direction:column; align-items:stretch; vertical-align:middle; margin:0 .18em; text-align:center; line-height:1.25; }
+        .frac > .num { padding:0 .3em .1em; border-bottom:1.4px solid currentColor; }
+        .frac > .den { padding:.1em .3em 0; }
+        sup .frac, sub .frac { font-size:1em; }
+        .rad { display:inline-block; position:relative; padding-left:.72em; white-space:nowrap; }
+        .rad > .rs { position:absolute; left:0; top:0; width:.72em; height:100%; overflow:visible; }
+        .rad > .rb { display:inline-block; border-top:1.4px solid currentColor; padding:0 .15em; line-height:1.3; }
+        .rad.tall { vertical-align:middle; }
+        .rad.tall > .rb { display:block; padding-top:.15em; }
+        .par { font-size:1.7em; font-weight:200; line-height:0; vertical-align:-.1em; }
+        .formula-box .frac, .worked-example .frac { font-size:1.02em; }
+    </style>
+
+</head>
+<body>
+    <div class="container ">
+        <div class="page-nav"><a href="teaching.html" class="back-link">&larr; All lectures</a><a href="../index.html" class="back-link">Portfolio &rarr;</a></div>
+        <div class="series-label">BM3110 Electronic Instrumentation &middot; Lecture 5 of 7</div>
+        <h1>Noise and Interference in Instrumentation, Part 5: Interference, Coupling and Mitigation</h1>
+        <div class="course-meta">University of Moratuwa &middot; Dept. of Biomedical Engineering &middot; Semester 5 &middot; Fall 2026 &middot; 58 slides</div>
+        <div class="chips"><span class="chip">source&ndash;coupling&ndash;receiver model</span><span class="chip">capacitive, inductive and conductive coupling</span><span class="chip">shielding</span><span class="chip">twisted pairs</span><span class="chip">ground loops and grounding</span><span class="chip">isolation</span><span class="chip">CMRR and differential signalling</span><span class="chip">power-line interference</span><span class="chip">ADC noise</span></div>
+        <div class="download-bar"><a href="noise-in-instrumentation-part-5.pdf" class="btn">Download slides (PDF) &darr;</a></div>
+        <hr>
+        <div class="lecture-page">
+
+<p class="lead">So far the series has dealt with <em>noise</em> generated inside devices. <strong>Interference</strong> is different: unwanted signals that originate from external sources, are more structured than intrinsic noise, and can usually be traced back to a specific source. This lecture models how interference gets into a circuit (through capacitive, inductive, conductive or radiative coupling) and how each path is blocked.</p>
+
+<div class="toc"><strong>On this page</strong>
+<ol>
+<li><a href="#s1">Interference: source, coupling, receiver</a></li>
+<li><a href="#s2">Observing noise and interference</a></li>
+<li><a href="#s3">Capacitive coupling and shielding</a></li>
+<li><a href="#s4">Inductive coupling, twisted pairs and magnetic shielding</a></li>
+<li><a href="#s5">Capacitive versus inductive coupling</a></li>
+<li><a href="#s6">Conductive coupling and ground loops</a></li>
+<li><a href="#s7">Grounding techniques and isolation</a></li>
+<li><a href="#s8">Common-mode rejection and differential signalling</a></li>
+<li><a href="#s9">EMI and power-line interference</a></li>
+<li><a href="#s10">Data acquisition: ADC noise and filtering</a></li>
+</ol></div>
+
+<h2 id="s1">1. Interference: source, coupling, receiver</h2>
+<p>Interference exists only when <strong>three components exist in order</strong>: a noise source, a coupling medium, and a receiver that reflects the coupled noise. Breaking or weakening any one of these links reduces the interference.</p>
+<div class="diagram-box"><svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Interference needs three links: a noise source, a coupling medium and a receiver. Breaking any one of them mitigates the interference."><rect x="20" y="14" width="200" height="50" rx="4" fill="#fff" stroke="#c28a00" stroke-width="2"/><text x="120" y="45" text-anchor="middle" font-size="15" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">Noise source</text><text x="120" y="92" text-anchor="middle" font-size="12.5" fill="#c28a00" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Mains (50 Hz)</text><text x="120" y="113" text-anchor="middle" font-size="12.5" fill="#c28a00" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Motors</text><text x="120" y="134" text-anchor="middle" font-size="12.5" fill="#c28a00" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Switching PSUs</text><text x="120" y="155" text-anchor="middle" font-size="12.5" fill="#c28a00" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Digital logic</text><text x="120" y="176" text-anchor="middle" font-size="12.5" fill="#c28a00" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">RF transmitters</text><rect x="280" y="14" width="200" height="50" rx="4" fill="#fff" stroke="#e60000" stroke-width="2"/><text x="380" y="45" text-anchor="middle" font-size="15" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">Coupling medium</text><text x="380" y="92" text-anchor="middle" font-size="12.5" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Capacitive (E-field)</text><text x="380" y="113" text-anchor="middle" font-size="12.5" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Inductive (B-field)</text><text x="380" y="134" text-anchor="middle" font-size="12.5" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Conductive (current)</text><text x="380" y="155" text-anchor="middle" font-size="12.5" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Radiative (E- and B-field)</text><rect x="540" y="14" width="200" height="50" rx="4" fill="#fff" stroke="#1f8a4c" stroke-width="2"/><text x="640" y="45" text-anchor="middle" font-size="15" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">Receiver</text><text x="640" y="92" text-anchor="middle" font-size="12.5" fill="#1f8a4c" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Sensors</text><text x="640" y="113" text-anchor="middle" font-size="12.5" fill="#1f8a4c" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Cables</text><text x="640" y="134" text-anchor="middle" font-size="12.5" fill="#1f8a4c" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Analog front-end</text><text x="640" y="155" text-anchor="middle" font-size="12.5" fill="#1f8a4c" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Ground and power supply</text><text x="640" y="176" text-anchor="middle" font-size="12.5" fill="#1f8a4c" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Reference voltages</text><line x1="222.0" y1="39.0" x2="269.0" y2="39.0" stroke="#c28a00" stroke-width="2" stroke-linecap="round"/><polygon points="278,39 269.0,43.05 269.0,34.95" fill="#c28a00"/><line x1="482.0" y1="39.0" x2="529.0" y2="39.0" stroke="#e60000" stroke-width="2" stroke-linecap="round"/><polygon points="538,39 529.0,43.05 529.0,34.95" fill="#e60000"/><text x="120" y="226" text-anchor="middle" font-size="12" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">Remove or reduce the source</text><text x="120" y="243" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">e.g. move switching regulators away</text><text x="120" y="258" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">from the analog section</text><text x="380" y="226" text-anchor="middle" font-size="12" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">Block the coupling path</text><text x="380" y="243" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">shield (E), twist &amp; shrink loops (B),</text><text x="380" y="258" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">single-point ground, filter, ferrites</text><text x="640" y="226" text-anchor="middle" font-size="12" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">Make the receiver less sensitive</text><text x="640" y="243" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">differential inputs with high CMRR,</text><text x="640" y="258" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">keep high-impedance nodes short</text><line x1="120.0" y1="196.0" x2="120.0" y2="210.0" stroke="#8a99a3" stroke-width="1.4" stroke-linecap="round"/><line x1="640.0" y1="196.0" x2="640.0" y2="210.0" stroke="#8a99a3" stroke-width="1.4" stroke-linecap="round"/><line x1="120.0" y1="196.0" x2="640.0" y2="196.0" stroke="#8a99a3" stroke-width="1.4" stroke-linecap="round"/><line x1="380.0" y1="160.0" x2="380.0" y2="210.0" stroke="#8a99a3" stroke-width="1.4" stroke-linecap="round"/></svg><div class="diagram-caption">Fig. 1: The three links of electrical interference and where to attack each one (redrawn from the lecture slides)</div></div>
+<p>Interference is usually studied separately from intrinsic noise. Intrinsic noise is typically continuous and stochastic; interference is more structured, e.g. the 50 Hz hum riding on an ECG trace.</p>
+
+<h2 id="s2">2. Observing noise and interference</h2>
+<p>Identifying the type of noise is the first step in designing the right mitigation, and three bench instruments cover most cases:</p>
+<ul>
+<li><strong>Oscilloscope</strong> (time domain): real-time fluctuations and peak-to-peak amplitudes. Use the time-base and voltage-scale settings and triggering to measure signal and noise parameters (e.g. power-line interference on top of an ECG).</li>
+<li><strong>Spectrum analyser</strong> (frequency domain): noise spectral densities, identifying interfering frequencies and the bands where noise is most prominent (e.g. a 50 Hz line and its harmonics). Frequency range, resolution bandwidth and related settings characterise the signal and noise.</li>
+<li><strong>Bench multimeter:</strong> can measure noise RMS in the absence of a signal, but only the noise that falls within its limited bandwidth; it also measures resistances, DC offsets and ground-potential differences.</li>
+</ul>
+
+<h2 id="s3">3. Capacitive coupling and shielding</h2>
+<p>Any two conductors separated by a dielectric form a capacitor. This includes two wires separated by an air gap, and even a single wire, since any wire has a stray capacitance to the (conductive) earth. Capacitive coupling causes interference and crosstalk between nearby wires and traces. Aggressors include high-voltage lines (the mains grid) and high-frequency lines (PCB traces around switching supplies).</p>
+<p>Consider a low-impedance aggressor wire 1 (e.g. a power line carrying 230 V<sub>RMS</sub> at 50 Hz, whose voltage <i>v<sub>n</sub></i> is spread over the whole wire without attenuation) running parallel to a victim wire 2 with a resistive load <i>R<sub>L</sub></i> (e.g. the input impedance of an amplifier stage sensing a signal). The stray capacitances to ground are <i>C</i><sub>1,G</sub> and <i>C</i><sub>2,G</sub>, and the capacitance between the wires is <i>C</i><sub>1,2</sub>.</p>
+<div class="diagram-box"><svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Capacitive coupling between two wires: the aggressor voltage drives the victim through the mutual capacitance C12; the victim sees capacitance C2G to ground and its load resistance RL."><line x1="70.0" y1="148.0" x2="70.0" y2="196.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="70" cy="135" r="13" fill="#fff" stroke="#e60000" stroke-width="1.6"/><path d="M62,135 q4,-9 8,0 t8,0" fill="none" stroke="#e60000" stroke-width="1.5"/><line x1="70.0" y1="80.0" x2="70.0" y2="122.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="60.0" y1="196.0" x2="80.0" y2="196.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="64.0" y1="200.0" x2="76.0" y2="200.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="67.5" y1="204.0" x2="72.5" y2="204.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="70.0" y1="80.0" x2="230.5" y2="80.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="239.5" y1="80.0" x2="470.0" y2="80.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="230.5" y1="64.0" x2="230.5" y2="96.0" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><line x1="239.5" y1="64.0" x2="239.5" y2="96.0" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><line x1="300.0" y1="80.0" x2="300.0" y2="131.5" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="300.0" y1="138.5" x2="300.0" y2="190.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="288.0" y1="131.5" x2="312.0" y2="131.5" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><line x1="288.0" y1="138.5" x2="312.0" y2="138.5" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><circle cx="300" cy="80" r="3" fill="#333"/><line x1="380.0" y1="80.0" x2="380.0" y2="105.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><polyline points="380,105.0 380,114.0 386,117.5 374,124.5 386,131.5 374,138.5 386,145.5 374,152.5 380,156.0 380,165.0" fill="none" stroke="#333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><line x1="380.0" y1="165.0" x2="380.0" y2="190.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="380" cy="80" r="3" fill="#333"/><line x1="300.0" y1="190.0" x2="380.0" y2="190.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="340.0" y1="190.0" x2="340.0" y2="196.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="330.0" y1="196.0" x2="350.0" y2="196.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="334.0" y1="200.0" x2="346.0" y2="200.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="337.5" y1="204.0" x2="342.5" y2="204.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="470" cy="80" r="3.5" fill="#333"/><line x1="470.0" y1="94.0" x2="470.0" y2="190.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><polygon points="470,86 473.6,94.0 466.4,94.0" fill="#333"/><line x1="420.0" y1="190.0" x2="470.0" y2="190.0" stroke="#fff" stroke-width="0.1" stroke-linecap="round"/><text x="110" y="66" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">v</tspan><tspan font-size="9.8" dy="3.9">n</tspan></text><text x="235" y="56" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">C</tspan><tspan font-size="9.8" dy="3.9">1,2</tspan></text><text x="282" y="140" text-anchor="end" font-size="14" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">C</tspan><tspan font-size="9.8" dy="3.9">2,G</tspan></text><text x="396" y="140" text-anchor="start" font-size="14" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">R</tspan><tspan font-size="9.8" dy="3.9">L</tspan></text><text x="486" y="150" text-anchor="start" font-size="16" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">v</tspan><tspan font-size="11.2" dy="4.5">o</tspan></text><text x="70" y="32" text-anchor="middle" font-size="12" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">Wire 1 (aggressor)</text><text x="340" y="32" text-anchor="middle" font-size="12" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">Wire 2 (victim)</text></svg><div class="diagram-caption">Fig. 2: Equivalent circuit for capacitive coupling onto a victim wire (the aggressor&rsquo;s own stray capacitance to ground is absorbed in the low-impedance source)</div></div>
+<div class="formula-box"><span class="label">Noise at the receiver</span>
+<i>v<sub>o</sub></i> = <i>v<sub>n</sub></i> &times; <span class="frac"><span class="num"><i>j&omega;R<sub>L</sub>C</i><sub>1,2</sub></span><span class="den">1 + <i>j&omega;R<sub>L</sub></i>(<i>C</i><sub>1,2</sub> + <i>C</i><sub>2,G</sub>)</span></span></div>
+<p>This resembles the output of a <strong>high-pass filter</strong>: the higher the noise frequency, the greater the chance of coupling. It has two useful limits:</p>
+<ul>
+<li><strong>Low frequency, small load impedance</strong> (<i>R<sub>L</sub></i> much smaller than the impedance of the coupling capacitances): <i>v<sub>o</sub></i> &asymp; <i>v<sub>n</sub></i> &middot; <i>j&omega;R<sub>L</sub>C</i><sub>1,2</sub>. This is the case for the 50 Hz mains, where &omega; = 2&pi;&times;50 is small and coupling capacitances (<i>C</i> = <span class="frac"><span class="num">&epsilon;<i>A</i></span><span class="den"><i>d</i></span></span>, tiny for air gaps) are small.</li>
+<li><strong>High frequency, high load impedance</strong> (e.g. switching-supply noise and a high-impedance amplifier input): <span class="frac"><span class="num">1</span><span class="den"><i>j&omega;R<sub>L</sub></i></span></span> &rarr; 0, so <i>v<sub>o</sub></i> &asymp; <i>v<sub>n</sub></i> &middot; <span class="frac"><span class="num"><i>C</i><sub>1,2</sub></span><span class="den"><i>C</i><sub>1,2</sub>+<i>C</i><sub>2,G</sub></span></span>, which is the plain capacitive-divider ratio.</li>
+</ul>
+<div class="diagram-box"><svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Frequency response of capacitively coupled noise: rising at 20 dB per decade like a high-pass filter, then flattening at the capacitive divider ratio C12 over C12 plus C2G."><line x1="70.0" y1="20.0" x2="70.0" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><line x1="225.0" y1="20.0" x2="225.0" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><line x1="380.0" y1="20.0" x2="380.0" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><line x1="535.0" y1="20.0" x2="535.0" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><line x1="690.0" y1="20.0" x2="690.0" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><line x1="70.0" y1="217.143" x2="690.0" y2="217.143" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="221.14285714285714" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">-60</text><line x1="70.0" y1="151.429" x2="690.0" y2="151.429" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="155.42857142857142" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">-40</text><line x1="70.0" y1="85.714" x2="690.0" y2="85.714" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="89.71428571428571" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">-20</text><line x1="70.0" y1="20.0" x2="690.0" y2="20.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="24.0" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">0</text><line x1="70.0" y1="20.0" x2="70.0" y2="250.0" stroke="#999" stroke-width="1.2" stroke-linecap="round"/><line x1="70.0" y1="250.0" x2="690.0" y2="250.0" stroke="#999" stroke-width="1.2" stroke-linecap="round"/><text transform="rotate(-90 20 135.0)" x="20" y="135.0" text-anchor="middle" font-size="11.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">|v<tspan font-size="9" dy="3">o</tspan><tspan dy="-3">/v</tspan><tspan font-size="9" dy="3">n</tspan><tspan dy="-3">| (dB)</tspan></text><text x="380.0" y="290" text-anchor="middle" font-size="12" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Frequency (log scale)</text><polyline points="70.0,217.14285714285714 380.0,85.71428571428571" fill="none" stroke="#8a99a3" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4"/><polyline points="380.0,85.71428571428571 690.0,85.71428571428571" fill="none" stroke="#8a99a3" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4"/><polyline points="70.0,217.1442840390969 73.87499999999999,215.5016009941467 77.75,213.85893918982532 81.625,212.21630121722689 85.50000000000001,210.57368998343725 89.375,208.93110875004714 93.24999999999999,207.28856117635289 97.125,205.64605136781452 101.0,204.0035839304085 104.87500000000001,202.3611640315895 108.75,200.71879746866307 112.62499999999999,199.07649074546404 116.5,197.43425115834683 120.375,195.79208689261108 124.25000000000001,194.15000713062147 128.125,192.50802217303016 132.0,190.86614357467778 135.875,189.22438429693403 139.75,187.58275887844798 143.625,185.94128362650724 147.5,184.2999768314633 151.375,182.65885900696418 155.25,181.01795315905102 159.125,179.3772850875263 163.0,177.73688372338475 166.875,176.09678150652596 170.75,174.45701480843465 174.625,172.81762440502754 178.5,171.17865600542729 182.375,169.54016084303456 186.25,167.90219633593102 190.125,166.2648268243611 194.0,164.6281243938032 197.875,162.99216979295625 201.75,161.3570534568219 205.625,159.72287664595427 209.5,158.08975271386228 213.375,156.45780851546706 217.25,154.82718597041395 221.125,153.19804379588265 225.0,151.5705594242868 228.875,149.9449311218448 232.75,148.3213803243729 236.625,146.70015420669708 240.5,145.08152850169483 244.375,143.46581058401887 248.25,141.85334283184403 252.125,140.24450627731892 256.0,138.63972455253574 259.875,137.03946813248172 263.75,135.4442588692641 267.625,133.85467480254536 271.5,132.27135521918467 275.375,130.69500592013986 279.25,129.12640463432552 283.125,127.5664064969789 287.0,126.01594948387194 290.875,124.47605966230361 294.75,122.94785608533405 298.625,121.43255511766652 302.5,119.93147394091311 306.375,118.44603294429878 310.25,116.97775666654327 314.125,115.52827291899068 318.0,114.09930969328246 321.875,112.69268944419893 325.75,111.31032034572719 329.625,109.95418415239362 333.5,108.62632036471427 337.375,107.32880650255659 341.25,106.06373443645738 345.125,104.83318291435347 349.0,103.63918664501965 352.875,102.48370254948027 356.75,101.3685740514845 360.625,100.29549452599105 364.5,99.26597123467116 368.375,98.28129122259212 372.25,97.34249070572706 376.125,96.45032942648326 380.0,95.60527128610224 383.875,94.80747228362615 387.75,94.05677642001278 391.625,93.3527197940207 395.5,92.69454266324259 399.375,92.08120881170534 403.25,91.51143119434165 407.125,90.98370254948027 411.0,90.49632950216251 414.875,90.04746862863918 418.75,89.63516300788595 422.625,89.25737793112802 426.5,88.91203465042855 430.375,88.59704129525076 434.25,88.31032034572718 438.125,88.04983230134178 442.0,87.81359540756819 445.875,87.59970149041925 449.75,87.40632809511469 453.625,87.23174723001306 457.5,87.07433108377025 461.375,86.9325551176665 465.25,86.80499894247691 469.125,86.69034537658933 473.0,86.5873780553005 476.875,86.49497792555033 480.75,86.41211892003982 484.625,86.33786306299699 488.5,86.27135521918464 492.375,86.21181765968822 496.25,86.15854458354983 500.125,86.11089670391027 504.0,86.06829598110717 507.875,86.03022056303321 511.75,85.99619997470118 515.625,85.96581058401887 519.5,85.93867135883774 523.375,85.91443992098282 527.25,85.8928088958015 531.125,85.87350255041622 535.0,85.85627371000112 538.875,85.84090093873985 542.75,85.82718597041394 546.625,85.81495137260993 550.5,85.80403842814798 554.375,85.79430521738286 558.25,85.78562488539333 562.125,85.77788407867054 566.0,85.77098153666032 569.875,85.76482682436108 573.75,85.7593391930739 577.625,85.75444655732026 581.5,85.75008457685585 585.375,85.74619583359897 589.25,85.74272909414891 593.125,85.7396386493831 597.0,85.73688372338476 600.875,85.73442794466918 604.75,85.73223887333673 608.625,85.73028757839273 612.5,85.72854826003476 616.375,85.72699791222152 620.25,85.72561602130511 624.125,85.724384296934 628.0,85.7232864318206 631.875,85.72230788731585 635.75,85.72143570205002 639.625,85.72065832118251 643.5,85.71996544406112 647.375,85.71934788832117 651.25,85.71879746866306 655.125,85.71830688873236 659.0,85.71786964469419 662.875,85.71747993924309 666.75,85.7171326049243 670.625,85.71682303576141 674.5,85.71654712629442 678.375,85.71630121722689 682.25,85.71608204696818 686.125,85.71588670843241 690.0,85.71571261052549" fill="none" stroke="#e60000" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><line x1="380.0" y1="20" x2="380.0" y2="250" stroke="#8a99a3" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 3"/><text x="386.0" y="34" text-anchor="start" font-size="11.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">corner: &omega;<tspan font-size="9" dy="3">c</tspan><tspan dy="-3"> = 1/[R</tspan><tspan font-size="9" dy="3">L</tspan><tspan dy="-3">(C</tspan><tspan font-size="9" dy="3">1,2</tspan><tspan dy="-3">+C</tspan><tspan font-size="9" dy="3">2,G</tspan><tspan dy="-3">)]</tspan></text><text x="194.0" y="138.28571428571428" text-anchor="end" font-size="11.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">+20 dB/decade</text><text x="535.0" y="105.42857142857143" text-anchor="middle" font-size="11.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">flat: capacitive divider</text><text x="535.0" y="120.42857142857143" text-anchor="middle" font-size="11.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">C<tspan font-size="9" dy="3">1,2</tspan><tspan dy="-3">/(C</tspan><tspan font-size="9" dy="3">1,2</tspan><tspan dy="-3">+C</tspan><tspan font-size="9" dy="3">2,G</tspan><tspan dy="-3">)</tspan></text></svg><div class="diagram-caption">Fig. 3: Capacitively coupled noise behaves like a high-pass filter. The curve is drawn for an illustrative divider ratio <i>C</i><sub>1,2</sub>/(<i>C</i><sub>1,2</sub>+<i>C</i><sub>2,G</sub>) = 0.1.</div></div>
+<p>Digital signals may have small source voltages, but their fast switching edges can cause crosstalk between parallel signal lines running close together. If the aggressor itself has a <strong>high source impedance</strong> <i>R<sub>S</sub></i>, the voltage at the coupling point is a low-pass-filtered version of <i>v<sub>n</sub></i> and the strength of coupling goes down: the pass bands of that low-pass filter (<i>f</i> &lt; <i>f<sub>LP</sub></i>) and the subsequent high-pass filter (<i>f</i> &gt; <i>f<sub>HP</sub></i>) must overlap for coupling to occur, so if <i>R<sub>S</sub></i> is large enough that <i>f<sub>HP</sub></i> &gt; <i>f<sub>LP</sub></i> there is no overlap and coupling is weak at all frequencies.</p>
+<h3>Shielding to reduce capacitive coupling</h3>
+<p>Shielding blocks external interference by encasing cables and equipment in conductive material (foil, metallic braiding, or a combination) kept at a fixed potential, which is the idea behind a <strong>Faraday cage</strong>. Maintaining a single potential is typically done by grounding the shield, though shields can also be actively driven (e.g. driven guard rings). Coupling can also be reduced by working directly from <i>C</i> = <span class="frac"><span class="num">&epsilon;<i>A</i></span><span class="den"><i>d</i></span></span>: increase distance, minimise overlap, and use low-permittivity material between conductors.</p>
+<div class="callout"><strong>An ungrounded shield does not help.</strong> A simple copper tube around the victim wire only adds an extra capacitance and changes the effective capacitor-divider ratio. It does not prevent coupling onto wire 2. <strong>Connect the shield to ground</strong> and there is no coupling between source and victim as long as the shield stays at constant ground potential despite external or internal interference.</div>
+
+<h2 id="s4">4. Inductive coupling, twisted pairs and magnetic shielding</h2>
+<p>Inductive (magnetic) coupling is the magnetic counterpart of capacitive coupling. A changing current in one conductor (the <em>aggressor</em>) creates a changing magnetic field; where that field passes through a loop of another circuit (the <em>victim</em>) it induces a voltage (Faraday&rsquo;s law) that appears in <strong>series with the victim loop</strong>. The victim is the <em>loop</em>, not the wire: what matters is the area enclosed between the signal path and its return. Typical aggressors are large or fast-changing currents: mains and power cables, transformers, motors, switching-converter current loops.</p>
+<div class="formula-box"><span class="label">Induced voltage</span>
+<i>v<sub>n</sub></i> = <i>M</i><sub>1,2</sub> <span class="frac"><span class="num">d<i>i</i><sub>1</sub></span><span class="den">d<i>t</i></span></span> &nbsp;&nbsp;|&nbsp;&nbsp; for a sinusoidal field: <i>v<sub>n</sub></i> = <i>j&omega;B</i>(<i>r</i>)<i>A</i> cos&theta;, &nbsp; <i>B</i>(<i>r</i>) = <span class="frac"><span class="num">&mu;<sub>0</sub><i>I</i><sub>1</sub></span><span class="den">2&pi;<i>r</i></span></span></div>
+<p>Each term points to a way of reducing it: <strong>distance</strong> (the field falls as 1/<i>r</i>); <strong>loop area</strong> (twist the aggressor&rsquo;s outgoing and return conductors together so their fields cancel; keep the victim&rsquo;s signal and return paths close together); and <strong>orientation</strong> (the induced voltage is zero when &theta; = 90&deg;, so route sensitive loops at right angles to the field, for example by crossing a mains cable at 90&deg;).</p>
+<p>The induced voltage rises in proportion to the aggressor&rsquo;s frequency, which is why fast edges cause so much trouble:</p>
+<div class="worked-example">
+<p><strong>Example.</strong> A wire carries 50 Hz mains current (1 A RMS) and has a mutual inductance of 100 nH with a nearby conductor: <i>v<sub>n</sub>(t)</i> = 100&times;10<sup>&minus;9</sup>&middot;<span class="frac"><span class="num">d</span><span class="den">d<i>t</i></span></span>(1<span class="rad"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb">2</span></span> sin(2&pi;&times;50<i>t</i>)), giving
+<i>V</i><sub>n,RMS</sub> = 100&times;10<sup>&minus;9</sup> &times; 2&pi; &times; 50 &times; 1 = <strong>31.4 &micro;V</strong>.</p>
+<p>A switching converter carrying the same 1 A RMS at <i>f</i> = 1 MHz with the same coupling gives <i>V</i><sub>n,RMS</sub> = <strong>0.63 V</strong>, a 20 000-fold increase. This is a practical concern for switching power supplies: even when they carry lower currents than the AC mains, their high switching frequency couples a lot of interference.</p>
+</div>
+<div class="diagram-box"><svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Voltage induced in a victim loop versus aggressor frequency for mutual inductance 100 nH and 1 A: 31 microvolts at 50 Hz rising to 0.63 volts at 1 MHz, a slope of 20 dB per decade."><line x1="70.0" y1="20.0" x2="70.0" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="70.0" y="268" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">10 Hz</text><line x1="173.333" y1="20.0" x2="173.333" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="173.33333333333331" y="268" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">100</text><line x1="276.667" y1="20.0" x2="276.667" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="276.66666666666663" y="268" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">1 kHz</text><line x1="380.0" y1="20.0" x2="380.0" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="380.0" y="268" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">10 kHz</text><line x1="483.333" y1="20.0" x2="483.333" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="483.3333333333333" y="268" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">100 kHz</text><line x1="586.667" y1="20.0" x2="586.667" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="586.6666666666667" y="268" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">1 MHz</text><line x1="690.0" y1="20.0" x2="690.0" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="690.0" y="268" text-anchor="middle" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">10 MHz</text><line x1="70.0" y1="250.0" x2="690.0" y2="250.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="254.0" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">1 &micro;V</text><line x1="70.0" y1="217.143" x2="690.0" y2="217.143" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="221.14285714285714" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">10 &micro;V</text><line x1="70.0" y1="184.286" x2="690.0" y2="184.286" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="188.28571428571428" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">100 &micro;V</text><line x1="70.0" y1="151.429" x2="690.0" y2="151.429" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="155.42857142857142" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">1 mV</text><line x1="70.0" y1="118.571" x2="690.0" y2="118.571" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="122.57142857142857" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">10 mV</text><line x1="70.0" y1="85.714" x2="690.0" y2="85.714" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="89.71428571428571" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">100 mV</text><line x1="70.0" y1="52.857" x2="690.0" y2="52.857" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="56.857142857142854" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">1 V</text><line x1="70.0" y1="20.0" x2="690.0" y2="20.0" stroke="#ececec" stroke-width="1" stroke-linecap="round"/><text x="62" y="24.0" text-anchor="end" font-size="11" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">10 V</text><line x1="70.0" y1="20.0" x2="70.0" y2="250.0" stroke="#999" stroke-width="1.2" stroke-linecap="round"/><line x1="70.0" y1="250.0" x2="690.0" y2="250.0" stroke="#999" stroke-width="1.2" stroke-linecap="round"/><text x="380.0" y="292" text-anchor="middle" font-size="12" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Aggressor frequency f</text><polyline points="70.0,223.77409003966193 690.0,26.63123289680479" fill="none" stroke="#1f5fa8" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="142.22690044805526" cy="200.80793275433558" r="5" fill="#1f5fa8" stroke="#fff" stroke-width="1.5"/><text x="156.22690044805526" y="218.80793275433558" text-anchor="start" font-size="12" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">50 Hz mains: 31 &micro;V</text><circle cx="586.6666666666667" cy="59.48837575394765" r="5" fill="#1f5fa8" stroke="#fff" stroke-width="1.5"/><text x="572.6666666666667" y="47.48837575394765" text-anchor="end" font-size="12" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">1 MHz switching: 0.63 V</text><text x="473.0" y="129.6312328968048" text-anchor="middle" font-size="11.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">+20 dB/decade (v<tspan font-size="9" dy="3">n</tspan><tspan dy="-3"> &prop; f)</tspan></text><text x="80.33333333333334" y="36" text-anchor="start" font-size="11.5" fill="#666" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">M = 100 nH, I<tspan font-size="9" dy="3">1</tspan><tspan dy="-3"> = 1 A (RMS)</tspan></text></svg><div class="diagram-caption">Fig. 4: Induced voltage versus aggressor frequency for <i>M</i> = 100 nH and <i>I</i><sub>1</sub> = 1 A (recomputed from the lecture&rsquo;s example)</div></div>
+<h3>Twisted-pair cables</h3>
+<p>Voltage induced in a cable by external magnetic fields drives interference currents in the signal wires. Twisting the pair makes the induced current direction alternate from one twist to the next, so adjacent loops cancel each other out and the interference is cancelled.</p>
+<h3>Shielding magnetic fields</h3>
+<p>Electric fields are easy to shield, since almost any thin, grounded conductor works. Low-frequency <em>magnetic</em> fields are harder: they penetrate conductors and are attenuated mainly by <strong>absorption</strong> as they pass through the thickness <i>x</i> of the shield:</p>
+<div class="formula-box"><i>B</i>(<i>x</i>) = <i>B</i><sub>0</sub> e<sup>&minus;<span class="frac"><span class="num"><i>x</i></span><span class="den">&delta;</span></span></sup>, &nbsp; &delta; = <span class="frac"><span class="num">1</span><span class="den"><span class="rad"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb">&pi;<i>f&mu;&sigma;</i></span></span></span></span> (the <em>skin depth</em>)</div>
+<p>where <i>f</i> is the interference frequency and &mu; and &sigma; are the permeability and conductivity of the shield. The field falls to 37% at one skin depth. At 50 Hz copper has a skin depth of about 9 mm, so a 0.5 mm copper shield is almost transparent; steel&rsquo;s high permeability shrinks the skin depth to under 1 mm, which is why steel is used for low-frequency magnetic shielding, while 0.5 mm of copper only becomes effective in the hundreds of kHz and above. <strong>Practical message:</strong> at mains frequency it is usually much easier to reduce inductive pickup with distance, small loop areas, twisting and orientation than with a shield.</p>
+
+<h2 id="s5">5. Capacitive versus inductive coupling</h2>
+<table class="cmp">
+<thead><tr><th>Aspect</th><th>Capacitive coupling</th><th>Inductive coupling</th></tr></thead>
+<tbody>
+<tr><td>Coupling field</td><td>Electric field (E)</td><td>Magnetic field (B)</td></tr>
+<tr><td>Coupling element</td><td>Stray capacitance <i>C</i><sub>1,2</sub></td><td>Mutual inductance <i>M</i><sub>1,2</sub></td></tr>
+<tr><td>Aggressor</td><td>Node with a large or fast <strong>voltage</strong> change (<span class="frac"><span class="num">d<i>v</i></span><span class="den">d<i>t</i></span></span>)</td><td>Conductor with a large or fast <strong>current</strong> change (<span class="frac"><span class="num">d<i>i</i></span><span class="den">d<i>t</i></span></span>)</td></tr>
+<tr><td>Typical aggressors</td><td>Mains wiring near the patient, switch nodes, clock lines</td><td>Power and mains cables, transformers, motors, switching-converter loops</td></tr>
+<tr><td>Noise in the victim</td><td>Current injected into the victim node: <i>i<sub>n</sub></i> = <i>C</i><sub>1,2</sub> <span class="frac"><span class="num">d<i>v</i><sub>1</sub></span><span class="den">d<i>t</i></span></span></td><td>Voltage in series with the victim loop: <i>v<sub>n</sub></i> = <i>M</i><sub>1,2</sub> <span class="frac"><span class="num">d<i>i</i><sub>1</sub></span><span class="den">d<i>t</i></span></span></td></tr>
+<tr><td>Model coupled noise as</td><td><strong>Current</strong> source (high source impedance)</td><td><strong>Voltage</strong> source (low source impedance)</td></tr>
+<tr><td>Most vulnerable victims</td><td><strong>High-impedance</strong> nodes (electrodes, op-amp inputs)</td><td><strong>Low-impedance</strong> circuits with a large loop area</td></tr>
+<tr><td>Geometry that matters</td><td>Spacing and parallel length of conductors</td><td>Loop area, distance, orientation</td></tr>
+<tr><td>Shielding</td><td>Thin grounded conductor works well</td><td>Thin conductors are poor at low frequency (needs steel or mu-metal)</td></tr>
+<tr><td>Main fixes</td><td>Grounded shield, spacing, lower victim impedance</td><td>Twisting and small loops, distance, orientation</td></tr>
+</tbody></table>
+
+<h2 id="s6">6. Conductive coupling and ground loops</h2>
+<p><strong>Conductive coupling</strong> happens when current from one circuit (a complete loop) flows through some impedance it shares with another circuit. Any practical wire or PCB trace has a non-zero impedance: purely resistive at low frequencies, with inductive reactance added in series at high frequencies.
+If a single wire or trace is shared between two subcircuits, currents from both flow through it and a potential drop appears across its length: at low frequency &Delta;<i>V</i> = <i>I</i> &times; <i>R</i>; at high frequency &Delta;<i>V</i> = <i>I</i> &times; (<i>R</i> + <i>j&omega;L</i>).</p>
+<div class="worked-example"><p><strong>Shared ground return.</strong> Two sub-circuits share one ground trace on a PCB, with impedance <i>Z</i><sub>1,2</sub>. A potential difference &Delta;<i>V</i> = <i>v</i><sub>1</sub> &minus; <i>v</i><sub>2</sub> = <i>Z</i><sub>1,2</sub>(<i>i<sub>A</sub></i> + <i>i<sub>B</sub></i>) appears across it. If the current <i>i<sub>A</sub></i> of sub-circuit A is large, then even though the bulb in sub-circuit B is powered by a DC source <i>V<sub>B</sub></i>, it will begin to flicker at the frequency of A&rsquo;s source <i>v<sub>a</sub></i>(<i>t</i>). The fix is to give each sub-circuit its own return path (no shared impedance), as in the PCB lecture.</p></div>
+<h3>Ground loops</h3>
+<p><strong>Ground loops</strong> occur when multiple ground connections close a loop. The potential differences within the loop come from two sources: EMF induced by magnetic flux through the loop area (inductive coupling), and ground-potential differences from other circuits&rsquo; currents flowing in shared ground impedance (conductive coupling). Those potential differences drive currents inside the loop and into connected nodes. Ground connections are especially susceptible because a ground is almost always a network of nodes connected at different points; improper grounding, multiple ground points connected inappropriately, long ground connections, and devices powered from separate-ground sources that are interconnected can all create ground loops.</p>
+<p>Long ground conductors are prone to all three kinds of interference: higher impedance gives larger potential drops; a larger enclosed area picks up more magnetic field (and because ground conductors have low impedance, the induced EMF drives a large circulating current); and the stray capacitance grows with length, so capacitive coupling increases as well. Ground loops exist at large scale (between devices) and inside a single PCB.</p>
+<h3>Improper shielding creates ground loops</h3>
+<p>For a shield to work against capacitive coupling it should be connected to the signal reference node, but connecting it to the reference at <em>both</em> ends can form a ground loop. Potential differences between the two grounding points then drive a current through the shield, whether picked up magnetically or from other circuits through a shared ground with non-zero impedance. This adds directly in series with the signal if the shield doubles as the signal return (e.g. a coaxial cable) or if source and receiver end sit on a shared ground rail at separate points.</p>
+<ul>
+<li><strong>Shield not connected to the reference:</strong> shielding does not work.</li>
+<li><strong>Shield connected at one end:</strong> shielding works.</li>
+<li><strong>Shield connected at both ends:</strong> works only partially, because a loop is formed. (At higher frequencies, grounding both ends may nevertheless be necessary, because an ungrounded end lets the shield act as an antenna.)</li>
+</ul>
+<p>A large-scale example is audio hum: the source (mixer/PC) is earthed through its power socket, a powered speaker is earthed through a separate socket at another location, and a shielded cable connects them with the shield grounded at both ends. The earth and shield complete a loop, with 50 Hz current flowing and magnetic fields inducing more. In medical devices such as EEG and ECG systems, ground loops introduce low-frequency noise into delicate &micro;V&ndash;mV-level measurements.</p>
+
+<h2 id="s7">7. Grounding techniques and isolation</h2>
+<p><strong>Mitigation techniques</strong> for ground loops: single-point grounding (effective at low frequency, but long ground leads have high impedance at high frequency); isolation (transformers, optocouplers); differential inputs with high common-mode rejection; short, thick ground wires; and twisted pair cables with careful cable routing.</p>
+<p>A well-designed grounding system distinguishes two kinds of ground: <strong>safety grounds</strong> (usually at earth potential; they carry fault currents and must not be used as signal grounds) and <strong>signal grounds</strong> (which may or may not be at earth potential; a battery-powered device may not have its reference tied to earth).</p>
+<table class="cmp">
+<thead><tr><th>Signal-ground scheme</th><th>Description</th><th>Pros</th><th>Cons</th><th>Use case</th></tr></thead>
+<tbody>
+<tr><td><strong>Single-point</strong></td><td>All modules connect to ground at a single common point</td><td>Eliminates ground loops at low frequency; simple</td><td>Long return paths cause high inductance at high frequency; ineffective for RF/EMI</td><td>Low-frequency analog, audio</td></tr>
+<tr><td><strong>Multipoint</strong></td><td>Each module connects directly to a ground plane at multiple points</td><td>Very low impedance; excellent for RF and digital</td><td>Can create ground loops at low frequency; can cause hum in audio</td><td>High-frequency digital, RF</td></tr>
+<tr><td><strong>Hybrid</strong></td><td>Single-point at low frequency, multipoint (capacitive coupling) at high frequency</td><td>Reduces low-frequency loops; low impedance at high frequency</td><td>More complex; needs careful capacitor selection and layout</td><td>Mixed-signal (analog + digital), EMI-sensitive equipment</td></tr>
+</tbody></table>
+<h3>Isolation</h3>
+<p>Isolation breaks the conductive (galvanic) path between two circuits but still passes the signal or power across a barrier. The ground-potential difference <i>V<sub>G</sub></i> then appears <em>across the barrier</em>, not in the signal path, so no ground-loop current flows. The barrier also serves as a safety barrier against dangerous currents and high voltages.</p>
+<table class="cmp">
+<thead><tr><th>Method</th><th>Crosses the barrier as</th><th>Typical use</th></tr></thead>
+<tbody>
+<tr><td>Transformer</td><td>Magnetic field</td><td>AC signals, power (isolated DC&ndash;DC)</td></tr>
+<tr><td>Optocoupler</td><td>Light (LED &rarr; photodetector)</td><td>Digital and control signals</td></tr>
+<tr><td>Capacitive isolator</td><td>HF carrier across small capacitors</td><td>Fast digital buses (SPI, UART)</td></tr>
+</tbody></table>
+<p><strong>Limits:</strong> the barrier still has a few pF of capacitance, so fast common-mode transients can couple across it, and the isolated side needs isolated power too (an isolated DC&ndash;DC converter or a battery). Medical devices isolate the patient-connected part from the mains to meet &micro;A-level leakage limits (IEC 60601-1). A battery-powered wearable is isolated by design, but <em>not</em> while it is connected to a PC or charger by USB.</p>
+
+<h2 id="s8">8. Common-mode rejection and differential signalling</h2>
+<p>Any pair of lines <i>v</i><sub>1</sub>, <i>v</i><sub>2</sub> (measured to ground) splits into a wanted differential part and an (usually unwanted) common part:</p>
+<div class="formula-box"><i>v<sub>DM</sub></i> = <i>v</i><sub>1</sub> &minus; <i>v</i><sub>2</sub>, &nbsp; <i>v<sub>CM</sub></i> = <span class="frac"><span class="num"><i>v</i><sub>1</sub> + <i>v</i><sub>2</sub></span><span class="den">2</span></span> &nbsp;&nbsp;&rArr;&nbsp;&nbsp; <i>v</i><sub>1</sub> = <i>v<sub>CM</sub></i> + <span class="frac"><span class="num"><i>v<sub>DM</sub></i></span><span class="den">2</span></span>, &nbsp; <i>v</i><sub>2</sub> = <i>v<sub>CM</sub></i> &minus; <span class="frac"><span class="num"><i>v<sub>DM</sub></i></span><span class="den">2</span></span></div>
+<p>A differential amplifier ideally responds only to <i>v<sub>DM</sub></i>, but a practical one responds to both: <i>v<sub>o</sub></i> = <i>G<sub>DM</sub> v<sub>DM</sub></i> + <i>G<sub>CM</sub> v<sub>CM</sub></i>. Shifting both inputs by the same amount moves <i>v<sub>CM</sub></i> but leaves <i>v<sub>DM</sub></i> unchanged. The figure of merit is the common-mode rejection ratio:</p>
+<div class="formula-box">CMRR = |<span class="frac"><span class="num"><i>G<sub>DM</sub></i></span><span class="den"><i>G<sub>CM</sub></i></span></span>| &nbsp;&nbsp;(referred to the input, the common-mode <em>error</em> is <span class="frac"><span class="num"><i>v<sub>CM</sub></i></span><span class="den">CMRR</span></span>)<br>
+e.g. 1 V of common-mode noise at 100 dB CMRR looks like 10 &micro;V of differential-mode signal.</div>
+<p>CMRR is measured by tying the inputs together to get <i>G<sub>CM</sub></i>, and driving <i>v<sub>DM</sub></i> alone to get <i>G<sub>DM</sub></i>.</p>
+<h3>Where an op-amp&rsquo;s <i>G<sub>CM</sub></i> comes from</h3>
+<p>Almost every op-amp has a differential pair as its first stage with a tail current source (<i>I<sub>EE</sub></i>). The pair only <em>steers</em> the fixed tail current between its two transistors, so a differential input moves the collector voltages by the factor <i>G<sub>DM</sub></i> = <span class="frac"><span class="num"><i>g<sub>m</sub>R<sub>C</sub></i></span><span class="den">2</span></span>. For a common-mode input the ideal tail source resists any change in total current, so the common-mode gain would be zero. A <em>practical</em> tail source (e.g. a biased transistor) has a finite output resistance <i>R<sub>EE</sub></i>, so raising both inputs lets some current flow through it:</p>
+<div class="formula-box"><i>G<sub>CM</sub></i> &asymp; &minus;<span class="frac"><span class="num"><i>R<sub>C</sub></i></span><span class="den">2<i>R<sub>EE</sub></i></span></span> &nbsp;&nbsp;&rArr;&nbsp;&nbsp; CMRR &asymp; <i>g<sub>m</sub>R<sub>EE</sub></i></div>
+<p>An ideal current source (<i>R<sub>EE</sub></i> &rarr; &infin;) therefore gives infinite CMRR. CMRR also falls with frequency because stray capacitance across the tail source lowers its impedance, so check the datasheet curve at 50 Hz.</p>
+<h3>Difference amplifier</h3>
+<p>For the standard difference amplifier (<i>v</i><sub>2</sub> through <i>R</i><sub>1</sub> to the inverting input with <i>R</i><sub>2</sub> feedback; <i>v</i><sub>1</sub> through <i>R</i><sub>3</sub> to the non-inverting input with <i>R</i><sub>4</sub> to ground), superposition gives <i>v<sub>o</sub></i> = <i>A v</i><sub>1</sub> &minus; <i>B v</i><sub>2</sub> with <i>A</i> = <span class="frac"><span class="num"><i>R</i><sub>4</sub></span><span class="den"><i>R</i><sub>3</sub>+<i>R</i><sub>4</sub></span></span>(1+<span class="frac"><span class="num"><i>R</i><sub>2</sub></span><span class="den"><i>R</i><sub>1</sub></span></span>) and <i>B</i> = <span class="frac"><span class="num"><i>R</i><sub>2</sub></span><span class="den"><i>R</i><sub>1</sub></span></span>. Substituting <i>v</i><sub>1,2</sub> = <i>v<sub>CM</sub></i> &plusmn; <i>v<sub>DM</sub></i>/2:</p>
+<div class="formula-box"><i>G<sub>CM</sub></i> = <i>A</i> &minus; <i>B</i>, &nbsp;&nbsp; <i>G<sub>DM</sub></i> = <span class="frac"><span class="num"><i>A</i> + <i>B</i></span><span class="den">2</span></span></div>
+<p>With perfectly matched resistor ratios <span class="frac"><span class="num"><i>R</i><sub>2</sub></span><span class="den"><i>R</i><sub>1</sub></span></span> = <span class="frac"><span class="num"><i>R</i><sub>4</sub></span><span class="den"><i>R</i><sub>3</sub></span></span> = <i>G</i> the common-mode gain is exactly zero, but real resistors have tolerances. If the two ratios differ by a fraction &delta; the CMRR is limited to about <span class="frac"><span class="num">1+<i>G</i></span><span class="den">&delta;</span></span>, so <strong>even a perfect op-amp is limited by its resistors</strong>, and source impedances can make the matching worse.</p>
+<h3>Differential signalling</h3>
+<p>Differential signalling transmits a signal on two complementary lines (one is the inverted version of the other); the receiver subtracts them, and with high CMRR any common-mode noise, which acts similarly on both lines, is cancelled. It is especially useful over longer distances, where long wires pick up more common-mode interference, and works best when the lines are matched and routed together (twisted pairs, differential PCB pairs). Examples include USB, Ethernet, RS-485 and the instrumentation-amplifier input of an ECG.</p>
+
+<h2 id="s9">9. EMI and power-line interference</h2>
+<p><strong>Electromagnetic interference (EMI)</strong> is electromagnetic disturbance, radiated or conducted, from an external source, either natural (lightning, solar flares) or artificial (motors, transformers, electronic devices). It is mitigated by <strong>shielding</strong> (conductive or magnetic enclosures) and <strong>filtering</strong> (capacitors, inductors, ferrite beads) to remove what the shield could not attenuate.</p>
+<p><strong>Power-line interference (PLI)</strong> is EMI from the mains wiring, coupling capacitively, inductively and conductively. Appliances and machinery can directly shift ground levels via conductive coupling, including 50 Hz noise and its harmonics. Conductively coupled PLI is mitigated by transformer isolation, power-line filters (for higher-frequency conducted noise) and proper grounding; the capacitive and inductive paths use the techniques above (shielding, twisted pairs, ground-loop mitigation).</p>
+<h3>Power-line (EMI) filters</h3>
+<p>Conducted noise travels in two modes. <strong>Common mode</strong> flows in the same direction on live and neutral and returns through protective earth via stray capacitance (e.g. nearby lightning induces nearly the same voltage on both and can lift the local earth relative to the transformer&rsquo;s remote earth). <strong>Differential mode</strong> flows in on live and returns on neutral; live/neutral imbalance converts part of a common-mode disturbance into differential mode.</p>
+<p>Power-line filters are passive LC low-pass filters fitted at the AC inlet of mains equipment (often built into the IEC power-entry module). They stop interference from the grid reaching the device, and the device&rsquo;s noise from reaching the grid. They do <em>not</em> remove the 50 Hz line voltage: they pass 50 Hz and attenuate conducted noise from about 10 kHz to 30 MHz. Inside:</p>
+<ul>
+<li><strong>X capacitors</strong> (<i>C<sub>X</sub></i>), across live and neutral: short-circuit differential-mode noise at high frequency, not at 50 Hz (typically 0.1&ndash;0.47 &micro;F). Safety class X: if one fails short it only blows the fuse. A bleeder resistor discharges them after unplugging.</li>
+<li><strong>Common-mode choke</strong> (<i>L<sub>CM</sub></i>): two identical windings on one core, one in L and one in N. 50 Hz load current and DM noise flow in opposite directions, so the fluxes cancel and impedance is low; CM noise flows the same way in both, so the fluxes add and the impedance is high.</li>
+<li><strong>Y capacitors</strong> (<i>C<sub>Y</sub></i>), from live and neutral to protective earth: divert CM noise to earth (typically 1&ndash;4.7 nF). They carry 50 Hz leakage current to earth, <i>I</i> = 2&pi;<i>fCV</i> &asymp; 0.34 mA for 4.7 nF at 230 V, so medical equipment with &micro;A-level leakage limits (IEC 60601-1) keeps them very small or omits them. They are safety class Y: designed to fail open.</li>
+</ul>
+
+<h2 id="s10">10. Data acquisition: ADC noise and filtering</h2>
+<p>A data-acquisition (DAQ) system converts physical phenomena into digital data. Noise can enter at every block, and noise added early is amplified by the later stages. Sources include internal noise (thermal, shot, flicker), power-supply noise (ripple currents, switching noise) and noise picked up in the signal transmission line (e.g. capacitively coupled noise). Fixes: shielding and layout, low-noise parts, decoupling, short twisted leads.</p>
+<h3>ADC quantisation noise</h3>
+<p>An <i>N</i>-bit ADC rounds each sample to one of 2<sup><i>N</i></sup> levels with step <i>q</i> = <span class="frac"><span class="num"><i>V<sub>FS</sub></i></span><span class="den">2<sup><i>N</i></sup></span></span> (1 LSB), where <i>V<sub>FS</sub></i> is the full-scale voltage. The rounding error lies within &plusmn;<i>q</i>/2 and behaves like white noise. Assuming the error is uniformly distributed between &minus;<i>q</i>/2 and +<i>q</i>/2, its RMS value is:</p>
+<div class="formula-box"><i>e</i><sub>RMS</sub> = <span class="frac"><span class="num"><i>q</i></span><span class="den"><span class="rad"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb">12</span></span></span></span> = <span class="frac"><span class="num"><i>V<sub>FS</sub></i></span><span class="den">2<sup><i>N</i></sup><span class="rad"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb">12</span></span></span></span></div>
+<div class="worked-example"><p><strong>ECG example.</strong> With <i>V<sub>FS</sub></i> = 3.3 V: a <strong>12-bit</strong> ADC has a quantisation noise floor of <span class="frac"><span class="num">3.3</span><span class="den">2<sup>12</sup><span class="rad"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb">12</span></span></span></span> &asymp; <strong>233 &micro;V<sub>RMS</sub></strong>, so a gain of a few hundred is needed to bring it below 1 &micro;V at the input, but at that gain the electrode offset voltage would saturate the amplifier. A <strong>24-bit</strong> ADC has <span class="frac"><span class="num">3.3</span><span class="den">2<sup>24</sup><span class="rad"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb">12</span></span></span></span> &asymp; <strong>56 nV<sub>RMS</sub></strong>, already negligible (though a real ADC&rsquo;s floor will be much higher because of its inherent thermal noise).</p></div>
+<p><strong>Design rule:</strong> refer the ADC noise to the input (divide by the front-end gain) and keep it below the analog noise.</p>
+<h3>ADC reference voltage</h3>
+<p><i>V<sub>FS</sub></i> is set by the reference voltage <i>V<sub>REF</sub></i> (usually <i>V<sub>FS</sub></i> = <i>V<sub>REF</sub></i> for unipolar ADCs such as those in microcontrollers; <i>V<sub>FS</sub></i> = 2<i>V<sub>REF</sub></i> for bipolar types such as the ADS1292). Noise on <i>V<sub>REF</sub></i> is reflected in <em>every</em> sample on top of the other noise in the signal. Therefore: never use <i>V<sub>DD</sub></i> straight from a switching converter as the reference; using the separate AVDD is not recommended either; use the ADC&rsquo;s internal stable reference if it has one, otherwise a reference IC powered from AVDD; and add a decoupling capacitor on the reference pin (value usually given in the datasheet).</p>
+<h3>Filtering</h3>
+<p>Filtering is the last resort for noise and interference that could not be mitigated by other means: <strong>low-pass</strong> to remove high-frequency noise, <strong>high-pass</strong> to remove low-frequency noise, <strong>band-pass</strong> to keep a certain frequency band, and <strong>notch</strong> (band-stop) to remove a narrow band such as 50 Hz.</p>
+
+        </div>
+        <div class="download-bar"><a href="noise-in-instrumentation-part-5.pdf" class="btn">Download slides (PDF) &darr;</a><a href="teaching.html" class="btn alt">All lectures</a></div>
+        <div class="lecture-nav"><a href="lecture-4-noise-part-4.html">&larr; Lecture 4: Op-Amp Noise Model</a><a class="next" href="lecture-6-noise-part-6-pcb-design.html">Lecture 6: Best Practices for PCB Design &rarr;</a></div>
+    </div>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+</body>
+</html>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:type" content="article">
+<meta property="og:title" content="“Alexa, Start My Car”: Voice-Controlled Remote Start on a 2003 Mitsubishi Lancer | Kasun Pathirage">
+<meta property="og:description" content="Amazon Alexa voice control for a 2003 Mitsubishi Lancer: remote start, lock/unlock and trunk release using a NodeMCU (ESP8266), a hacked Banvie 1 remote start system and the Sinric Pro IoT cloud. Full Arduino code included.">
+<meta property="og:site_name" content="Kasun Pathirage">
+<meta name="twitter:card" content="summary_large_image">
+<title>“Alexa, Start My Car”: Voice-Controlled Remote Start on a 2003 Mitsubishi Lancer | Kasun Pathirage</title>
+<meta name="description" content="Amazon Alexa voice control for a 2003 Mitsubishi Lancer: remote start, lock/unlock and trunk release using a NodeMCU (ESP8266), a hacked Banvie 1 remote start system and the Sinric Pro IoT cloud. Full Arduino code included.">
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f6f8;
+        color: #333;
+        line-height: 1.6;
+    }
+    .container {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    h1 { color: #1a1a1a; margin-top: 0; }
+    h2 {
+        color: #1a1a1a;
+        margin-top: 2.5rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid #eee;
+    }
+    h3 { color: #1a1a1a; margin-top: 1.8rem; }
+    .back-link { display: inline-block; margin-bottom: 2rem; color: #e60000; text-decoration: none; font-weight: bold; }
+    .back-link:hover { text-decoration: underline; }
+    .meta { color: #555; }
+    a { color: #e60000; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+    .table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+    th, td { border: 1px solid #ddd; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background-color: #1a1a1a; color: #fff; }
+    tr:nth-child(even) { background-color: #f8f8f8; }
+    figure { margin: 1.2rem 0; text-align: center; }
+    figure img { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); display: block; margin: 0 auto; }
+    figure.figure-wide img { max-width: 620px; }
+    figcaption { font-size: 0.85rem; color: #777; margin-top: 0.5rem; }
+    .figure-grid { display: grid; gap: 1rem; margin: 1.2rem 0; }
+    .figure-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .figure-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .figure-grid figure { margin: 0; }
+    @media (max-width: 640px) {
+        .figure-grid.cols-2, .figure-grid.cols-3 { grid-template-columns: 1fr; }
+    }
+    .quick-facts {
+        background: #fafafa;
+        border: 1px solid #eee;
+        border-left: 4px solid #e60000;
+        border-radius: 6px;
+        padding: 1.2rem 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .quick-facts h4 { margin: 0 0 0.6rem 0; color: #1a1a1a; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .quick-facts ul { margin: 0; padding-left: 1.2rem; }
+    .quick-facts li { margin-bottom: 0.35rem; }
+    .video-badge {
+        display: inline-block;
+        background: #1a1a1a;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        margin-bottom: 0.6rem;
+    }
+    .video-series-box a.video-thumb { display: block; position: relative; border-radius: 6px; overflow: hidden; }
+    .video-series-box a.video-thumb img { display: block; width: 100%; height: auto; transition: transform 0.2s ease; }
+    .video-series-box a.video-thumb:hover img { transform: scale(1.03); }
+    .video-series-box figcaption { font-size: 0.8rem; }
+    .video-series-box .playlist-link { margin: 1rem 0 0 0; font-weight: 600; }
+    pre {
+        background: #1a1a1a;
+        color: #e8e8e8;
+        padding: 1rem 1.2rem;
+        border-radius: 6px;
+        overflow: auto;
+        max-height: 340px;
+        font-size: 0.76rem;
+        line-height: 1.4;
+    }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+    p code, li code, td code { background: #eee; color: #a30000; padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.88em; }
+    .step-list { padding-left: 1.3rem; }
+    .step-list li { margin-bottom: 0.6rem; }
+    .obs-list { padding-left: 1.3rem; }
+    .obs-list li { margin-bottom: 0.7rem; }
+    .obs-list strong { color: #a30000; }
+</style>
+<style>
+    .tag-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 2.5rem 0 0.5rem 0; padding-top: 1.2rem; border-top: 1px solid #eee; }
+    .tag { background: #f4f4f4; border: 1px solid #e2e2e2; color: #444; font-size: 0.8rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 999px; }
+    pre code { white-space: pre; }
+    .code-details summary { cursor: pointer; font-weight: 600; color: #e60000; margin: 0.4rem 0; }
+    .figure-grid.phone-shots img { max-height: 460px; width: auto; }
+    .demo-clips video { width: 100%; height: auto; display: block; border-radius: 6px; background: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    @media (max-width: 640px) { .figure-grid.demo-clips { grid-template-columns: 1fr; } }
+    .figure-grid.cols-4 { display: grid; grid-template-columns: repeat(4, 1fr); }
+    @media (max-width: 640px) { .figure-grid.cols-4 { grid-template-columns: repeat(2, 1fr); } }
+</style>
+<style id="single-figure-size">
+    /* Standalone images: keep them from filling the whole screen so the text stays readable. Click to zoom. */
+    .container > figure img { max-width: min(100%, 560px); max-height: 400px; width: auto; }
+    .container > figure.figure-wide img { max-width: min(100%, 680px); max-height: 460px; }
+    .container > figure.figure-narrow img { max-width: min(100%, 380px); max-height: 360px; }
+</style>
+<style id="compact-tables">
+    /* Tables: size to their content instead of the full column, and cap long ones with a scroll + sticky header. */
+    .container .table-wrap { max-height: 460px; overflow: auto; border-radius: 6px; }
+    .container .table-wrap table { width: auto; max-width: 100%; margin: 0 auto; font-size: 0.85rem; }
+    .container .table-wrap th, .container .table-wrap td { padding: 0.32rem 0.6rem; }
+    .container .table-wrap th { position: sticky; top: 0; z-index: 1; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <a href="../index.html" class="back-link">← Back to Portfolio</a>
+
+    <h1>“Alexa, Start My Car”: Voice-Controlled Remote Start on a 2003 Mitsubishi Lancer</h1>
+    <p class="meta"><strong>Date:</strong> March 2026 &nbsp;|&nbsp; <strong>Tech:</strong> NodeMCU (ESP8266), Arduino C++, Sinric Pro IoT Cloud, Amazon Alexa Smart Home, OAuth 2.0 Account Linking, Key Fob Code Injection</p>
+
+    <hr style="border: 0; border-top: 1px solid #ddd; margin: 2rem 0;">
+
+    <h2>Live Demo</h2>
+    <p>The finished system, running live: <em>“Alexa, start my car”</em>, stop, unlock (with the voice PIN), lock, and <em>“Alexa, open the car trunk”</em>.</p>
+    <div class="figure-grid cols-3 demo-clips">
+        <figure><video controls="" preload="metadata" playsinline="" poster="videos/demo-1-start-poster.jpg"><source src="videos/demo-1-start.mp4" type="video/mp4"></video><figcaption>“Alexa, start my car.”</figcaption></figure>
+        <figure><video controls="" preload="metadata" playsinline="" poster="videos/demo-2-stop-unlock-lock-poster.jpg"><source src="videos/demo-2-stop-unlock-lock.mp4" type="video/mp4"></video><figcaption>Stop, unlock (with the voice PIN), then lock.</figcaption></figure>
+        <figure><video controls="" preload="metadata" playsinline="" poster="videos/demo-3-trunk-poster.jpg"><source src="videos/demo-3-trunk.mp4" type="video/mp4"></video><figcaption>“Alexa, open the car trunk.”</figcaption></figure>
+    </div>
+
+    <div class="quick-facts video-series-box">
+        <h4>🎥 Watch the Build: 2-Part Video Series</h4>
+        <div class="figure-grid cols-2">
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/Zj3M_oprxGs" target="_blank" rel="noopener">
+                    <img src="images/thumb-part1.jpg" alt="Part 1 video thumbnail: &quot;Alexa, start my car&quot; on a 2003 Lancer" loading="lazy">
+                </a>
+                <figcaption>Part 1: How It Works: IoT Cloud + Sinric Pro Setup</figcaption>
+            </figure>
+            <figure>
+                <a class="video-thumb" href="https://youtu.be/xYrCJzT1T6Y" target="_blank" rel="noopener">
+                    <img src="images/thumb-part2.jpg" alt="Part 2 video thumbnail: &quot;Alexa, start my car&quot; on a 2003 Lancer" loading="lazy">
+                </a>
+                <figcaption>Part 2: The Code, Alexa Setup &amp; Live Demo</figcaption>
+            </figure>
+        </div>
+        <p class="playlist-link"><a href="https://www.youtube.com/playlist?list=PLGy9N4sUrfFo" target="_blank" rel="noopener">▶ Watch the full playlist on YouTube</a></p>
+    </div>
+
+    <h2>Overview</h2>
+    <p>I added Amazon Alexa voice control to my 2003 Mitsubishi Lancer. From anywhere with an internet connection, I can say <em>“Alexa, start my car”</em>, lock or unlock the doors, or pop the trunk. Since the car itself had no smart features at all, I built this on top of two earlier projects: a cheap aftermarket remote start system that I had reverse engineered, and the control board I had already installed in the car for my HVAC retrofit.</p>
+    <p>I used a NodeMCU (ESP8266) on that board to inject key fob codes straight into the <strong>Banvie 1</strong> remote start module, mimicking a button press on the real fob. To connect it to Alexa, I used <strong>Sinric Pro</strong>, an IoT cloud backend, so I didn't have to build my own Alexa skill.</p><p>Note: several infographics in this article were generated with AI.</p>
+
+    <div class="quick-facts">
+        <h4>⚡ Quick Facts</h4>
+        <ul>
+            <li><strong>Voice commands:</strong>&nbsp;Remote start / stop, lock / unlock, and trunk release</li>
+            <li><strong>Car:</strong> 2003 Mitsubishi Lancer, with a hacked Banvie 1 remote start &amp; keyless entry system (about $50 online)</li>
+            <li><strong>Controller:</strong> NodeMCU 0.9 (ESP-12 / ESP8266), programmed in the Arduino IDE</li>
+            <li><strong>Minimum hardware:</strong>&nbsp;The NodeMCU, a 12&nbsp;V → 5&nbsp;V buck converter, and <em>one</em> data wire (D1) into the Banvie</li>
+            <li><strong>Cloud:</strong> Sinric Pro free plan (3 devices) + the Sinric Pro Alexa skill</li>
+            <li><strong>Range:</strong>&nbsp;Anywhere the NodeMCU has internet; home Wi-Fi in the driveway, or a mobile hotspot everywhere else</li>
+            <li><strong>Code:</strong>&nbsp;<a href="code/alexa_car_control.ino" download="">Download the full Arduino sketch (.ino)</a> or read it <a href="#full-code">below</a></li>
+        </ul>
+    </div>
+
+    <div class="quick-facts">
+        <h4>💡 Read This First</h4>
+        <p style="margin:0;">This build depends on two earlier projects on the same car. <a href="../banvie-1-reverse-engineering/banvie-1-reverse-engineering.html">Reverse-Engineering the Banvie 1</a> (<a href="https://www.youtube.com/playlist?list=PLdhMo-92UOj0" target="_blank" rel="noopener">5-part video series</a>) shows how I decoded the key fob's codes and injected them from a NodeMCU.&nbsp;<a href="https://youtu.be/Inx7_RVSyEI" target="_blank" rel="noopener">Part 5</a>&nbsp;of that series is the direct prequel. <a href="../hvac-retrofitting/hvac-retrofitting.html">The HVAC retrofit</a> (<a href="https://www.youtube.com/playlist?list=PLIieeidNUI08" target="_blank" rel="noopener">2-part video series</a>) shows how the control board is powered, mounted and wired into the car. This page picks up from there.</p>
+    </div>
+
+    <h2>System Architecture</h2>
+    <p>Every voice command makes a trip through two cloud servers before it reaches the board in the car:</p>
+    <p style="text-align:center; font-weight:600;">Your voice → Alexa Cloud → Third-party Alexa skill / add-on → Third-party cloud backend → NodeMCU (ESP8266)</p><figure><img src="images/slide-1-iot-cloud-backend.png" alt="Diagram: Alexa Cloud connects to an IoT cloud backend (the middleman), which connects to your hardware." loading="lazy">
+        <figcaption>The missing piece between Alexa and custom hardware: an IoT cloud backend.</figcaption>
+    </figure>
+
+    <h2>Why Alexa Needs an IoT Cloud Backend</h2>
+    <p>When you say <em>“Alexa, turn on Bulb 1”</em>, Alexa's servers turn your voice into a small, structured <strong>JSON directive</strong>: a namespace such as <code>Alexa.PowerController</code>, an action such as <code>TurnOn</code>, and an <code>endpointId</code> that names the device. But that message can't go straight to an ESP8266, for two reasons:</p>
+    <ol class="step-list">
+        <li><strong>Amazon only sends smart home directives to cloud code registered with an Alexa skill,</strong>&nbsp;and never to a random device on the internet.</li>
+        <li><strong>The board is hidden behind a router or phone hotspot (NAT):</strong>&nbsp;Nothing on the internet can reach it unless the board opened the connection itself.</li>
+    </ol>
+    <div class="figure-grid cols-3">
+        <figure><img src="images/slide-2-voice-to-json.png" alt="Your voice becomes a JSON message: the Alexa cloud converts speech to a structured directive." loading="lazy"><figcaption>Your voice becomes a JSON message.</figcaption></figure>
+        <figure><img src="images/slide-3-only-registered-skills.png" alt="Alexa only sends smart home commands to cloud code registered with a skill, never directly to a device." loading="lazy"><figcaption>Alexa only talks to registered skills.</figcaption></figure>
+        <figure><img src="images/slide-4-hidden-behind-router.png" alt="Incoming connections from the internet are blocked by the router; connections started by the device are allowed." loading="lazy"><figcaption>The board is hidden behind a router.</figcaption></figure>
+    </div>
+    <p>An <strong>IoT cloud backend</strong>&nbsp;sits in the middle: it receives Alexa's commands through its own published skill, handles security and <strong>OAuth 2.0 account linking</strong> (which ties your Alexa account to your account on the cloud platform), and keeps an <strong>always-open connection</strong> to the microcontroller. The board dials out once and holds that connection open, so commands come back down it almost instantly.</p>
+    <p>These platforms also provide <strong>both halves</strong>: an Arduino library for the device side, and an official Alexa smart home skill (Amazon now calls these “add-ons”) for the cloud side. Without one, I would have had to set up the Amazon Developer Console, write a smart home skill from scratch, host it on AWS Lambda, run my own backend server, and implement OAuth 2.0 account linking. That's a lot of work to turn on a light bulb.</p>
+    <div class="figure-grid cols-2">
+        <figure><img src="images/slide-5-backend-is-the-middleman.png" alt="The IoT cloud backend receives Alexa's commands, handles security and OAuth, and passes commands to the ESP8266 over an always-open connection." loading="lazy"><figcaption>The backend is the middleman.</figcaption></figure>
+        <figure><img src="images/slide-6-both-halves-of-the-bridge.png" alt="The platform provides both halves of the bridge: an Arduino library on the device side and an Alexa skill on the cloud side." loading="lazy"><figcaption>The platform builds both halves of the bridge.</figcaption></figure>
+        <figure><img src="images/slide-7-diy-vs-platform.png" alt="Without a platform: five hard jobs, from the Amazon Developer Console to OAuth 2.0 account linking." loading="lazy"><figcaption>Without a platform: five hard jobs.</figcaption></figure>
+        <figure><img src="images/slide-8-popular-cloud-backends.png" alt="Popular IoT cloud backends for Alexa: Sinric Pro, Arduino Cloud, ESP RainMaker and Home Assistant." loading="lazy"><figcaption>Popular IoT cloud backends that work with Alexa.</figcaption></figure>
+    </div>
+
+    <h2>Choosing Sinric Pro: One Board, Three Virtual Devices</h2>
+    <p>I went with <strong>Sinric Pro</strong> because its free plan covers three devices. There was only one physical device (the NodeMCU), but on Sinric Pro I had to set up each function as its own <em>virtual</em> device, and each one counted toward that limit.</p>
+    <p>The device type matters because it decides which voice commands Alexa understands out of the box. A Switch knows “turn on” and “turn off”, but there's no “open the switch”. A garage door knows “open” and “close”, which fits a trunk far better. So I picked a type per function:</p>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Function</th><th>Sinric Pro device type</th><th>Natural voice command</th><th>Callback in the code</th></tr></thead>
+            <tbody>
+                <tr><td>Engine start / stop</td><td>Switch</td><td>“Alexa, turn on / off my car”</td><td><code>onPowerStateCarEngineSwitch</code> → <code>startEngine()</code> / <code>stopEngine()</code></td></tr>
+                <tr><td>Door locks</td><td>Smart Lock</td><td>“Alexa, lock / unlock my car”</td><td><code>onLockStateCarLock</code> → <code>lockCar()</code> / <code>unlockCar()</code></td></tr>
+                <tr><td>Trunk</td><td>Garage Door</td><td>“Alexa, open the car trunk”</td><td><code>onDoorStateCarTrunk</code> → <code>releaseTrunk()</code> (open only)</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <figure class="figure-wide"><img src="images/slide-9-sinric-pro-3-free-devices.png" alt="Sinric Pro's free plan covers 3 devices: a Switch for engine start/stop, a Lock for the doors, and a Garage Door for trunk release." loading="lazy"><figcaption>Three free devices: one each for start, lock and trunk.</figcaption></figure>
+
+    <h2>Hardware</h2>
+    <p>I reused the circuit board from the <a href="../hvac-retrofitting/hvac-retrofitting.html">HVAC retrofit</a>, which also carries a motorized AC knob driver and a blend-door servo. None of that was needed for this project, so the minimal setup was just:</p>
+    <ul class="step-list">
+        <li><strong>NodeMCU 0.9 (ESP-12, ESP8266):</strong>&nbsp;for Wi-Fi, the Sinric Pro connection, and the code injection.</li>
+        <li><strong>A 12&nbsp;V → 5&nbsp;V buck converter</strong> (2&nbsp;A rating) fed from the car battery through a 2&nbsp;A fuse.</li>
+        <li><strong>One data wire:</strong> NodeMCU pin <code>D1</code> → pin 11 of the Holtek microcontroller inside the Banvie, which is where the RF receiver normally delivers decoded key fob codes.</li>
+        <li><strong>A common ground</strong> between the car, the buck converter, the NodeMCU and the Banvie.</li>
+    </ul>
+    <div class="figure-grid cols-2">
+        <figure><img src="images/wiring-diagram-pin11.jpg" alt="Wiring diagram: 12 V car battery through a 2 A fuse to a 12 V to 5 V step-down converter powering the NodeMCU; NodeMCU pin D1 to pin 11 of the Holtek microcontroller in the Banvie; common grounds." loading="lazy"><figcaption>Complete wiring: power, one signal wire, and a common ground.</figcaption></figure>
+        
+        <figure><img src="images/control-board.jpg" alt="The control board from the HVAC retrofit, with the HVAC-only connectors marked as irrelevant to this project." loading="lazy"><figcaption>The reused control board. The marked connectors are for the HVAC modification and are irrelevant to this project.</figcaption></figure>
+        <figure><img src="images/holtek-pin11-codes.jpg" alt="Inside the Banvie: the RF chip carries key codes to pin 11 of the Holtek microcontroller, which receives them." loading="lazy"><figcaption>Pin 11 of the Holtek IC receives the key codes (the injection point).</figcaption></figure>
+        <figure><img src="images/holtek-pin-map-cropped.jpg" alt="Holtek microcontroller pin map: indicator lights, car lock, car unlock, trunk release and horn/siren outputs." loading="lazy"><figcaption>Holtek output pins mapped in the Banvie project: lock, unlock, trunk release, horn and indicators.</figcaption></figure>
+    </div>
+    
+    <p>The Banvie's key fob sends <strong>fixed (non-rolling) 24-bit on-off-keyed codes</strong>. Replaying a code on Holtek pin 11 looks just like a real button press, and three unlock codes in a row start the engine. Details are in the <a href="../banvie-1-reverse-engineering/banvie-1-reverse-engineering.html#cracking-the-key-fobs-rf-protocol">Banvie reverse-engineering write-up</a>.</p>
+
+    <h2 id="setup">Setting It Up</h2>
+    <h3>1. Sinric Pro portal</h3>
+    <ol class="step-list">
+        <li><strong>Create credentials.</strong> The Credentials tab offers two kinds. An <em>API Key</em> is for your own code that <em>sends</em> commands to your devices without a voice assistant (for example, a custom phone app). An <em>App Key + App Secret</em> is what goes inside the IoT device itself, so it can connect and <em>receive</em> commands. The NodeMCU is the device, so it gets an App Key and Secret.</li>
+        <li><strong>Create the three virtual devices</strong> (Switch, Smart Lock, Garage Door) and copy each device ID into the sketch.</li>
+        <li><strong>Turn OFF “Restore Device State When Connect”</strong> for every device. This one matters: see <a href="#gotchas">Design Decisions</a>.</li>
+    </ol>
+    <div class="figure-grid cols-2">
+        <figure><img src="images/sinric-credentials.jpg" alt="Sinric Pro Credentials page with the New API Key and New App Key and Secret buttons." loading="lazy"><figcaption>The Credentials tab. The NodeMCU needs an App Key and Secret, not an API key.</figcaption></figure>
+        <figure><img src="images/sinric-add-device.jpg" alt="Sinric Pro New Device form: name Engine, description Starts or stops the engine, device type Switch, app key Car Control." loading="lazy"><figcaption>Adding the Engine device as a Switch, linked to the Car Control app key.</figcaption></figure>
+        <figure><img src="images/sinric-restore-state.jpg" alt="Sinric Pro device settings, Other tab, with Restore Device State When Connect switched off." loading="lazy"><figcaption>“Restore Device State When Connect” turned off.</figcaption></figure>
+        <figure><img src="images/sinric-device-list.jpg" alt="Sinric Pro Devices list showing the three devices: car trunk, car door lock and engine." loading="lazy"><figcaption>All three virtual devices on the same app key.</figcaption></figure>
+    </div>
+    <h3>2. Arduino IDE</h3>
+    <ol class="step-list">
+        <li>Click <strong>Select Board → Select other board and port</strong>, search "NodeMCU", pick <strong>NodeMCU 0.9 (ESP-12 Module)</strong>, and pick the COM port it's plugged into.</li>
+        <li>Install the <strong>SinricPro</strong> library: <em>Sketch → Include Library → Manage Libraries</em>, search “SinricPro”.</li>
+        <li>Fill in the App Key/Secret, the three device IDs, and the Wi-Fi credentials. Use home Wi-Fi if it only needs to work in the driveway, or a mobile hotspot to make it work anywhere.</li>
+    </ol>
+    <div class="figure-grid cols-2">
+        <figure><img src="images/arduino-board-select.jpg" alt="Arduino IDE Select Other Board and Port dialog: searching node, selecting NodeMCU 0.9 (ESP-12 Module) under Boards and COM4 under Ports." loading="lazy"><figcaption>Select Board → Select other board and port: search "NodeMCU", pick <strong>NodeMCU 0.9 (ESP-12 Module)</strong>, then the COM port it's on.</figcaption></figure>
+        <figure><img src="images/arduino-library.jpg" alt="Arduino IDE Library Manager with a search for SinricPro, showing the SinricPro library by Boris Jaeger." loading="lazy"><figcaption>Installing the SinricPro library from the Library Manager.</figcaption></figure>
+    </div>
+    <h3>3. Alexa app</h3>
+    <p>Finding the skill isn't obvious. It's in the Alexa+ Store, which is tucked inside the <strong>More</strong> menu, and the store's search button is easy to miss. On my phone the path was:</p>
+    <ol class="step-list">
+        <li>Open the Alexa app and tap the <strong>☰ menu icon in the top-left corner</strong> of the home screen. That opens the <strong>More</strong> page.</li>
+        <li>Tap <strong>Alexa+ Store</strong>.</li>
+        <li>In the store, tap the <strong>search icon (🔍) on the top left</strong>, next to the "Smart Home &amp; Safety" and "Entertainment" tabs, and type <strong>Sinric Pro</strong>.</li>
+        <li>Under <strong>Original Skills</strong>, open <strong>Sinric Pro</strong> and tap <strong>Enable to Use</strong>.</li>
+        <li>Sign in with your Sinric Pro account. This is the OAuth account-linking step that connects Alexa to Sinric Pro.</li>
+        <li>Tap <strong>Next</strong> and let Alexa discover devices. The engine switch, car lock and trunk show up as regular smart home devices.</li>
+    </ol>
+    <div class="figure-grid cols-4 phone-shots">
+        <figure><img src="images/alexa-home.jpg" alt="Alexa app home screen, with the menu icon in the top-left corner." loading="lazy"><figcaption>1. Home screen: tap ☰ (top-left).</figcaption></figure>
+        <figure><img src="images/alexa-more.jpg" alt="Alexa app More page with tiles for Music, Communicate, Lists, Reminders, Routines, Alarms, Alexa+ Store and Calendar." loading="lazy"><figcaption>2. More → Alexa+ Store.</figcaption></figure>
+        <figure><img src="images/alexa-store.jpg" alt="Alexa+ Store page with a search icon to the left of the Smart Home and Safety and Entertainment tabs." loading="lazy"><figcaption>3. Tap the search icon on the top left.</figcaption></figure>
+        <figure><img src="images/alexa-search.jpg" alt="Alexa+ Store search for Sinric, showing Sinric Pro under Original Skills." loading="lazy"><figcaption>4. Search "Sinric Pro": it's under Original Skills.</figcaption></figure>
+    </div>
+    <div class="figure-grid cols-3 phone-shots">
+        <figure><img src="images/alexa-enable-skill.jpg" alt="Sinric Pro skill page in the Alexa app with the Enable to Use button." loading="lazy"><figcaption>Enable the Sinric Pro skill.</figcaption></figure>
+        <figure><img src="images/alexa-linked.jpg" alt="Alexa app confirming Sinric Pro has been successfully linked." loading="lazy"><figcaption>Account linked.</figcaption></figure>
+        <figure><img src="images/alexa-devices-found.jpg" alt="Alexa app reporting it automatically connected 3 devices: car trunk, car lock and engine." loading="lazy"><figcaption>Alexa finds all three devices.</figcaption></figure>
+    </div>
+
+    <h2>Code Walkthrough</h2>
+    <p>The sketch has three parts: the Banvie interface (pulse trains that copy the key fob), the Wi-Fi and Sinric Pro setup, and three callbacks that turn Alexa commands into Banvie actions. I reused the Banvie part from the earlier project and wrote the Wi-Fi, Sinric Pro and callback code for this one, so that's what this section focuses on.</p>
+
+    <h3>Banvie interface (reused)</h3>
+    <p>The constants describe the fob's signal: 25 positive pulse edges (24 bits), 10 repeats per pulse train, a 1500&nbsp;µs bit period with 1200&nbsp;µs / 300&nbsp;µs long and short pulses, a 4&nbsp;s hold for trunk release, and a 500&nbsp;ms step delay for the start sequence. Four bit arrays hold the lock, muted lock, unlock and trunk release codes. <code>issuePulses()</code> switches <code>D1</code> to <code>OUTPUT</code> only while sending codes, then switches back to a floating <code>INPUT</code> so the original fob keeps working. All of this is covered in depth in <a href="https://youtu.be/Inx7_RVSyEI" target="_blank" rel="noopener">Banvie Part 5</a>.</p>
+    <p>Remote start is just the fob sequence replayed: one lock, then three unlocks, 500&nbsp;ms apart.</p>
+<pre><code>void startEngine(){
+  issuePulses(lockPulseWidths, num_positive_pulses);
+  delay(car_start_step_delay_ms);
+  issuePulses(unlockPulseWidths, num_positive_pulses);   // x3: three unlocks in a row
+  delay(car_start_step_delay_ms);                        // trigger the Banvie remote start
+  issuePulses(unlockPulseWidths, num_positive_pulses);
+  delay(car_start_step_delay_ms);
+  issuePulses(unlockPulseWidths, num_positive_pulses);
+  delay(car_start_step_delay_ms);
+}</code></pre>
+
+    <h3>Connecting to Wi-Fi</h3>
+    <p>The NodeMCU joins either my home Wi-Fi (works in the driveway) or a phone hotspot (works anywhere). Two settings mattered here. I turned sleep off so that a command would reach the car right away instead of waiting for the radio to wake up. The cost was a constant 70–100 mA or so from the car battery. I also enabled auto-reconnect, so that when I drove out of range of a router and came back, the board rejoined on its own.</p>
+<pre><code>#define WIFI_SSID "YOUR-WIFI-OR-HOTSPOT-SSID"
+#define WIFI_PASS "YOUR-WIFI-OR-HOTSPOT-PASSWORD"
+
+void setupWiFi(){
+  WiFi.setSleepMode(WIFI_NONE_SLEEP);  // never sleep: fastest response, higher current draw
+  WiFi.setAutoReconnect(true);         // rejoin automatically after the connection drops
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+
+  while (WiFi.status() != WL_CONNECTED) {   // block until connected
+    Serial.println(".");
+    delay(250);
+  }
+  Serial.println("WiFi: IP-Address is " + WiFi.localIP().toString());
+}</code></pre>
+
+    <h3>Creating the Sinric Pro devices in code</h3>
+    <p>The three devices already exist on the Sinric Pro portal, but the sketch still needs an object for each one. <code>SinricPro[ID]</code> looks a device up by the ID copied from the portal and returns it as the right type: a switch, a lock, or a garage door. Each type only fires certain events. A switch has a power state, a lock has a lock state, and a garage door has a door state. So I attached one callback to the single event I cared about on each device.</p>
+<pre><code>#define APP_KEY       "YOUR-APP-KEY"       // Credentials &gt; New App Key and Secret
+#define APP_SECRET    "YOUR-APP-SECRET"
+#define CAR_ENGINE_ID "YOUR-ENGINE-SWITCH-DEVICE-ID"
+#define CAR_LOCK_ID   "YOUR-LOCK-DEVICE-ID"
+#define CAR_TRUNK_ID  "YOUR-GARAGE-DOOR-DEVICE-ID"
+
+void setupSinricPro(){
+  SinricProSwitch     &amp;carEngineSwitch = SinricPro[CAR_ENGINE_ID];
+  SinricProLock       &amp;carLock         = SinricPro[CAR_LOCK_ID];
+  SinricProGarageDoor &amp;carTrunkDoor    = SinricPro[CAR_TRUNK_ID];
+
+  carEngineSwitch.onPowerState(onPowerStateCarEngineSwitch);  // "turn on / off my car"
+  carLock.onLockState(onLockStateCarLock);                    // "lock / unlock my car"
+  carTrunkDoor.onDoorState(onDoorStateCarTrunk);              // "open the car trunk"
+
+  SinricPro.onConnected([](){ Serial.println("Connected to SinricPro"); });
+  SinricPro.onDisconnected([](){ Serial.println("Disconnected from SinricPro"); });
+
+  SinricPro.restoreDeviceStates(false);   // don't replay the last command on reconnect
+  SinricPro.begin(APP_KEY, APP_SECRET);   // open the connection to the Sinric Pro cloud
+}</code></pre>
+    <p><code>restoreDeviceStates(false)</code> is there because of the "car starts itself" problem described under <a href="#gotchas">Design Decisions</a>. On its own it wasn't enough. I also had to turn the same setting off on the portal for every device (see <a href="#setup">Setting It Up</a>).</p>
+
+    <h3>Callbacks: where Alexa commands turn into fob presses</h3>
+    <p>Each callback gets the device ID and the requested state. Every callback belongs to exactly one device, so the ID can be ignored. Each one has to <strong>return <code>true</code></strong> so Sinric Pro, and then Alexa, know the command was handled.</p>
+<pre><code>bool onPowerStateCarEngineSwitch(const String &amp;deviceId, bool &amp;state) {
+  // Switch device: state == true -&gt; "turn on", state == false -&gt; "turn off"
+  if (state) startEngine();
+  else       stopEngine();
+  return true;
+}
+
+bool onLockStateCarLock(const String &amp;deviceId, bool &amp;state) {
+  // Lock device: state == true -&gt; lock requested, false -&gt; unlock requested
+  if (state) lockCar();
+  else       unlockCar();
+  return true;
+}
+
+bool onDoorStateCarTrunk(const String &amp;deviceId, bool &amp;state) {
+  // Garage Door logic is inverted: false = OPEN requested, true = CLOSE requested
+  if (!state) releaseTrunk();   // no motorized trunk closing, so only "open" is handled
+  return true;
+}</code></pre>
+    <p>For the garage door device type, <code>false</code> means "open". Therefore the trunk release runs on the negated state:&nbsp;<code>!state</code>.</p>
+
+    <h3>setup() and loop()</h3>
+    <p><code>setup()</code> just runs the three setup functions in order. <code>setupBanvieSystem()</code> leaves the data pin floating so the real fob still works. In <code>loop()</code>, <code>SinricPro.handle()</code> has to run constantly: it services the open connection to the cloud and fires the callbacks above when a command comes in. I also added a serial check as a debugging shortcut. Typing <code>L</code>, <code>T</code>, <code>U</code> or <code>M</code> in the Serial Monitor locks, opens the trunk, unlocks, or does a muted lock, so I could test the Banvie side from a laptop without going through Alexa.</p>
+<pre><code>void setup() {
+  Serial.begin(74880);   // the ESP8266 boot ROM's baud rate, so boot messages are readable too
+  setupWiFi();
+  setupSinricPro();
+  setupBanvieSystem();   // pinMode(banvie_pin, INPUT): floating, so the real fob still works
+}
+
+void loop() {
+  if (Serial.available() &gt; 0) {               // debug: L / T / U / M from the Serial Monitor
+    handleSerialInputForBanvieSystem(Serial.read());
+  }
+  SinricPro.handle();   // listen for commands from the cloud and run the callbacks
+  delay(100);
+}</code></pre>
+
+    <h3 id="full-code">Full Arduino sketch</h3>
+    <p><a href="code/alexa_car_control.ino" download="">⬇ Download alexa_car_control.ino</a>.</p>
+    <details class="code-details">
+    <summary>Show the full sketch</summary>
+<pre><code>// "Alexa, Start My Car" - Voice-controlled remote start for a 2003 Mitsubishi Lancer
+// NodeMCU (ESP8266) + hacked Banvie 1 remote start system + Sinric Pro + Amazon Alexa
+// Kasun Pathirage / Dumbledore's Navy - https://www.youtube.com/@DumbledoresNavy
+//
+// Before uploading: fill in your own Sinric Pro App Key/Secret, the three device IDs,
+// and your Wi-Fi (or mobile hotspot) credentials below. Board: NodeMCU 0.9 (ESP-12).
+// Library: "SinricPro" (Arduino IDE &gt; Sketch &gt; Include Library &gt; Manage Libraries).
+// Also turn OFF "Restore Device State When Connect" for every device on the Sinric Pro portal.
+
+#include &lt;Arduino.h&gt;
+#include &lt;ESP8266WiFi.h&gt;
+#include &lt;SinricPro.h&gt;  // The main SinricPro library
+
+// The libraries corresponding to the individual SinricPro Devices that we plan to use.
+#include "SinricProSwitch.h"
+#include "SinricProLock.h"
+#include "SinricProGarageDoor.h"
+
+////////////////////////////////////////////////////////////////////////////
+// SINRICPRO VARIABLES
+
+#define APP_KEY "YOUR-APP-KEY"  // Sinric Pro portal &gt; Credentials &gt; New App Key and Secret
+#define APP_SECRET "YOUR-APP-SECRET"
+
+// Each device on Sinric Pro needs a unique ID.
+// This way Alexa, the Sinric Pro cloud backend, and the microcontroller know which device a message was intended to.
+#define CAR_ENGINE_ID "YOUR-ENGINE-SWITCH-DEVICE-ID"
+#define CAR_LOCK_ID "YOUR-LOCK-DEVICE-ID"
+#define CAR_TRUNK_ID "YOUR-GARAGE-DOOR-DEVICE-ID"
+
+////////////////////////////////////////////////////////////////////////////
+// BANVIE SYSTEM CONTROL VARIABLES
+#define banvie_pin D1
+
+volatile long startTime = 0;
+const int num_positive_pulses = 25; // 25 positive pulse edges because we want 24 pull downs.
+const int num_repeats_per_train = 10;
+const int trunk_release_key_press_hold_time_s = 4;
+
+const uint16_t period_us = 1500; 
+const uint16_t long_pulse_length_us = 1200;
+const uint16_t short_pulse_length_us = period_us - long_pulse_length_us;
+const int car_start_step_delay_ms = 500;
+
+bool lockPulseWidths[num_positive_pulses] = {1,0,0,1,0,0,1,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0};  // Lock sequence
+bool mutedLockPulseWidths[num_positive_pulses] = {1,0,0,1,0,0,1,1,0,0,1,0,1,0,0,0,0,0,0,0,0,1,0,0,0};  // Muted Lock sequence
+bool unlockPulseWidths[num_positive_pulses] = {1,0,0,1,0,0,1,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,0};  // Unlock sequence
+bool trunkReleasePulseWidths[num_positive_pulses] = {1,0,0,1,0,0,1,1,0,0,1,0,1,0,0,0,0,0,0,0,1,1,0,0,0};  // Trunk release sequence
+
+////////////////////////////////////////////////////////////////////////////
+// WIFI SSID AND PASSWORSD
+#define WIFI_SSID "YOUR-WIFI-OR-HOTSPOT-SSID"
+#define WIFI_PASS "YOUR-WIFI-OR-HOTSPOT-PASSWORD"
+
+////////////////////////////////////////////////////////////////////////////
+// BANVIE SYSTEM CONTROL FUNCTIONS
+
+void issuePulses(bool pulseWidths[], int num_positive_pulses){
+  pinMode(banvie_pin, OUTPUT);
+  digitalWrite(banvie_pin, LOW);
+
+  for (int r = 0; r &lt; num_repeats_per_train; r++){
+    for (int i = 0; i &lt; num_positive_pulses; i++) {
+      
+      uint16_t highTime = pulseWidths[i] == 1? long_pulse_length_us: short_pulse_length_us;
+      uint16_t lowTime = pulseWidths[i] == 1? short_pulse_length_us: long_pulse_length_us;
+
+      // HIGH portion
+      digitalWrite(banvie_pin, HIGH);
+      startTime = micros();
+      while ((micros() - startTime) &lt; highTime){};
+      
+
+      // LOW portion
+      digitalWrite(banvie_pin, LOW);
+      startTime = micros();
+      while ((micros() - startTime) &lt; lowTime){};   
+    }
+    
+    delay(12);  // gap between trains
+  }
+  pinMode(banvie_pin, INPUT);
+  
+}
+
+void lockCar(){
+  Serial.println("Locking car");
+  issuePulses(lockPulseWidths, num_positive_pulses);  
+}
+
+void mutedLockCar(){
+  Serial.println("Muted Lock Activated");
+  issuePulses(mutedLockPulseWidths, num_positive_pulses);
+}
+
+void unlockCar(){
+  Serial.println("Unlocking Car");
+  issuePulses(unlockPulseWidths, num_positive_pulses);
+}
+
+void releaseTrunk(){
+  Serial.println("Releasing Trunk Door");      
+  long trunk_start_time = millis();
+  while ((millis() - trunk_start_time) &lt; (trunk_release_key_press_hold_time_s * 1000)){
+    issuePulses(trunkReleasePulseWidths, num_positive_pulses);
+  }      
+}
+
+void startEngine(){
+  Serial.println("Starting car");
+  issuePulses(lockPulseWidths, num_positive_pulses);
+  delay(car_start_step_delay_ms);
+  issuePulses(unlockPulseWidths, num_positive_pulses);
+  delay(car_start_step_delay_ms);
+  issuePulses(unlockPulseWidths, num_positive_pulses);
+  delay(car_start_step_delay_ms);
+  issuePulses(unlockPulseWidths, num_positive_pulses);
+  delay(car_start_step_delay_ms);
+}
+
+void stopEngine(){
+  Serial.println("Stopping car");
+  issuePulses(unlockPulseWidths, num_positive_pulses);
+  delay(car_start_step_delay_ms);
+  issuePulses(unlockPulseWidths, num_positive_pulses);
+  delay(car_start_step_delay_ms);
+  issuePulses(unlockPulseWidths, num_positive_pulses);
+  delay(car_start_step_delay_ms);
+}
+
+void handleSerialInputForBanvieSystem(char c){
+    
+    if (c == 'L') {
+      lockCar();
+    }
+    else if (c == 'T') {          
+      releaseTrunk();
+    }
+    else if (c == 'U') {
+      unlockCar();
+    }
+    else if (c == 'M') {
+      mutedLockCar();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////
+// WIFI AND ALEXA CONTROL FUNCTIONS
+
+// Each callback function below receives two inputs, first, a deviceID, and the state of the device depending on the command the callback was linked to.
+// We do not need to worry about the deviceID because each callback only handles state changes from one device. That is, we have a one to one mapping between each callback function and device.
+// After every successful callback, the bool TRUE must be returned so that the cloud back end knows that the request was handled, and conveys that to Alexa too.
+
+bool onPowerStateCarEngineSwitch(const String &amp;deviceId, bool &amp;state) {
+  // The car engine was configured as a switch device, and this callback was attached to the SinricPro's 'onPowerState' method for the SinricProSwitch devices.
+  // When the power state of the switch flips, this method is called.
+  // If the switch is ON, the state will be True, and if it is OFF, it will be False.
+  Serial.println("Device " + String(deviceId.c_str()) + " is " + (state?"on":"off"));
+
+  // If the switch power state is ON, trigger the startEngine sequence.
+  if (state) {
+    startEngine();
+    return true;
+  }
+  else{  // If the switch power state is OFF, trigger the stopEngine sequence
+    stopEngine();
+    return true;
+  }
+}
+
+bool onLockStateCarLock(const String &amp;deviceId, bool &amp;state) {
+  // The car lock was configured as a generic smart lock device, and this callback was attached to the SinricPro's 'onLockState' method for the SinricProLock devices.
+  // When the lock state toggles, this method is called.
+  // If the command requests the lock to be locked, the state will be True, and if it is to be unlocked, the state will be False.
+
+  Serial.println("Device " + String(deviceId.c_str()) + " is " + (state?"locked":"unlocked"));
+  
+  // Based on the state, trigger either the locking or unlocking sequences.
+  // Return true once done. 
+  if (state){
+    lockCar();  
+  }
+  else{
+    unlockCar();
+  }  
+  return true;
+}
+
+bool onDoorStateCarTrunk(const String &amp;deviceId, bool &amp;state) {
+  // The car trunk door was configured as a garage door device, and this callback was attached to the SinricPro's 'onDoorState' method for the SinricProGarageDoor devices.
+  // When the door state toggles, this method is called.
+  // If the command requests the door to be CLOSED, the state will be True, and if it is to be OPENED, the state will be False.
+
+  Serial.println("Device " + String(deviceId.c_str()) + " is " + (state?"closed":"open"));
+  
+  // The following portion executes if state is FALSE.
+  if (!state){
+    releaseTrunk();  
+  }
+  // I did not retrofit a mechanism for the trunk closing, hence we don't have the need for the TRUE state.
+  
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+void setupWiFi(){ // setup function for WiFi connection
+  Serial.println("Wifi is Connecting...");
+  
+  WiFi.setSleepMode(WIFI_NONE_SLEEP);  // Do not let the wifi system sleep. 
+  WiFi.setAutoReconnect(true);  // If wifi drops, it will auto-reconnect.  
+  WiFi.begin(WIFI_SSID, WIFI_PASS);  // Use the specified SSID and password to establish internet connection. If you need to use this anywhere, use a mobile hotspot connection here. 
+  
+  // Print a stream of dots until wifi connectivity is established.
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.println(".");
+    delay(250);
+  }
+
+  IPAddress localIP = WiFi.localIP();
+  Serial.println("connected!");
+  Serial.println("WiFi: IP-Address is" + String(localIP[0]) + "." + String(localIP[1]) + "." + String(localIP[2]) + "." + String(localIP[3]));
+}
+
+void setupSinricPro(){
+  // Create a Sinric Pro virtual device for every function.
+  // Select devices that natively support the intended voice commands.
+  // Note, on the Alexa interface (inside the Alexa app), you can name each of these devices with a custom name, like 'My Car Engine', 'My Car Trunk', etc. 
+  SinricProSwitch &amp;carEngineSwitch = SinricPro[CAR_ENGINE_ID];  // The car engine start/stop is configured as a Switch device. Name the object carEngineSwitch.
+  SinricProLock &amp;carLock = SinricPro[CAR_LOCK_ID];  // The car lock/unlock is configured as a generic Lock device. Name the object carLock.
+  SinricProGarageDoor &amp;carTrunkDoor = SinricPro[CAR_TRUNK_ID];   // The trunk door is configured as a GarageDoor device. Name the object carTrunkDoor.
+
+  // Each SinricPro device type has a set of commands it recognizes and responds to.
+  // Attach callbacks to appropriate commands.
+  carEngineSwitch.onPowerState(onPowerStateCarEngineSwitch);  // Attach the callback 'onPowerStateCarEngineSwitch' to be triggered when the carEngineSwitch is switched ON or OFF (Power state).
+  carLock.onLockState(onLockStateCarLock);  // Attach the callback 'onLockStateCarLock' to be triggered when the carLock is locked or unlocked.
+  carTrunkDoor.onDoorState(onDoorStateCarTrunk);  // Attach the callback 'onDoorStateCarTrunk' to be triggered when the carTrunkDoor is opened or closed.
+  
+  // For debugging purposes, notify everytime the SinricPro Library running on the microcontroller establishes/loses connection (via wifi) with the cloud backend.
+  SinricPro.onConnected([](){Serial.println("Connected to SinricPro");});
+  SinricPro.onDisconnected([](){Serial.println("Disconnected from SinricPro");});
+  
+  // This is important - If this is set to True, if the connection to the cloud backend is re-established after a drop, the last used state will be restored.
+  // For example, if you last asked the car to start, the start car command will be re-issued. 
+  // Despite setting this in code, I found that I also had to make sure the setting "Restore Device State When Connect" on the Sinric Pro web portal was set to False  
+  SinricPro.restoreDeviceStates(false);
+
+  // Here we setup the secure connection between the cloud backend and the microcontroller.
+  SinricPro.begin(APP_KEY, APP_SECRET);
+}
+
+void setupBanvieSystem(){
+    pinMode(banvie_pin, INPUT); // This should be set to floating whenever we do NOT issue any command so that the normal remote can also work.
+    Serial.println("Banvie system initialized.");
+    Serial.println("Press 'L', 'T', 'U', 'M' for 'Lock', 'Trunk release', 'Unlock', and 'Muted Lock' respectively.");
+}
+
+
+void setup() {
+  Serial.begin(74880);
+  setupWiFi();  
+  setupSinricPro();
+  setupBanvieSystem();
+}
+
+void loop() {
+  
+  // If a message is received via Serial Input (during debugging), trigger the appropriate command.
+  if (Serial.available() &gt; 0) {
+    char c = Serial.read();
+    Serial.println("Received Serial Code " + String(c));
+    handleSerialInputForBanvieSystem(c);
+  }
+
+  SinricPro.handle();  // Constantly listens to any messages the cloud backend may send.
+
+  delay(100);
+
+}</code></pre>
+    </details>
+
+    <h2 id="gotchas">Design Decisions and Important Considerations</h2>
+    <ul class="obs-list">
+        <li><strong>The car could start itself:</strong>&nbsp;<br>Sinric Pro can restore each device's last state when the board reconnects. If the last command was “engine on”, driving home and reconnecting to Wi-Fi would re-send it and <em>start the car</em>. Setting <code>restoreDeviceStates(false)</code> in code wasn't enough on its own: I also had to turn off “Restore Device State When Connect” on the Sinric Pro portal for every device.</li>
+        <li><strong>Always-on Wi-Fi drains the battery:</strong>&nbsp;<br>Because I disabled sleep, the NodeMCU draws somewhere around 70–100 mA continuously. This is fine for a car that is driven every day, but it will drain the battery if the car sits for a while.</li>
+        <li><strong>The original key fob still works:</strong>&nbsp;<br>I kept the data pin floating (<code>INPUT</code>) whenever the NodeMCU isn't sending, so the hack sits alongside the factory receiver instead of replacing it.</li>
+        <li><strong>Device type decides the voice commands:</strong><br>Choosing Switch, Smart Lock and Garage Door gave me “turn on my car”, “unlock my car” and “open the car trunk” without any custom voice model.</li>
+        <li><strong>Garage Door logic is inverted:</strong>&nbsp;<br>For this device type, <code>false</code> means “open” and <code>true</code> means “close”.</li>
+        <li><strong>Voice PIN for sensitive actions:</strong>&nbsp;<br>Alexa asks for a spoken PIN before unlocking a Lock device or opening a Garage Door device.</li>
+        <li><strong>Range depends on the connection:</strong>&nbsp;<br>On home Wi-Fi it works in the driveway; on a mobile hotspot it works anywhere the car has a signal.</li>
+        <li><strong>Safety:</strong> <br>As with any remote start, never start the car in an enclosed garage.</li>
+    </ul>
+
+    <h2>Related Work</h2>
+    <ul class="step-list">
+        <li><a href="../banvie-1-reverse-engineering/banvie-1-reverse-engineering.html">Reverse-Engineering the Banvie 1 Remote Start &amp; Keyless Entry Unit</a>:&nbsp;how the key fob codes were found (<a href="https://www.youtube.com/playlist?list=PLdhMo-92UOj0" target="_blank" rel="noopener">5-part series</a>; <a href="https://youtu.be/Inx7_RVSyEI" target="_blank" rel="noopener">Part 5: injecting key fob codes via Arduino</a>).</li>
+        <li><a href="../hvac-retrofitting/hvac-retrofitting.html">Motorizing the Lancer's HVAC Blend Door</a>:&nbsp;the same control board, plus how it's powered and installed (<a href="https://youtu.be/R66rsbbOmAk" target="_blank" rel="noopener">Part 1</a>, <a href="https://youtu.be/EmcxPi2tjaE" target="_blank" rel="noopener">Part 2</a>).</li>
+        <li>More builds on my YouTube channel: <a href="https://www.youtube.com/@DumbledoresNavy" target="_blank" rel="noopener">Dumbledore's Navy</a>.</li></ul>
+
+</div>
+
+<script src="../assets/zoom.js"></script>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

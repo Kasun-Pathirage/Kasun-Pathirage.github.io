@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 3: Noise Part 3: Diode and BJT Noise Models | Kasun Pathirage</title>
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #e60000;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 2rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .course-meta {
+            font-size: 0.95rem;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 2rem 0;
+        }
+        .lecture-card {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .lecture-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            color: var(--primary);
+            line-height: 1.35;
+        }
+        .lecture-topics {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.25rem;
+        }
+        .lecture-card h4 {
+            font-size: 1.02rem;
+            color: var(--primary);
+            margin: 1.5rem 0 0.5rem 0;
+        }
+        .lecture-card h4:first-of-type {
+            margin-top: 0.5rem;
+        }
+        .lecture-card p, .lecture-card li {
+            font-size: 0.95rem;
+        }
+        .lecture-card ul {
+            padding-left: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        .lecture-card li {
+            margin-bottom: 0.35rem;
+        }
+        .formula-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0;
+            font-family: Cambria, "Times New Roman", serif;
+            font-size: 1rem;
+            color: #222;
+        }
+        .formula-box .label {
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 0.2rem;
+        }
+        .worked-example {
+            background: #fbfbfb;
+            border-left: 3px solid var(--secondary);
+            padding: 0.9rem 1.1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .worked-example p { margin: 0.4rem 0; }
+        .callout {
+            background: #fff8e6;
+            border: 1px solid #f0e0b0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #5a4a1a;
+        }
+        .diagram-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem 0.75rem 0.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .diagram-box svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            min-width: 560px;
+        }
+        .diagram-caption {
+            font-size: 0.78rem;
+            color: #888;
+            text-align: center;
+            margin: 0.5rem 0 0.25rem;
+        }
+        .media-box {
+            background: #eee;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            margin: 1rem 0;
+            color: #888;
+            font-size: 0.95rem;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: #fff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: normal;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn:hover {
+            background-color: var(--secondary);
+            color: #fff;
+            text-decoration: none;
+        }
+        .btn.disabled {
+            background-color: #ccc;
+            cursor: default;
+            pointer-events: none;
+        }
+    
+        .lead { font-size: 1.02rem; color: #333; }
+        .page-nav { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem 1rem; margin-bottom:1.5rem; }
+        .page-nav .back-link { margin-bottom:0; }
+        .chips { display:flex; flex-wrap:wrap; gap:.4rem .5rem; margin:.25rem 0 1.25rem; }
+        .chip { font-size:.78rem; background:#f1f1f5; color:#444; border-radius:12px; padding:.2rem .65rem; }
+        .toc { background:#fafafa; border:1px solid #e5e5e5; border-radius:6px; padding:.85rem 1.25rem; margin:1.25rem 0 .5rem; font-size:.92rem; }
+        .toc ol { margin:.45rem 0 0; padding-left:1.25rem; columns:2; column-gap:2rem; }
+        .toc li { margin-bottom:.2rem; break-inside:avoid; }
+        .toc a { color:#333; text-decoration:none; } .toc a:hover { color:var(--secondary); text-decoration:underline; }
+        .lecture-page h2 { font-size:1.3rem; margin:2.25rem 0 .6rem; padding-top:.5rem; border-top:1px solid #e8e8e8; color:var(--primary); scroll-margin-top:1rem; }
+        .lecture-page h3 { font-size:1.05rem; margin:1.5rem 0 .4rem; color:var(--primary); }
+        .lecture-page p, .lecture-page li { font-size:.97rem; line-height:1.6; }
+        .lecture-page ul, .lecture-page ol { padding-left:1.3rem; }
+        .lecture-page li { margin-bottom:.4rem; }
+        .formula-box { overflow-x:auto; line-height:1.75; }
+        .worked-example, .callout { font-size:.95rem; }
+        .small { font-size:.82rem !important; color:#777; }
+        table.cmp { width:100%; border-collapse:collapse; font-size:.86rem; margin:1rem 0; display:block; overflow-x:auto; }
+        table.cmp th, table.cmp td { border:1px solid #e0e0e0; padding:.45rem .65rem; text-align:left; vertical-align:top; line-height:1.45; }
+        table.cmp th { background:#f4f4f6; font-weight:600; }
+        table.cmp td.hl { background:#fff0f0; font-weight:600; color:#a00000; }
+        .diagram-box { padding:1rem .75rem .5rem; }
+        .diagram-box svg { min-width:560px; }
+        .download-bar { display:flex; flex-wrap:wrap; gap:.6rem; align-items:center; margin:1.25rem 0 0; }
+        .btn.alt { background:#fff; color:var(--primary); border:1px solid #bbb; }
+        .btn.alt:hover { background:var(--secondary); color:#fff; border-color:var(--secondary); }
+        .lecture-nav { display:flex; justify-content:space-between; gap:1rem; margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid #ddd; flex-wrap:wrap; }
+        .lecture-nav a { color:var(--secondary); text-decoration:none; font-weight:600; font-size:.92rem; max-width:48%; }
+        .lecture-nav a:hover { text-decoration:underline; }
+        .lecture-nav .next { margin-left:auto; text-align:right; }
+        .series-label { font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:#888; font-weight:600; margin:2rem 0 .75rem; }
+        .lecture-row .num { display:inline-block; min-width:2rem; color:var(--secondary); font-weight:700; }
+        .lecture-row .btn-row { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.75rem; }
+        @media (max-width:640px){ .container{margin:1rem;padding:1.25rem;} .toc ol{columns:1;} .lecture-nav a{max-width:100%;} }
+    
+        /* stacked fractions and radicals for equations */
+        .frac { display:inline-flex; flex-direction:column; align-items:stretch; vertical-align:middle; margin:0 .18em; text-align:center; line-height:1.25; }
+        .frac > .num { padding:0 .3em .1em; border-bottom:1.4px solid currentColor; }
+        .frac > .den { padding:.1em .3em 0; }
+        sup .frac, sub .frac { font-size:1em; }
+        .rad { display:inline-block; position:relative; padding-left:.72em; white-space:nowrap; }
+        .rad > .rs { position:absolute; left:0; top:0; width:.72em; height:100%; overflow:visible; }
+        .rad > .rb { display:inline-block; border-top:1.4px solid currentColor; padding:0 .15em; line-height:1.3; }
+        .rad.tall { vertical-align:middle; }
+        .rad.tall > .rb { display:block; padding-top:.15em; }
+        .par { font-size:1.7em; font-weight:200; line-height:0; vertical-align:-.1em; }
+        .formula-box .frac, .worked-example .frac { font-size:1.02em; }
+    </style>
+
+</head>
+<body>
+    <div class="container ">
+        <div class="page-nav"><a href="teaching.html" class="back-link">&larr; All lectures</a><a href="../index.html" class="back-link">Portfolio &rarr;</a></div>
+        <div class="series-label">BM3110 Electronic Instrumentation &middot; Lecture 3 of 7</div>
+        <h1>Noise and Interference in Instrumentation, Part 3: Modelling Diode and BJT Noise</h1>
+        <div class="course-meta">University of Moratuwa &middot; Dept. of Biomedical Engineering &middot; Semester 5 &middot; Fall 2026 &middot; 49 slides</div>
+        <div class="chips"><span class="chip">diode small-signal model</span><span class="chip">diode shot, flicker and thermal noise</span><span class="chip">BJT hybrid-&pi; model</span><span class="chip">the six BJT noise sources</span><span class="chip">input-referred noise</span><span class="chip">effect of source impedance</span></div>
+        <div class="download-bar"><a href="noise-in-instrumentation-part-3.pdf" class="btn">Download slides (PDF) &darr;</a></div>
+        <hr>
+        <div class="lecture-page">
+
+<p class="lead">Parts 1&ndash;2 introduced noise sources and their spectral densities. This lecture shows how to build <strong>circuit-level noise models</strong> of real semiconductor devices: first the diode, then the bipolar junction transistor (BJT). Both are non-linear, so the analysis starts from a small-signal (linearised) model and attaches the physical noise mechanisms to it. It ends with the more subtle point: why a BJT&rsquo;s input-referred noise needs a voltage <em>and</em> a current source, and why the two cannot be treated as independent.</p>
+
+<div class="toc"><strong>On this page</strong>
+<ol>
+<li><a href="#s1">Small-signal model of a diode</a></li>
+<li><a href="#s2">Diode noise sources</a></li>
+<li><a href="#s3">Total diode noise voltage</a></li>
+<li><a href="#s4">BJT small-signal model and current gain</a></li>
+<li><a href="#s5">The six noise sources of a BJT</a></li>
+<li><a href="#s6">Referring BJT noise to the input</a></li>
+<li><a href="#s7">Why both a voltage and a current source are needed</a></li>
+<li><a href="#s8">Exercise and take-homes</a></li>
+</ol></div>
+
+<h2 id="s1">1. Small-signal model of a diode</h2>
+<p>A diode is a non-linear device described by the Shockley equation:</p>
+<div class="formula-box"><span class="label">Shockley diode equation</span>
+<i>I<sub>D</sub></i> = <i>I<sub>S</sub></i>(e<sup><span class="frac"><span class="num"><i>V<sub>D</sub></i></span><span class="den">&eta;<i>V<sub>T</sub></i></span></span></sup> &minus; 1), &nbsp; <i>V<sub>T</sub></i> = <span class="frac"><span class="num"><i>k<sub>B</sub>T</i></span><span class="den"><i>q</i></span></span> &asymp; 25.7 mV at room temperature</div>
+<p>with <i>I<sub>S</sub></i> the reverse saturation current (order of 10<sup>&minus;10</sup> A), &eta; the ideality factor (typically 1&ndash;2) and <i>V<sub>T</sub></i> the thermal voltage. The equation assumes steady state, so it says nothing about how the diode responds to time-varying signals.</p>
+<p>We study <strong>small signals</strong> because they are the ones most susceptible to noise. For a small signal the diode is usually
+forward biased, and in the small region around the operating point <i>Q</i> the curve can be replaced by its tangent:</p>
+<div class="formula-box"><span class="label">Slope at the Q-point</span>
+<span class="frac"><span class="num">d<i>I<sub>D</sub></i></span><span class="den">d<i>V<sub>D</sub></i></span></span> |<sub><i>Q</i></sub> = <span class="frac"><span class="num"><i>I<sub>DQ</sub></i> + <i>I<sub>S</sub></i></span><span class="den">&eta;<i>V<sub>T</sub></i></span></span> &asymp; <span class="frac"><span class="num"><i>I<sub>DQ</sub></i></span><span class="den">&eta;<i>V<sub>T</sub></i></span></span>
+&nbsp;&nbsp;(since <i>I<sub>S</sub></i> &asymp; 10<sup>&minus;10</sup> A &#8810; <i>I<sub>DQ</sub></i>)</div>
+<p>This slope has units of conductance, so its inverse is a resistance, called the <strong>dynamic resistance</strong> <i>r<sub>d</sub></i> = <span class="frac"><span class="num">&eta;<i>V<sub>T</sub></i></span><span class="den"><i>I<sub>DQ</sub></i></span></span>. To capture time-varying behaviour the junction capacitance <i>C<sub>j</sub></i> and the diffusion capacitance <i>C<sub>d</sub></i> are placed in parallel with <i>r<sub>d</sub></i>.</p>
+
+<h2 id="s2">2. Diode noise sources</h2>
+<p>A diode has three main noise sources, all attached to the small-signal model:</p>
+<ul>
+<li><strong>Shot noise:</strong> the PN junction is a potential barrier that carriers must cross, so the diode current has shot noise, modelled as a parallel current source across the junction (hence across <i>r<sub>d</sub></i>): <i>i&#772;<sub>ns</sub></i><sup>2</sup> = 2<i>qI<sub>DQ</sub></i>&Delta;<i>f</i>, with <i>I<sub>DQ</sub></i> the quiescent current.</li>
+<li><strong>Flicker noise:</strong> as a semiconductor device, it has 1/<i>f</i> noise, also a parallel current source: <i>i&#772;<sub>nF</sub></i><sup>2</sup> = <i>K<sub>F</sub> I<sub>DQ</sub><sup>&alpha;</sup></i> ln<span class="par">(</span><span class="frac"><span class="num"><i>f<sub>H</sub></i></span><span class="den"><i>f<sub>L</sub></i></span></span><span class="par">)</span>, where <i>K<sub>F</sub></i> and &alpha; are device-dependent constants.</li>
+<li><strong>Thermal noise:</strong> the contacts and silicon substrate have a real resistance <i>R<sub>s</sub></i>, modelled as a resistor in series with <i>r<sub>d</sub></i> that generates a series voltage noise <i>v&#772;<sub>nRs</sub></i><sup>2</sup> = 4<i>k<sub>B</sub>T R<sub>s</sub></i>&Delta;<i>f</i>.</li>
+</ul>
+<div class="diagram-box"><svg viewBox="0 0 620 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Small-signal noise model of a diode: bulk resistance with its thermal noise in series, in series with the dynamic resistance in parallel with the junction capacitances and the shot and flicker noise current sources."><line x1="24.0" y1="90.0" x2="67.0" y2="90.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="24" cy="90" r="3.5" fill="#333"/><line x1="93.0" y1="90.0" x2="120.0" y2="90.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="80" cy="90" r="13" fill="#fff" stroke="#e60000" stroke-width="1.6"/><text x="80" y="89" text-anchor="middle" font-size="10" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">+</text><text x="80" y="99" text-anchor="middle" font-size="10" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">&minus;</text><polyline points="120.0,90 129.0,90 132.5,96 139.5,84 146.5,96 153.5,84 160.5,96 167.5,84 171.0,90 180.0,90" fill="none" stroke="#333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><line x1="180.0" y1="90.0" x2="560.0" y2="90.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="24.0" y1="200.0" x2="560.0" y2="200.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="24" cy="200" r="3.5" fill="#333"/><circle cx="560" cy="90" r="0" fill="#333"/><text x="80" y="66" text-anchor="middle" font-size="14" font-family="Cambria,Times New Roman,serif" font-style="italic" fill="#e60000">v<tspan font-size="10" dy="3">nRs</tspan><tspan font-size="10" dy="-9">2</tspan></text><text x="150" y="68" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">R</tspan><tspan font-size="9.8" dy="3.9">s</tspan></text><line x1="250.0" y1="90.0" x2="250.0" y2="132.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="250" cy="90" r="3" fill="#333"/><circle cx="250" cy="200" r="3" fill="#333"/><line x1="250.0" y1="158.0" x2="250.0" y2="200.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="250" cy="145" r="13" fill="#fff" stroke="#e60000" stroke-width="1.6"/><line x1="250.0" y1="136.94" x2="250.0" y2="147.06" stroke="#e60000" stroke-width="1.6" stroke-linecap="round"/><polygon points="250,153.06 247.3,147.06 252.7,147.06" fill="#e60000"/><line x1="330.0" y1="90.0" x2="330.0" y2="132.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="330" cy="90" r="3" fill="#333"/><circle cx="330" cy="200" r="3" fill="#333"/><line x1="330.0" y1="158.0" x2="330.0" y2="200.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="330" cy="145" r="13" fill="#fff" stroke="#e60000" stroke-width="1.6"/><line x1="330.0" y1="136.94" x2="330.0" y2="147.06" stroke="#e60000" stroke-width="1.6" stroke-linecap="round"/><polygon points="330,153.06 327.3,147.06 332.7,147.06" fill="#e60000"/><line x1="410.0" y1="90.0" x2="410.0" y2="115.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="410" cy="90" r="3" fill="#333"/><circle cx="410" cy="200" r="3" fill="#333"/><polyline points="410,115.0 410,124.0 416,127.5 404,134.5 416,141.5 404,148.5 416,155.5 404,162.5 410,166.0 410,175.0" fill="none" stroke="#333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><line x1="410.0" y1="175.0" x2="410.0" y2="200.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="490.0" y1="90.0" x2="490.0" y2="141.5" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="490" cy="90" r="3" fill="#333"/><circle cx="490" cy="200" r="3" fill="#333"/><line x1="490.0" y1="148.5" x2="490.0" y2="200.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="478.0" y1="141.5" x2="502.0" y2="141.5" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><line x1="478.0" y1="148.5" x2="502.0" y2="148.5" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><line x1="560.0" y1="90.0" x2="560.0" y2="200.0" stroke="#fff" stroke-width="0.1" stroke-linecap="round"/><text x="230" y="149" text-anchor="end" font-size="14" fill="#e60000" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">i</tspan><tspan font-size="9.8" dy="3.9">ns</tspan><tspan font-size="9.8" dy="-9.1">2</tspan></text><text x="310" y="149" text-anchor="end" font-size="14" fill="#e60000" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">i</tspan><tspan font-size="9.8" dy="3.9">nF</tspan><tspan font-size="9.8" dy="-9.1">2</tspan></text><text x="424" y="150" text-anchor="start" font-size="14" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">r</tspan><tspan font-size="9.8" dy="3.9">d</tspan></text><text x="508" y="150" font-size="14" font-family="Cambria,Times New Roman,serif" font-style="italic">C<tspan font-size="10" dy="3">j</tspan><tspan dy="-3"> , </tspan>C<tspan font-size="10" dy="3">d</tspan></text><text x="310" y="232" text-anchor="middle" font-size="11" fill="#777" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">The dynamic resistance <tspan font-family="Cambria,Times New Roman,serif" font-style="italic">r</tspan><tspan font-size="9" dy="3" font-family="Cambria,Times New Roman,serif">d</tspan><tspan dy="-3"> is not a physical resistor, so it contributes no thermal noise.</tspan></text><text x="24" y="218" text-anchor="middle" font-size="11" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif"></text></svg><div class="diagram-caption">Fig. 1: Small-signal noise model of a diode (redrawn from the lecture slides)</div></div>
+<div class="callout"><strong>Why doesn&rsquo;t <i>r<sub>d</sub></i> make thermal noise?</strong> The dynamic resistance is not a real resistor. It is a <em>behavioural</em> quantity added to the model to match the diode&rsquo;s I&ndash;V relationship. Only physical resistances (like the bulk resistance <i>R<sub>s</sub></i>) generate thermal noise.</div>
+
+<h2 id="s3">3. Total diode noise voltage</h2>
+<p>The three sources sit in different branches, so they cannot simply be added. <i>R<sub>s</sub></i>&rsquo;s thermal noise is a <em>series</em> voltage, whereas shot and flicker noise are
+<em>parallel</em> currents. The fix is to convert the parallel currents into an equivalent series (Th&eacute;venin) voltage across <i>r<sub>d</sub></i>, after which KVL applies and, with the sources uncorrelated, the mean-square values add:</p>
+<div class="formula-box"><span class="label">Total noise voltage of a diode (with &Delta;<i>f</i> = <i>f<sub>H</sub></i> &minus; <i>f<sub>L</sub></i>)</span>
+<i>v&#772;<sub>n,tot</sub></i><sup>2</sup> = 4<i>k<sub>B</sub>T</i>&Delta;<i>f R<sub>s</sub></i> + [ 2<i>qI<sub>DQ</sub></i>&Delta;<i>f</i> + <i>K<sub>F</sub> I<sub>DQ</sub><sup>&alpha;</sup></i> ln<span class="par">(</span><span class="frac"><span class="num"><i>f<sub>H</sub></i></span><span class="den"><i>f<sub>L</sub></i></span></span><span class="par">)</span> ] <i>r<sub>d</sub></i><sup>2</sup></div>
+<p>Substituting <i>I<sub>DQ</sub></i> = <span class="frac"><span class="num">&eta;<i>V<sub>T</sub></i></span><span class="den"><i>r<sub>d</sub></i></span></span> and <i>V<sub>T</sub></i> = <span class="frac"><span class="num"><i>k<sub>B</sub>T</i></span><span class="den"><i>q</i></span></span> collapses the shot-noise term and gives the compact form from the lecture:</p>
+<div class="formula-box"><i>v&#772;<sub>n,tot</sub></i><sup>2</sup> = 2<i>k<sub>B</sub>T</i>&Delta;<i>f</i> (2<i>R<sub>s</sub></i> + &eta;<i>r<sub>d</sub></i>) + <i>K<sub>F</sub> I<sub>DQ</sub><sup>&alpha;</sup></i> ln<span class="par">(</span><span class="frac"><span class="num"><i>f<sub>H</sub></i></span><span class="den"><i>f<sub>L</sub></i></span></span><span class="par">)</span> <i>r<sub>d</sub></i><sup>2</sup></div>
+<p>For simplicity the capacitances are ignored here (open circuit), which is reasonable for frequencies up to the MHz range where their roll-off has not yet begun.</p>
+
+<h2 id="s4">4. BJT small-signal model and current gain</h2>
+<p>There are several small-signal models for a BJT. The lecture groups them into <strong>physics-based</strong> models (the hybrid-&pi; model, with simplified, low-frequency and high-frequency variants, and the T-model) and
+<strong>two-port / black-box</strong> models (h-parameters, built from measured terminal behaviour). The analysis uses the high-frequency <strong>hybrid-&pi;</strong> model with
+<i>g<sub>m</sub></i>, <i>r<sub>&pi;</sub></i>, <i>r<sub>o</sub></i>, <i>C<sub>&pi;</sub></i> and <i>C<sub>&mu;</sub></i> (Fig. 2).</p>
+<p>Linearising <i>I<sub>C</sub></i> &asymp; <i>I<sub>S</sub></i>e<sup><span class="frac"><span class="num"><i>V<sub>BE</sub></i></span><span class="den"><i>V<sub>T</sub></i></span></span></sup> about the operating point gives the transconductance <i>g<sub>m</sub></i> = <span class="frac"><span class="num"><i>I<sub>CQ</sub></i></span><span class="den"><i>V<sub>T</sub></i></span></span> (collector shorted so <i>r<sub>o</sub></i> does not matter), and the DC current gain follows directly:</p>
+<div class="formula-box"><span class="label">DC current gain</span> &beta;<sub>DC</sub> = <span class="frac"><span class="num"><i>I<sub>C</sub></i></span><span class="den"><i>I<sub>B</sub></i></span></span> = <i>g<sub>m</sub> r<sub>&pi;</sub></i></div>
+<p>With the collector shorted for AC, the base sees <i>r<sub>&pi;</sub></i> in parallel with <i>C<sub>&pi;</sub></i> and <i>C<sub>&mu;</sub></i>, so the AC current gain is a low-pass response:</p>
+<div class="formula-box"><span class="label">AC current gain and unity-gain frequency</span>
+&beta;<sub>AC</sub> = <span class="frac"><span class="num">&beta;<sub>DC</sub></span><span class="den">1 + <i>j&omega;r<sub>&pi;</sub></i>(<i>C<sub>&pi;</sub></i>+<i>C<sub>&mu;</sub></i>)</span></span><br>|&beta;<sub>AC</sub>|<sup>2</sup> = <span class="frac"><span class="num">1</span><span class="den"><span class="frac"><span class="num">1</span><span class="den">&beta;<sub>DC</sub><sup>2</sup></span></span> + <span class="par">(</span><span class="frac"><span class="num">&omega;</span><span class="den">&omega;<sub>T</sub></span></span><span class="par">)</span><sup>2</sup></span></span><br>&omega;<sub>T</sub> = <span class="frac"><span class="num"><i>g<sub>m</sub></i></span><span class="den"><i>C<sub>&pi;</sub></i>+<i>C<sub>&mu;</sub></i></span></span></div>
+<p>This resembles an RC low-pass filter with corner <i>f</i><sub>&minus;3</sub> = <span class="frac"><span class="num">1</span><span class="den">2&pi;<i>r<sub>&pi;</sub></i>(<i>C<sub>&pi;</sub></i>+<i>C<sub>&mu;</sub></i>)</span></span>. As &omega; approaches &omega;<sub>T</sub> the current gain falls to 1: beyond that the BJT no longer works as an amplifier, so &omega;<sub>T</sub> is the maximum useful operating frequency. Because <i>g<sub>m</sub></i> = <i>I<sub>CQ</sub></i>/<i>V<sub>T</sub></i>, the unity-gain frequency is not a fixed property of the device. It changes with the quiescent collector current.</p>
+
+<h2 id="s5">5. The six noise sources of a BJT</h2>
+<p>A BJT has <strong>six</strong> main noise sources: three thermal, two shot and one flicker.</p>
+<ul>
+<li><strong>Thermal noise</strong> from the bulk resistances of the emitter, base and collector regions (<i>R<sub>E</sub></i>, <i>R<sub>B</sub></i>, <i>R<sub>C</sub></i>), added in series with the corresponding terminals.
+<i>R<sub>E</sub></i> and <i>R<sub>C</sub></i> are generally ignored: the emitter is heavily doped (minimal resistance), and the collector, although lightly doped, has a wide cross-section and a well-doped substrate to carry signals outward.
+<i>R<sub>B</sub></i> <em>cannot</em> be ignored: the base is a very narrow, only moderately doped region, so its resistance is comparatively high, and noise generated there is amplified by &beta;.</li>
+<li><strong>Shot noise</strong>: there are two current paths, and each crosses a potential barrier. Forward-biasing the base&ndash;emitter junction sends electrons from the highly doped emitter into the thin base; almost all diffuse across and are swept into the collector, so the collector current is a stream of carriers crossing a barrier. This gives <strong>collector shot noise</strong> <i>i&#772;<sub>nC</sub></i><sup>2</sup> = 2<i>qI<sub>CQ</sub></i>&Delta;<i>f</i>, in parallel with the C&ndash;E junction. The small difference between <i>I<sub>E</sub></i> and <i>I<sub>C</sub></i> is the base current <i>I<sub>B</sub></i> (a few charges recombine in the base); it crosses the B&ndash;E junction and gives <strong>base shot noise</strong> <i>i&#772;<sub>nB</sub></i><sup>2</sup> = 2<i>qI<sub>BQ</sub></i>&Delta;<i>f</i>, in parallel with the B&ndash;E junction.</li>
+<li><strong>Flicker noise</strong>: as with any semiconductor, trap states give 1/<i>f</i> noise, modelled as a current source in parallel with the B&ndash;E junction: <i>i&#772;<sub>nF</sub></i><sup>2</sup> = <i>K I<sub>BQ</sub><sup>&alpha;</sup></i> ln<span class="par">(</span><span class="frac"><span class="num"><i>f<sub>H</sub></i></span><span class="den"><i>f<sub>L</sub></i></span></span><span class="par">)</span>.</li>
+</ul>
+<div class="diagram-box"><svg viewBox="0 0 780 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="High-frequency hybrid-pi model of a BJT with its noise sources: base-resistance thermal noise in series with the base, base shot and flicker current noise across the base-emitter junction, and collector shot noise across the collector-emitter output."><line x1="24.0" y1="110.0" x2="67.0" y2="110.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="24" cy="110" r="3.5" fill="#333"/><line x1="93.0" y1="110.0" x2="120.0" y2="110.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="80" cy="110" r="13" fill="#fff" stroke="#e60000" stroke-width="1.6"/><text x="80" y="109" text-anchor="middle" font-size="10" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">+</text><text x="80" y="119" text-anchor="middle" font-size="10" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">&minus;</text><polyline points="120.0,110 129.0,110 132.5,116 139.5,104 146.5,116 153.5,104 160.5,116 167.5,104 171.0,110 180.0,110" fill="none" stroke="#333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><line x1="180.0" y1="110.0" x2="496.0" y2="110.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="504.0" y1="110.0" x2="720.0" y2="110.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="496.0" y1="96.0" x2="496.0" y2="124.0" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><line x1="504.0" y1="96.0" x2="504.0" y2="124.0" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><circle cx="720" cy="110" r="3.5" fill="#333"/><line x1="24.0" y1="250.0" x2="730.0" y2="250.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="730" cy="250" r="3.5" fill="#333"/><circle cx="215" cy="110" r="3" fill="#333"/><line x1="235.0" y1="110.0" x2="235.0" y2="167.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="235.0" y1="193.0" x2="235.0" y2="250.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="235" cy="180" r="13" fill="#fff" stroke="#e60000" stroke-width="1.6"/><line x1="235.0" y1="171.94" x2="235.0" y2="182.06" stroke="#e60000" stroke-width="1.6" stroke-linecap="round"/><polygon points="235,188.06 232.3,182.06 237.7,182.06" fill="#e60000"/><circle cx="235" cy="110" r="3" fill="#333"/><circle cx="235" cy="250" r="3" fill="#333"/><line x1="300.0" y1="110.0" x2="300.0" y2="167.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="300.0" y1="193.0" x2="300.0" y2="250.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="300" cy="180" r="13" fill="#fff" stroke="#e60000" stroke-width="1.6"/><line x1="300.0" y1="171.94" x2="300.0" y2="182.06" stroke="#e60000" stroke-width="1.6" stroke-linecap="round"/><polygon points="300,188.06 297.3,182.06 302.7,182.06" fill="#e60000"/><circle cx="300" cy="110" r="3" fill="#333"/><circle cx="300" cy="250" r="3" fill="#333"/><line x1="390.0" y1="110.0" x2="390.0" y2="150.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><polyline points="390,150.0 390,159.0 396,162.5 384,169.5 396,176.5 384,183.5 396,190.5 384,197.5 390,201.0 390,210.0" fill="none" stroke="#333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><line x1="390.0" y1="210.0" x2="390.0" y2="250.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="390" cy="110" r="3" fill="#333"/><circle cx="390" cy="250" r="3" fill="#333"/><line x1="445.0" y1="110.0" x2="445.0" y2="176.5" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="445.0" y1="183.5" x2="445.0" y2="250.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="433.0" y1="176.5" x2="457.0" y2="176.5" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><line x1="433.0" y1="183.5" x2="457.0" y2="183.5" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><circle cx="445" cy="110" r="3" fill="#333"/><circle cx="445" cy="250" r="3" fill="#333"/><line x1="570.0" y1="110.0" x2="570.0" y2="167.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="570.0" y1="193.0" x2="570.0" y2="250.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="570" cy="180" r="13" fill="#fff" stroke="#333" stroke-width="1.6"/><line x1="570.0" y1="171.94" x2="570.0" y2="182.06" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><polygon points="570,188.06 567.3,182.06 572.7,182.06" fill="#333"/><circle cx="570" cy="110" r="3" fill="#333"/><circle cx="570" cy="250" r="3" fill="#333"/><line x1="625.0" y1="110.0" x2="625.0" y2="150.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><polyline points="625,150.0 625,159.0 631,162.5 619,169.5 631,176.5 619,183.5 631,190.5 619,197.5 625,201.0 625,210.0" fill="none" stroke="#333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><line x1="625.0" y1="210.0" x2="625.0" y2="250.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="625" cy="110" r="3" fill="#333"/><circle cx="625" cy="250" r="3" fill="#333"/><line x1="680.0" y1="110.0" x2="680.0" y2="167.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="680.0" y1="193.0" x2="680.0" y2="250.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="680" cy="180" r="13" fill="#fff" stroke="#e60000" stroke-width="1.6"/><line x1="680.0" y1="171.94" x2="680.0" y2="182.06" stroke="#e60000" stroke-width="1.6" stroke-linecap="round"/><polygon points="680,188.06 677.3,182.06 682.7,182.06" fill="#e60000"/><circle cx="680" cy="110" r="3" fill="#333"/><circle cx="680" cy="250" r="3" fill="#333"/><text x="24" y="96" text-anchor="middle" font-size="13" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">B</text><text x="720" y="96" text-anchor="middle" font-size="13" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">C</text><text x="744" y="254" text-anchor="start" font-size="13" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">E</text><text x="80" y="84" text-anchor="middle" font-size="14" font-family="Cambria,Times New Roman,serif" font-style="italic" fill="#e60000">v<tspan font-size="10" dy="3">rb</tspan><tspan font-size="10" dy="-9">2</tspan></text><text x="150" y="88" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">R</tspan><tspan font-size="9.8" dy="3.9">B</tspan></text><text x="215" y="184" text-anchor="end" font-size="14" fill="#e60000" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">i</tspan><tspan font-size="9.8" dy="3.9">B</tspan><tspan font-size="9.8" dy="-9.1">2</tspan></text><text x="280" y="184" text-anchor="end" font-size="14" fill="#e60000" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">i</tspan><tspan font-size="9.8" dy="3.9">F</tspan><tspan font-size="9.8" dy="-9.1">2</tspan></text><text x="406" y="185" text-anchor="start" font-size="14" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">r</tspan><tspan font-size="9.8" dy="3.9">&pi;</tspan></text><text x="463" y="185" text-anchor="start" font-size="14" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">C</tspan><tspan font-size="9.8" dy="3.9">&pi;</tspan></text><text x="500" y="88" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">C</tspan><tspan font-size="9.8" dy="3.9">&mu;</tspan></text><text x="552" y="185" text-anchor="end" font-size="14" font-family="Cambria,Times New Roman,serif" font-style="italic">g<tspan font-size="10" dy="3">m</tspan><tspan dy="-3">v</tspan><tspan font-size="10" dy="3">&pi;</tspan></text><text x="641" y="185" text-anchor="start" font-size="14" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">r</tspan><tspan font-size="9.8" dy="3.9">o</tspan></text><text x="698" y="184" text-anchor="start" font-size="14" fill="#e60000" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">i</tspan><tspan font-size="9.8" dy="3.9">C</tspan><tspan font-size="9.8" dy="-9.1">2</tspan></text><text x="345" y="146" text-anchor="middle" font-size="11" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">+</text><text x="345" y="224" text-anchor="middle" font-size="11" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">&minus;</text><text x="345" y="185" text-anchor="middle" font-size="13" fill="#1a1a1a" font-family="Cambria,Times New Roman,serif"><tspan font-style="italic">v</tspan><tspan font-size="9.1" dy="3.6">&pi;</tspan></text><text x="110" y="40" text-anchor="middle" font-size="11.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Series thermal noise</text><line x1="110.0" y1="48.0" x2="110.0" y2="70.0" stroke="#8a99a3" stroke-width="1" stroke-linecap="round"/><text x="268" y="40" text-anchor="middle" font-size="11.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Base shot + flicker</text><line x1="268" y1="48" x2="268" y2="102" stroke="#8a99a3" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 3"/><text x="680" y="40" text-anchor="middle" font-size="11.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Collector shot</text><line x1="680" y1="48" x2="680" y2="102" stroke="#8a99a3" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 3"/><text x="390" y="284" text-anchor="middle" font-size="11" fill="#777" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Red sources are noise. The dynamic resistances <tspan font-family="Cambria,Times New Roman,serif" font-style="italic">r</tspan><tspan font-size="9" dy="3" font-family="Cambria,Times New Roman,serif">&pi;</tspan><tspan dy="-3"> and </tspan><tspan font-family="Cambria,Times New Roman,serif" font-style="italic">r</tspan><tspan font-size="9" dy="3" font-family="Cambria,Times New Roman,serif">o</tspan><tspan dy="-3"> are small-signal parameters, not physical resistors, so they add no noise.</tspan></text></svg><div class="diagram-caption">Fig. 2: Hybrid-&pi; model of a BJT with its noise sources (redrawn from the lecture slides). <i>R<sub>E</sub></i> and <i>R<sub>C</sub></i> are neglected.</div></div>
+<p>As with the diode, the dynamic resistances <i>r<sub>&pi;</sub></i> and <i>r<sub>o</sub></i> are not real resistors and add no noise.</p>
+
+<h2 id="s6">6. Referring BJT noise to the input</h2>
+<p>A BJT is a two-port, so its equivalent input-referred noise model needs a series <strong>voltage</strong> source <em>and</em> a parallel <strong>current</strong> source across the input port. Everything is transferred to the input side:
+base thermal noise is already in series at the input; base shot and flicker noise are already across the input; only the <strong>collector shot noise</strong> is still at the output.</p>
+<p>To refer the collector shot noise to the input <em>as a current</em>, divide by the squared magnitude of the AC current gain; to refer it <em>as a voltage</em>, divide by the squared transconductance (an AC quantity):</p>
+<div class="formula-box"><span class="label">Collector shot noise referred to the input</span>
+<i>i&#772;<sub>nc&minus;ir</sub></i><sup>2</sup> = <span class="frac"><span class="num"><i>i&#772;<sub>nC</sub></i><sup>2</sup></span><span class="den">|&beta;<sub>AC</sub>|<sup>2</sup></span></span> = 2<i>q</i>&Delta;<i>f I<sub>BQ</sub></i> <span class="frac"><span class="num">1 + (&omega;<i>r<sub>&pi;</sub></i>(<i>C<sub>&pi;</sub></i>+<i>C<sub>&mu;</sub></i>))<sup>2</sup></span><span class="den"><i>g<sub>m</sub> r<sub>&pi;</sub></i></span></span><br> <i>v&#772;<sub>nc&minus;ir</sub></i><sup>2</sup> = <span class="frac"><span class="num"><i>i&#772;<sub>nC</sub></i><sup>2</sup></span><span class="den"><i>g<sub>m</sub></i><sup>2</sup></span></span> = 2<i>q</i>&Delta;<i>f</i> <span class="frac"><span class="num"><i>I<sub>BQ</sub> r<sub>&pi;</sub></i></span><span class="den"><i>g<sub>m</sub></i></span></span></div>
+<p>Adding up the pieces, the complete input-referred noise model of the BJT is:</p>
+<div class="formula-box"><span class="label">Current noise</span>
+<i>i&#772;<sub>ni</sub></i><sup>2</sup> = <i>i&#772;<sub>nB</sub></i><sup>2</sup> + <i>i&#772;<sub>nc&minus;ir</sub></i><sup>2</sup> + <i>i&#772;<sub>nF</sub></i><sup>2</sup> = 2<i>qI<sub>BQ</sub></i>&Delta;<i>f</i> &#8201;<span class="par">[</span>1 + <span class="frac"><span class="num">1 + (&omega;<i>r<sub>&pi;</sub></i>(<i>C<sub>&pi;</sub></i>+<i>C<sub>&mu;</sub></i>))<sup>2</sup></span><span class="den"><i>g<sub>m</sub> r<sub>&pi;</sub></i></span></span><span class="par">]</span> + <i>K I<sub>BQ</sub><sup>&alpha;</sup></i> ln<span class="par">(</span><span class="frac"><span class="num"><i>f<sub>H</sub></i></span><span class="den"><i>f<sub>L</sub></i></span></span><span class="par">)</span>
+<span class="label" style="margin-top:.6rem">Voltage noise</span>
+<i>v&#772;<sub>ni</sub></i><sup>2</sup> = <i>v&#772;<sub>nrB</sub></i><sup>2</sup> + <i>v&#772;<sub>nc&minus;ir</sub></i><sup>2</sup> = 4<i>k<sub>B</sub>T</i>&Delta;<i>f r<sub>b</sub></i> + 2<i>q</i>&Delta;<i>f</i> <span class="frac"><span class="num"><i>I<sub>BQ</sub> r<sub>&pi;</sub></i></span><span class="den"><i>g<sub>m</sub></i></span></span></div>
+<p>The additions above are valid only when the sources have zero mean and are uncorrelated, and when KVL/KCL permit the addition. In reality the collector and base noise are somewhat correlated, but for this course they are treated as uncorrelated.</p>
+
+<h2 id="s7">7. Why both a voltage and a current source are needed</h2>
+<p>This is the most important concept in the lecture. The input-referred collector shot noise appears <em>twice</em> in the model, as <i>i&#772;<sub>nc&minus;ir</sub></i> and as <i>v&#772;<sub>nc&minus;ir</sub></i>, but they come from <strong>the same noise source</strong>, so they are <strong>not independent</strong>. When the total noise at the output is calculated, the contributions of these two terms cannot simply be added as squared quantities, because their correlation matters.</p>
+<p>The calculation uses superposition for each source with the signal source replaced by its source resistance <i>R<sub>S</sub></i> (at low frequency, so <i>C<sub>&pi;</sub></i> and <i>C<sub>&mu;</sub></i> drop out). The result for the output noise current of a common-emitter stage is:</p>
+<div class="formula-box"><span class="label">Output noise current including source resistance <i>R<sub>S</sub></i></span>
+<i>i&#772;<sub>out</sub></i><sup>2</sup> = <span class="par">(</span><span class="frac"><span class="num"><i>g<sub>m</sub> r<sub>&pi;</sub></i></span><span class="den"><i>R<sub>B</sub></i>+<i>R<sub>S</sub></i>+<i>r<sub>&pi;</sub></i></span></span><span class="par">)</span><sup>2</sup> &times; [ <i>v&#772;<sub>nB</sub></i><sup>2</sup> + <i>v&#772;<sub>nc&minus;ir</sub></i><sup>2</sup> + (<i>i&#772;<sub>nB</sub></i><sup>2</sup>+<i>i&#772;<sub>nF</sub></i><sup>2</sup>)(<i>R<sub>B</sub></i>+<i>R<sub>S</sub></i>)<sup>2</sup> + <i>R<sub>S</sub></i><sup>2</sup> <i>i&#772;<sub>nc&minus;ir</sub></i><sup>2</sup> + 2<i>R<sub>S</sub></i> <span class="rad"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb"><i>v&#772;<sub>nc&minus;ir</sub></i><sup>2</sup> <i>i&#772;<sub>nc&minus;ir</sub></i><sup>2</sup></span></span> ]</div>
+<p>The last term is the cross-correlation between the voltage and current forms of the collector shot noise. Two observations follow:</p>
+<ul>
+<li><strong>Ideal source (<i>R<sub>S</sub></i> = 0):</strong> the expression collapses to <i>i&#772;<sub>out</sub></i><sup>2</sup> &asymp; <i>g<sub>m</sub></i><sup>2</sup>(<i>v&#772;<sub>nB</sub></i><sup>2</sup> + <i>v&#772;<sub>nc&minus;ir</sub></i><sup>2</sup>), and the base thermal noise and the <em>voltage</em> form of the collector shot noise dominate. The base shot and flicker noise drop out because <i>R<sub>B</sub></i> is small.</li>
+<li><strong>Non-zero source resistance:</strong> the <em>current</em> form of the collector shot noise now matters too, because it flows through <i>R<sub>S</sub></i>. If only the current-source part were propagated to the output (or only the voltage part), the result would <em>not</em> equal the true collector noise current <i>i&#772;<sub>nC</sub></i>; with both parts <em>and</em> the correlation term, it does.</li>
+</ul>
+<div class="callout"><strong>The takeaway:</strong> this is why two-port theory requires <em>both</em> an equivalent voltage and an equivalent current noise source at the input. A single source cannot give correct answers for every source impedance that might be connected. It also shows how the dominant noise source of a BJT amplifier depends on the source impedance.</div>
+
+<h2 id="s8">8. Exercise and take-homes</h2>
+<div class="worked-example">
+<p><strong>Exercise 1 (from the lecture).</strong> A BJT amplifier has &beta; = 50, <i>g<sub>m</sub></i> = 38 mS and <i>r<sub>&pi;</sub></i> = 1.33 k&Omega; (1 mA bias), with all capacitors noiseless and short-circuited for AC. Measurements on the amplifier give a noise figure of 3 dB with a source resistance of 50 &Omega; and 9 dB with 500 &Omega;; the effective bandwidth is 100 kHz. Find the transistor&rsquo;s input-referred voltage and current noise spectral densities (<i>v&#772;<sub>n</sub></i><sup>2</sup>/Hz and <i>i&#772;<sub>n</sub></i><sup>2</sup>/Hz), assuming both are white.</p>
+</div>
+<p><strong>Important take-homes</strong> from the lecture:</p>
+<ul>
+<li>Noise is fundamentally an AC quantity and a small signal in itself; begin with small-signal models for analysis.</li>
+<li>Dynamic resistances in small-signal models do <em>not</em> generate noise, because they represent behaviour, not physical resistors. Bulk resistances and terminal resistances are physical and <em>must</em> be considered.</li>
+<li>The capacitances were mostly ignored during these derivations; think about how including them would change the noise characteristics (effective bandwidth).</li>
+<li>A diode has thermal, shot and flicker noise. A BJT has several intrinsic noise sources, of which four are important (base thermal, base shot, collector shot, flicker).</li>
+<li>You must be able to calculate the AC current gain &beta;<sub>AC</sub> and explain why it is needed; refer noise sources to the input so a generic noise model results; and understand why the 2-port model needs both a voltage and a current source at the input.</li>
+<li>Explain how source impedance changes which noise sources (voltage or current) dominate; use superposition to propagate individual sources, and recognise when input-referred sources are not independent.</li>
+<li>Derivations are <em>not</em> examinable in detail, but the concepts used (and why each simplification is valid) are.</li>
+</ul>
+
+        </div>
+        <div class="download-bar"><a href="noise-in-instrumentation-part-3.pdf" class="btn">Download slides (PDF) &darr;</a><a href="teaching.html" class="btn alt">All lectures</a></div>
+        <div class="lecture-nav"><a href="lecture-2-noise-part-2.html">&larr; Lecture 2: Classification of Noise</a><a class="next" href="lecture-4-noise-part-4.html">Lecture 4: Op-Amp Noise Model &rarr;</a></div>
+    </div>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Fixed a laptop throttling under 1 GHz with an audio-amplifier heatsink, a 3D-printed mounting frame and a stronger fan, then raised the power limits and undervolted in ThrottleStop to sustain 4.0 GHz at 85°C.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MateBook X Pro Thermal Mod &amp; CPU Overclock | Kasun Pathirage">
+<meta property="og:description" content="Fixed a laptop throttling under 1 GHz with an audio-amplifier heatsink, a 3D-printed mounting frame and a stronger fan, then raised the power limits and undervolted in ThrottleStop to sustain 4.0 GHz at 85°C.">
+<meta property="og:site_name" content="Kasun Pathirage">
+<meta name="twitter:card" content="summary_large_image">
+<title>MateBook X Pro Thermal Mod &amp; CPU Overclock | Kasun Pathirage</title>
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f6f8;
+        color: #333;
+        line-height: 1.6;
+    }
+    .container {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    h1 { color: #1a1a1a; margin-top: 0; }
+    .hero-image { margin: 1.5rem 0; }
+    .hero-image img { display: block; width: 100%; max-height: 420px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    h2 {
+        color: #1a1a1a;
+        margin-top: 2.5rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid #eee;
+    }
+    h3 { color: #1a1a1a; margin-top: 1.8rem; }
+    .back-link { display: inline-block; margin-bottom: 2rem; color: #e60000; text-decoration: none; font-weight: bold; }
+    .back-link:hover { text-decoration: underline; }
+    .meta { color: #555; }
+    a { color: #e60000; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+    .table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+    th, td { border: 1px solid #ddd; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background-color: #1a1a1a; color: #fff; }
+    tr:nth-child(even) { background-color: #f8f8f8; }
+    figure { margin: 1.2rem 0; text-align: center; }
+    figure img { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); display: block; margin: 0 auto; }
+    figure.figure-wide img { max-width: 620px; }
+    figcaption { font-size: 0.85rem; color: #777; margin-top: 0.5rem; }
+    .figure-grid { display: grid; gap: 1rem; margin: 1.2rem 0; }
+    .figure-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .figure-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .figure-grid figure { margin: 0; }
+    .figure-grid > figure { min-width: 0; }
+    @media (max-width: 640px) {
+        .figure-grid.cols-2, .figure-grid.cols-3 { grid-template-columns: 1fr; }
+    }
+    .quick-facts {
+        background: #fafafa;
+        border: 1px solid #eee;
+        border-left: 4px solid #e60000;
+        border-radius: 6px;
+        padding: 1.2rem 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .quick-facts h4 { margin: 0 0 0.6rem 0; color: #1a1a1a; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .quick-facts ul { margin: 0; padding-left: 1.2rem; }
+    .quick-facts li { margin-bottom: 0.35rem; }
+    .step-list { padding-left: 1.3rem; }
+    .step-list li { margin-bottom: 0.6rem; }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+    p code, li code, td code { background: #eee; color: #a30000; padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.88em; }
+
+    /* 3D viewer, styled to match the site's existing media-box convention */
+    .viewer-box {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 6px;
+        margin: 1.5rem 0;
+        overflow: hidden;
+    }
+    .viewer-tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid #eee; background: #fafafa; }
+    .viewer-tab {
+        font-family: inherit; font-size: 0.78rem; background: none; border: none; cursor: pointer;
+        color: #555; padding: 0.5rem 0.75rem; border-right: 1px solid #eee;
+    }
+    .viewer-tab:last-child { border-right: none; }
+    .viewer-tab.is-active { color: #e60000; font-weight: bold; background: #fff; }
+    .viewer-stage {
+        position: relative; width: 100%; height: clamp(220px, 40vh, 380px); background: #eee;
+        background-image:
+            linear-gradient(#e2e2e2 1px, transparent 1px),
+            linear-gradient(90deg, #e2e2e2 1px, transparent 1px);
+        background-size: 26px 26px;
+    }
+    .viewer-stage canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+    .viewer-stage canvas:active { cursor: grabbing; }
+    .viewer-hint {
+        position: absolute; left: 12px; bottom: 10px; font-size: 0.72rem; letter-spacing: 0.02em;
+        color: #888; pointer-events: none;
+    }
+    .viewer-loading {
+        position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        font-size: 0.82rem; color: #888; background: #eee;
+    }
+    .viewer-loading[hidden] { display: none; }
+    .viewer-caption { padding: 0.9rem 1.1rem; font-size: 0.88rem; color: #555; border-top: 1px solid #eee; }
+    .viewer-caption p { margin: 0; }
+    .viewer-downloads { padding: 0 1.1rem 1rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
+    .viewer-downloads a { font-size: 0.82rem; color: #e60000; text-decoration: none; font-weight: 600; white-space: nowrap; }
+    .viewer-downloads a:hover { text-decoration: underline; }
+</style>
+<style id="single-figure-size">
+    /* Standalone images: keep them from filling the whole screen so the text stays readable. Click to zoom. */
+    .container > figure img { max-width: min(100%, 560px); max-height: 400px; width: auto; }
+    .container > figure.figure-wide img { max-width: min(100%, 680px); max-height: 460px; }
+    .container > figure.figure-narrow img { max-width: min(100%, 380px); max-height: 360px; }
+</style>
+<style id="compact-tables">
+    /* Tables: size to their content instead of the full column, and cap long ones with a scroll + sticky header. */
+    .container .table-wrap { max-height: 460px; overflow: auto; border-radius: 6px; }
+    .container .table-wrap table { width: auto; max-width: 100%; margin: 0 auto; font-size: 0.85rem; }
+    .container .table-wrap th, .container .table-wrap td { padding: 0.32rem 0.6rem; }
+    .container .table-wrap th { position: sticky; top: 0; z-index: 1; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <a href="../index.html" class="back-link">← Back to Portfolio</a>
+
+    <h1>Overclocking a 2018 MateBook X Pro with a DIY Heatsink Mod</h1>
+    <p class="meta"><strong>Date:</strong> January 2022&nbsp; |&nbsp; <strong>Tech:</strong> Thermal-Interface Trade-off (TIM Thickness vs. Contact Area), Forced-Convection Ducting, Power-Limit Tuning &amp; Undervolting (ThrottleStop), Schematic/Board-View Rail Tracing, DfAM (Reversible, Screw-Boss-Keyed Mounts)</p>
+
+    <hr style="border: 0; border-top: 1px solid #ddd; margin: 2rem 0;">
+
+    <h2 id="viewer">Interactive 3D Models</h2>
+    <p>The print files from the build: the two-part <a href="#viewer" data-viewer-tab="assembly">mounting frame</a> (shown with a reference model of the heatsink it clamps), the <a href="#viewer" data-viewer-tab="fan_cover">fan duct cover</a>, the two back plates (<a href="#viewer" data-viewer-tab="back_plate_usbA">USB-A side</a>, <a href="#viewer" data-viewer-tab="back_plate_usbC">USB-C side</a>) and the <a href="#viewer" data-viewer-tab="side_plate_usbA">side enclosure</a>. Drag to rotate, scroll to zoom. STL downloads are below the viewer.</p>
+
+    <div class="viewer-box">
+        <div class="viewer-tabs" role="tablist">
+            <button class="viewer-tab is-active" data-model="assembly" role="tab" aria-selected="true">Mounting frame assembly</button>
+            <button class="viewer-tab" data-model="fan_cover" role="tab" aria-selected="false">Fan duct cover</button>
+            <button class="viewer-tab" data-model="back_plate_usbA" role="tab" aria-selected="false">Back plate (USB-A side)</button>
+            <button class="viewer-tab" data-model="back_plate_usbC" role="tab" aria-selected="false">Back plate (USB-C side)</button>
+            <button class="viewer-tab" data-model="side_plate_usbA" role="tab" aria-selected="false">Side enclosure (USB-A side)</button>
+        </div>
+        <div class="viewer-stage">
+            <canvas id="stl-canvas"></canvas>
+            <div class="viewer-hint">drag to rotate · scroll to zoom</div>
+            <div class="viewer-loading" id="viewer-loading">loading mesh…</div>
+        </div>
+        <div class="viewer-caption" id="viewer-caption">
+            <p data-model="assembly" data-label="Mounting frame assembly">The complete two-part frame that clamps the heatsink onto the CPU heat pipes, shown together with a reference model of the heatsink itself: the base plate keys into the stock screw bosses, and the second piece bolts down over it to hold the heatsink in place.</p>
+            <p data-model="fan_cover" data-label="Fan duct cover" hidden="">Directs intake air from the new fan straight through the heatsink fins instead of letting it spill around them.</p>
+            <p data-model="back_plate_usbA" data-label="Back plate (USB-A side)" hidden="">Re-encloses the USB-A side of the chassis where the stock back plate no longer fits over the new hardware.</p>
+            <p data-model="back_plate_usbC" data-label="Back plate (USB-C side)" hidden="">Re-encloses the USB-C / charging side, keyed to the same stock screw bosses as the heatsink frame.</p>
+            <p data-model="side_plate_usbA" data-label="Side enclosure (USB-A side)" hidden="">Encloses the USB-A side profile of the chassis, keyed to the same stock screw bosses as the frame and back plates.</p>
+        </div>
+        <div class="viewer-downloads" id="viewer-downloads"></div>
+    </div>
+
+    <h2>Overview</h2>
+    <p>My 2018 Huawei MateBook X Pro (Intel i7-8550U) cooled its CPU with a small blower fan. That was fine at the stock 15&nbsp;W settings, but when I raised the CPU's power limits, the temperature spiked within seconds and the clock dropped, often to under 1&nbsp;GHz for the rest of the task.</p>
+    <p>To fix this, I added a much bigger heatsink taken from an audio amplifier and clamped it onto the heat pipes with a two-part 3D-printed frame that used the laptop's existing screw bosses. I also replaced the stock fan with a stronger one from another laptop and ducted its air through the heatsink fins. Since the laptop no longer closed, I designed and 3D printed side and back plates to enclose it again. Then I used ThrottleStop to raise the power limits and slightly undervolt the CPU. With these changes, the laptop held <strong>4.0&nbsp;GHz sustained</strong> at <strong>85°C</strong> average and <strong>92°C</strong> peak. Because every part mounted to existing holes in the chassis, the whole mod could be undone.</p>
+
+    <div class="quick-facts">
+        <h4>Quick Facts</h4>
+        <ul>
+            <li>Stock cooling let the clock fall below 1.0&nbsp;GHz. With the mod, the i7-8550U held <strong>4.0&nbsp;GHz</strong> on all cores under load.</li>
+            <li>Logged <strong>85°C average / 92°C peak</strong> under that load in ThrottleStop.</li>
+            <li>Clamped an audio-amplifier heatsink onto the heat pipes with a frame I modeled in SolidWorks and 3D printed, using the existing screw bosses (no new holes).</li>
+            <li>Replaced the stock fan with a stronger one from another laptop and added a printed duct to push its air through the fins.</li>
+            <li>Used a thick layer of thermal paste, trading a little extra thermal resistance for much more contact area.</li>
+            <li>Added a switch on the side of the chassis to turn the new fan on and off.</li>
+            <li>Traced the power rails using the schematic and board-view files for this board revision.</li>
+            <li>Kept it fully reversible: unscrewing the frame and removing the plates returned it to a stock MateBook X Pro.</li>
+        </ul>
+    </div>
+
+    <h2>The Problem: A 15&nbsp;W Chassis Asked to Do More</h2>
+    <p>The cooling on this laptop was only ever meant for a 15&nbsp;W chip. With the small stock fan and tight internals, the airflow wasn't sufficient to cool the laptop during high demand tasks.</p>
+    <figure class="figure">
+        <img src="images/image01.png" alt="USB-A side profile of the reassembled laptop, with the 3D-printed side enclosure attached." loading="lazy">
+        <figcaption>The USB-A side, closed back up. The 3D-printed side enclosure replaced a stock plate that had no venting at all.</figcaption>
+    </figure>
+
+    <h2>Measuring the Chassis and Tracing the Board</h2>
+    <p>Before starting the CAD, I measured the spacing, depth and thread pitch of every screw boss in the stock frame. I did this so that the new parts could use holes that were already there instead of needing new ones.</p>
+    <p>For the electrical side, I used publicly shared schematic and board-view files for this board revision. I found each component on the schematic and then located it on the board view to see where its traces actually went. This was how I told <code>VCC</code>, <code>VSUS</code> and the always-on <code>VS</code> rail apart before touching any connector, and how I later found a clean point to power the new fan and its switch.</p>
+
+    <h2>Mounting a Heatsink It Was Never Built For</h2>
+    <p>The main part of the mod was a heatsink taken from an audio amplifier, far bigger than anything that could fit inside the original chassis. I clamped it onto the CPU's heat pipes with a two-part frame (<a href="#viewer" data-viewer-tab="assembly">view in 3D</a>) that I modeled in SolidWorks from the screw-boss measurements: a base plate that screwed into the existing heatsink holes, and a clamp piece that pressed the heatsink down onto the base plate and the pipes. Since it was held only by screws, I didn't need any glue or drilling.</p>
+    <p>After printing the base plate, I coated it with a thick layer of polyurethane adhesive to hold the part together at high temperatures without deforming.</p>
+    <div class="figure-grid cols-2">
+        <figure>
+            <img src="images/base-plate-flip-side.jpg" alt="Top view of the 3D-printed base plate of the heatsink mounting frame, coated in polyurethane adhesive, showing the screw bosses that line up with the laptop's existing screw holes." loading="lazy">
+            <figcaption>The top view of the printed base plate, with the screw bosses that line up with the laptop's existing holes.</figcaption>
+        </figure><figure>
+            <img src="images/base-plate-top.jpg" alt="The flip side of the 3D-printed base plate, coated in polyurethane adhesive." loading="lazy">
+            <figcaption>The printed base plate, flip side view.</figcaption>
+        </figure>
+        
+    </div>
+    <figure class="figure">
+        <img src="images/image05.jpg" alt="3D-printed frame mounted on the existing screw holes, holding the heatsink over the stock heat pipes, with thermal paste applied for contact." style="max-width: 360px;" loading="lazy">
+        <figcaption>The printed frame, screwed into the existing holes, clamping the heatsink over the stock heat pipes.</figcaption>
+    </figure>
+    <p>I used Arctic thermal paste, and a lot more of it than usual. A thick layer adds its own thermal resistance, but it also filled the uneven gap between the hand-fit aluminum heatsink and the factory-formed copper pipes, so more of the surface made contact. In this case, the extra contact area was worth more than the extra resistance.</p>
+
+    <h2>Ducting the Airflow</h2>
+    <p>A heatsink this big needed air moving through it, and the stock fan couldn't move enough. So I replaced it with a stronger fan from another laptop, mounted it beside the battery, and designed a 3D-printed duct (<a href="#viewer" data-viewer-tab="fan_cover">view in 3D</a>) shaped around the fins. This forced the air to go through the fins instead of around them.</p>
+    <figure class="figure">
+        <img src="images/image06.png" alt="Bottom-up view of the new fan mounted beside the battery, pulling air from above and pushing it sideways across the heatsink fins." loading="lazy">
+        <figcaption>The fan pulled air in from the top and pushed it sideways through the heatsink fins.</figcaption>
+    </figure>
+    <figure class="figure">
+        <img src="images/image07.png" alt="Rear view of the assembly showing the fan mounted directly behind the heatsink fin stack." loading="lazy">
+        <figcaption>Rear view: the fan sat directly behind the heatsink fins.</figcaption>
+    </figure>
+    <figure class="figure">
+        <img src="images/image08.jpg" alt="Side perspective view of the fan, mounted at a slightly raised angle relative to the board." loading="lazy">
+        <figcaption>Side view: I tilted the fan up slightly to line it up with the duct.</figcaption>
+    </figure>
+
+    <h2>A Manual Switch for the Fan</h2>
+    <p>The new fan drew more current than the laptop's own fan header could supply, so I couldn't run it from the stock fan control. Instead, I powered it from a rail I found on the board view, through its own switch on the side of the chassis. This let me turn it off when I didn't need the extra cooling (or the noise).</p>
+    <figure class="figure">
+        <img src="images/image09.png" alt="USB-C side profile of the laptop with the enclosure removed, showing the ON/OFF switch added for the new fan." loading="lazy">
+        <figcaption>The USB-C side with the enclosure off, showing the ON/OFF switch for the new fan.</figcaption>
+    </figure>
+
+    <h2>Closing It Back Up</h2>
+    <p>With all this added, the chassis no longer closed flush. Instead of leaving it open, I designed and printed new back plates (<a href="#viewer" data-viewer-tab="back_plate_usbA">USB-A side</a>, <a href="#viewer" data-viewer-tab="back_plate_usbC">USB-C side</a>), a <a href="#viewer" data-viewer-tab="side_plate_usbA">side enclosure</a> and a vented <a href="#viewer" data-viewer-tab="fan_cover">fan cover</a>, and screwed them into the same stock bosses as the heatsink frame. Because of this, removing the plates and unscrewing the frame turned it back into a stock MateBook X Pro in under ten minutes.</p>
+
+    <h2>Tuning It with ThrottleStop</h2>
+    <p>The new hardware gave the CPU thermal headroom, and I used ThrottleStop to make use of it. I raised the power limits so the i7-8550U could run all four cores at its top 4.0&nbsp;GHz turbo step instead of falling back. I also reduced the CPU voltage slightly (an undervolt) to cut power dissipation, since lower voltage at the same clock means less heat. This was how I got both the clock speed and the temperatures I wanted. During testing, I also used ThrottleStop to watch the core and package temperatures live.</p>
+
+    <h2>Results</h2>
+    <p>I logged both numbers in ThrottleStop under a sustained all-core load, the same load that used to make the stock cooler throttle within seconds.</p>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Metric</th><th>Stock cooling</th><th>With the mod</th></tr></thead>
+            <tbody>
+                <tr><td>Sustained CPU clock</td><td>&lt; 1.0 GHz (kept falling under load)</td><td>4.0 GHz</td></tr>
+                <tr><td>Core temperature under load</td><td>Throttling within seconds</td><td>85°C average / 92°C peak</td></tr>
+                <tr><td>Cooling</td><td>Stock heat pipe + stock fan</td><td>Audio-amplifier heatsink + stronger fan + duct + Arctic paste</td></tr>
+                <tr><td>Chassis modifications</td><td>None</td><td>None (no drilling, no cutting, fully reversible)</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <p style="font-size: 0.9rem; color: #777;"><em>I kept about 8°C of margin at peak, since the i7-8550U starts throttling at 100°C. I did this so that a hot room or a longer job wouldn't push it into throttling mid-task.</em></p>
+
+    <h2>Living With the Bulk</h2>
+    <p>The downside was size. With the heatsink, duct and plates, the laptop became a lot thicker and heavier than the one Huawei sold. But it let me run heavy multicore Python jobs without the clock dropping halfway through, which was the reason I did this mod. It also looked strange enough that TSA once pulled me aside to ask why my laptop had a fan bolted to it.</p>
+
+</div>
+
+<script src="../assets/three.min.js"></script>
+<script src="js/3d-models.js"></script>
+<script src="../assets/zoom.js"></script>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+
+
+
+
+
+
+</body></html>

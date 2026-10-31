@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio of Kasun Pathirage, Ph.D. candidate in Electrical &amp; Computer Engineering at UMD: hands-on hardware, reverse-engineering, 3D design and mechatronics projects, plus a guest lecture series on noise in electronic instrumentation.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Kasun Pathirage | Hardware &amp; Mechatronics Engineer">
+    <meta property="og:description" content="Portfolio of Kasun Pathirage, Ph.D. candidate in Electrical &amp; Computer Engineering at UMD: hands-on hardware, reverse-engineering, 3D design and mechatronics projects, plus a guest lecture series on noise in electronic instrumentation.">
+    <meta property="og:site_name" content="Kasun Pathirage">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Kasun Pathirage | Hardware &amp; Mechatronics Engineer</title>
+<style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #e60000; /* Subtle red accent for an automotive/hardware feel */
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        header {
+            background-color: var(--primary);
+            color: #fff;
+            padding: 1.75rem 2rem;
+            text-align: center;
+            border-bottom: 4px solid var(--secondary);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: -1px;
+        }
+        header p {
+            font-size: 1.05rem;
+            color: #ccc;
+            max-width: 600px;
+            margin: 0.4rem auto 0;
+        }
+        .header-links {
+            margin: 0.9rem 0 0;
+            display: flex;
+            justify-content: center;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+        }
+        .header-links a {
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.35rem 0.05rem;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .header-links a:hover {
+            color: var(--secondary);
+            border-bottom-color: var(--secondary);
+        }
+        .container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+        }
+        .section-title {
+            font-size: 2rem;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+        .project-card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            transition: transform 0.2s ease;
+        }
+        .project-card:hover {
+            transform: translateY(-2px);
+        }
+        .project-card h3 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .project-date {
+            font-size: 1rem;
+            color: #666;
+            font-weight: normal;
+            white-space: nowrap;
+        }
+        .tech-stack {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        .project-card ul {
+            padding-left: 1.2rem;
+        }
+        .project-card li {
+            margin-bottom: 0.5rem;
+        }
+        .media-placeholder {
+            background-color: #eee;
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 1rem;
+            color: #888;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: #fff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: normal;
+            transition: background-color 0.2s;
+        }
+        .btn:hover {
+            background-color: var(--secondary);
+            color: #fff;
+            text-decoration: none;
+        }
+        .contact {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 3rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .contact a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .contact a:hover {
+            text-decoration: underline;
+        }
+        .email-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 1rem;
+        }
+        .email-modal-overlay.is-active {
+            display: flex;
+        }
+        .email-modal-box {
+            background: #fff;
+            border-radius: 10px;
+            padding: 1.75rem 1.75rem 1.5rem;
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+            position: relative;
+        }
+        .email-modal-box h4 {
+            margin: 0 0 0.9rem;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+        .email-modal-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f4f6f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 0.6rem 0.6rem 0.6rem 0.9rem;
+        }
+        .email-modal-address {
+            flex: 1 1 auto;
+            font-size: 0.9rem;
+            color: #1a1a1a;
+            text-align: left;
+            word-break: break-all;
+        }
+        .email-modal-copy-btn {
+            flex-shrink: 0;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 0.45rem 0.7rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: background-color 0.2s;
+        }
+        .email-modal-copy-btn:hover {
+            background-color: var(--secondary);
+        }
+        .email-modal-close {
+            position: absolute;
+            top: 0.6rem;
+            right: 0.75rem;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            line-height: 1;
+            color: #999;
+            cursor: pointer;
+            padding: 0.2rem;
+        }
+        .email-modal-close:hover {
+            color: var(--secondary);
+        }
+        .youtube-line {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        .youtube-line a.yt-icon-link {
+            flex-shrink: 0;
+            display: block;
+            line-height: 0;
+        }
+        .youtube-line .yt-icon {
+            width: 24px;
+            height: 24px;
+        }
+        .youtube-line a.yt-text-link {
+            color: var(--secondary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .youtube-line a.yt-text-link:hover {
+            text-decoration: underline;
+        }
+        .video-link-line {
+            font-size: 0.92rem;
+            margin-top: 0.75rem;
+        }
+        .video-link-line a {
+            color: var(--secondary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .video-link-line a:hover {
+            text-decoration: underline;
+        }
+        .project-card-flex {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+        .project-card-flex .project-card-text {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .project-card-flex .project-card-text h3,
+        .project-card-flex .project-card-text .tech-stack,
+        .project-card-flex .project-card-text p {
+            margin-top: 0;
+        }
+        .project-card-cover {
+            flex: 0 0 280px;
+            width: 280px;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .project-card-cover img {
+            display: block;
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
+        .project-card-cover a.cover-video-link {
+            display: block;
+            position: relative;
+            border-radius: 6px;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+        .project-card-cover a.cover-video-link:hover {
+            transform: translateY(-2px);
+        }
+        .project-card-cover a.cover-video-link .play-badge-sm {
+            position: absolute;
+            bottom: 6px;
+            left: 6px;
+            background: rgba(0,0,0,0.75);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 0.15rem 0.45rem;
+            border-radius: 3px;
+        }
+        @media (max-width: 640px) {
+            .project-card-flex {
+                flex-direction: column-reverse;
+            }
+            .project-card-cover {
+                width: 100%;
+                flex-basis: auto;
+            }
+            .project-card-cover img {
+                height: 200px;
+            }
+        }
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .project-tile {
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border: 1px solid #e8e8e8;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .project-tile:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.14);
+        }
+        .project-tile-cover {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary), #3a3a3a);
+        }
+        .project-tile-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .project-tile-cover.no-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.9);
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 1.25rem;
+            letter-spacing: 0.01em;
+        }
+        .project-tile-badge {
+            position: absolute;
+            bottom: 0.6rem;
+            right: 0.6rem;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 0.25rem 0.55rem;
+            border-radius: 999px;
+        }
+        .project-tile-body {
+            padding: 1.1rem 1.2rem 1.3rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+        }
+        .project-tile-date {
+            font-size: 0.72rem;
+            color: var(--secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 0.35rem;
+        }
+        .project-tile-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.32;
+            margin: 0 0 0.5rem;
+            color: var(--primary);
+        }
+        .project-tile-tech {
+            font-size: 0.72rem;
+            color: #6b6b6b;
+            margin-bottom: 0.6rem;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+        .project-tile-desc {
+            font-size: 0.85rem;
+            color: #444;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 7.25em;
+            max-height: 7.25em;
+            flex: 0 0 auto;
+        }
+        .project-tile-cta {
+            margin-top: auto;
+            padding-top: 0.85rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+            @media (max-width: 760px) { header p[style*="nowrap"] { white-space: normal !important; } }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Kasun Pathirage</h1>
+    <p>Ph.D. Candidate in Electrical &amp; Computer Engineering at UMD</p>
+    <p style="font-size: 0.85rem; color: #aaa; margin-top: 0.35rem; white-space: nowrap; max-width: none;">Hardware Engineering • 3D Design • Hardware-Software Co-Design • Power Electronics • Mechatronics Integration</p>
+    <div class="header-links">
+        <a href="mailto:kasun.k4@gmail.com" class="email-trigger">Email</a>
+        <a href="https://github.com/Kasun-Pathirage" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://linkedin.com/in/kasun-pathirage" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.youtube.com/@DumbledoresNavy" target="_blank" rel="noopener">YouTube</a>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- YouTube Channel -->
+    <div class="youtube-line">
+        <a class="yt-icon-link" href="https://www.youtube.com/@DumbledoresNavy" target="_blank" rel="noopener" aria-label="Dumbledore's Navy on YouTube">
+            <svg class="yt-icon" viewBox="0 0 24 24" fill="#e60000" xmlns="http://www.w3.org/2000/svg">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"></path>
+            </svg>
+        </a>
+        <span>Check out my YouTube channel: <a class="yt-text-link" href="https://www.youtube.com/@DumbledoresNavy" target="_blank" rel="noopener">DumbledoresNavy</a></span>
+    </div>
+
+    <h2 class="section-title">Engineering Projects</h2>
+
+    <div class="projects-grid">
+        <a href="delta-psu-reverse-engineering/delta-psu-reverse-engineering.html" class="project-tile">
+            <div class="project-tile-cover"><img src="https://img.youtube.com/vi/l3F6WUHF6hg/hqdefault.jpg" data-original-src="https://img.youtube.com/vi/l3F6WUHF6hg/hqdefault.jpg" alt="Dell Server Power Supply D1100E-S0 (DPS-1100BB) Reverse Engineering video series thumbnail" width="280" height="190" loading="lazy"><span class="project-tile-badge">▶ Video series</span></div>
+            <div class="project-tile-body">
+                <div class="project-tile-date">May 2026</div>
+                <h3 class="project-tile-title">Reverse-Engineering a Server PSU: Fixed 12.2V to Variable Output</h3>
+                <div class="project-tile-tech">dsPIC33FJ64GS606 | Delta/Dell DPS-1100BB Server PSU | PCB Analog Electronics Hack</div>
+                <p class="project-tile-desc">Reverse-engineered a 12.2 Volt, 90 Ampere (~1100 Watt) server power supply unit with no datasheet, and modified its feedback loop to convert a fixed 12.2V output into a variable voltage supply (up to ~14.5 V).</p>
+                <span class="project-tile-cta">View Project Details →</span>
+            </div>
+        </a>
+        <a href="voice-activated-car-control/voice-activated-car-control.html" class="project-tile">
+            <div class="project-tile-cover"><img src="voice-activated-car-control/images/hero-alexa-plate.jpg" data-original-src="voice-activated-car-control/images/hero-alexa-plate.jpg" alt="The 2003 Mitsubishi Lancer with its headlights on and an ALEXA plate, started by voice" loading="lazy"><span class="project-tile-badge">▶ Video series</span></div>
+            <div class="project-tile-body">
+                <div class="project-tile-date">March 2026</div>
+                <h3 class="project-tile-title">“Alexa, Start My Car”: Voice-Control on 2003 Mitsubishi Lancer</h3>
+                <div class="project-tile-tech">NodeMCU (ESP8266) | Key Fob Code Injection | Amazon Alexa | Sinric Pro IoT Cloud | OAuth 2.0</div>
+                <p class="project-tile-desc">Voice remote start, lock/unlock and trunk release for a 2003 Lancer. A NodeMCU injects key fob codes into a hacked Banvie 1 module, bridged to Alexa through the Sinric Pro IoT cloud.</p>
+                <span class="project-tile-cta">View Project Details →</span>
+            </div>
+        </a>
+        <a href="banvie-1-reverse-engineering/banvie-1-reverse-engineering.html" class="project-tile">
+            <div class="project-tile-cover"><img src="https://img.youtube.com/vi/gaNq2AkMLPA/hqdefault.jpg" data-original-src="https://img.youtube.com/vi/gaNq2AkMLPA/hqdefault.jpg" alt="Reverse Engineering the Banvie 1 Car Remote Start and Keyless Entry System video series thumbnail" width="280" height="190" loading="lazy"><span class="project-tile-badge">▶ Video series</span></div>
+            <div class="project-tile-body">
+                <div class="project-tile-date">March 2026</div>
+                <h3 class="project-tile-title">Reverse-Engineering the Banvie 1 Remote Start &amp; Keyless Entry Unit</h3>
+                <div class="project-tile-tech">RF Protocol Sniffing | ULN2003G | Holtek/ChipOn MCUs | Oscilloscope Data Analysis - Python</div>
+                <p class="project-tile-desc">Reverse-engineered a BANVIE 1 aftermarket remote-start/keyless entry unit down to its two onboard microcontrollers, and decoded its key fob's RF protocol bit-by-bit by analyzing oscilloscope data in Python.</p>
+                <span class="project-tile-cta">View Project Details →</span>
+            </div>
+        </a>
+        <a href="hvac-retrofitting/hvac-retrofitting.html" class="project-tile">
+            <div class="project-tile-cover"><img src="hvac-retrofitting/images/bracket-installed.jpg" data-original-src="hvac-retrofitting/images/bracket-installed.jpg" alt="The printed two-anchor servo bracket installed on the AC actuator in the car." loading="lazy"></div>
+            <div class="project-tile-body">
+                <div class="project-tile-date">February 2023</div>
+                <h3 class="project-tile-title">Motorizing a Mitsubishi Lancer's HVAC Blend Door</h3>
+                <div class="project-tile-tech">Free-Body Torque Analysis | RC Filter Design | Closed-Loop Servo Control | DfAM | SolidWorks</div>
+                <p class="project-tile-desc">Reverse-engineered a 2003 Lancer's HVAC actuator after its knob kept snapping from a stiffened linkage. 3D-printed a servo bracket and coupler to bypass it, then motorized the knob to track the blend door's position.</p>
+                <span class="project-tile-cta">View Project Details →</span>
+            </div>
+        </a>
+        <a href="automated-blinds/automated-blinds.html" class="project-tile">
+            <div class="project-tile-cover"><img src="automated-blinds/images/cover.jpg" data-original-src="automated-blinds/images/cover.jpg" alt="Motorized 80-inch window blind with the salvaged motor mounted beside the window" loading="lazy"></div>
+            <div class="project-tile-body">
+                <div class="project-tile-date">September 2024</div>
+                <h3 class="project-tile-title">Rapid Prototyping: Automated Window Blind</h3>
+                <div class="project-tile-tech">Custom Circuitry | 3D Printing | Amazon Alexa API | Sinric Pro API</div>
+                <p class="project-tile-desc">Automated a manual 80" window blind in under 48 hours, driven by a salvaged car power window motor with custom circuitry, Alexa integration, 3D printed linkages, and custom end-stops.</p>
+                <span class="project-tile-cta">View Project Details →</span>
+            </div>
+        </a>
+        <a href="double-din-conversion/double-din-conversion.html" class="project-tile">
+            <div class="project-tile-cover"><img src="double-din-conversion/images/cover-render.png" data-original-src="double-din-conversion/images/cover-render.png" alt="CAD render of the custom 3D-printed structure housing the relocated climate-control assembly and double-DIN radio bay." loading="lazy"></div>
+            <div class="project-tile-body">
+                <div class="project-tile-date">May 2023</div>
+                <h3 class="project-tile-title">Double-DIN Radio Conversion &amp; Servo-Driven Climate Control</h3>
+                <div class="project-tile-tech">DfAM | Multi-Body SolidWorks Assembly | Mechatronic Redesign | Modular Fastened Joints</div>
+                <p class="project-tile-desc">Designed and 3D-printed a modular structure in SolidWorks to relocate the climate-control assembly for a double-DIN head unit, also converting the temperature knob to servo control (same fix as the HVAC project).</p>
+                <span class="project-tile-cta">View Project Details →</span>
+            </div>
+        </a>
+        <a href="matebook-overclock-mod/matebook-overclock-mod.html" class="project-tile">
+            <div class="project-tile-cover"><img src="matebook-overclock-mod/images/image01.png" data-original-src="matebook-overclock-mod/images/image01.png" alt="USB-A side profile of the reassembled MateBook X Pro, with the 3D-printed side enclosure attached." loading="lazy"></div>
+            <div class="project-tile-body">
+                <div class="project-tile-date">January 2022</div>
+                <h3 class="project-tile-title">Overclocking a 2018 MateBook X Pro with a DIY Heatsink Mod</h3>
+                <div class="project-tile-tech">TIM Trade-off | Forced-Convection Ducting | Power-Limit Tuning &amp; Undervolting | DfAM</div>
+                <p class="project-tile-desc">Fixed a laptop throttling under 1 GHz with an audio-amplifier heatsink, a 3D-printed mounting frame and a stronger fan, then raised the power limits and undervolted in ThrottleStop to sustain 4.0 GHz at 85°C.</p>
+                <span class="project-tile-cta">View Project Details →</span>
+            </div>
+        </a>
+    </div>
+
+    <h2 class="section-title">Teaching Experience</h2>
+
+    <!-- Teaching 0 -->
+    <div class="project-card">
+        <h3>Guest Lecturer, BM3110: Electronic Instrumentation <span class="project-date">Fall 2026</span></h3>
+        <div class="tech-stack">Dept. of Biomedical Engineering | University of Moratuwa, Sri Lanka | Semester 5 Undergraduates</div>
+        <p>Delivered a series of lectures on electronic instrumentation to third-year Biomedical Engineering undergraduates, covering the analog and digital building blocks used in medical measurement systems. Slides for each lecture are linked below.</p>
+        <a href="teaching/teaching.html" class="btn">View Lecture Materials →</a>
+    </div>
+
+    <h2 class="section-title">Contact &amp; Links</h2>
+    <div class="contact">
+        <h2>Let's Build Something</h2>
+        <p>I am actively seeking roles in hardware engineering and robotics integration.</p>
+        <p>
+            <a href="mailto:kasun.k4@gmail.com" class="email-trigger">Email Me</a> |
+            <a href="https://github.com/Kasun-Pathirage">GitHub Profile</a> |
+            <a href="https://linkedin.com/in/kasun-pathirage">LinkedIn Profile</a> |
+            <a href="https://www.youtube.com/@DumbledoresNavy" target="_blank" rel="noopener">YouTube Channel</a>
+        </p>
+    </div>
+
+</div>
+
+<div class="email-modal-overlay" id="email-modal-overlay">
+    <div class="email-modal-box">
+        <button class="email-modal-close" id="email-modal-close" type="button" aria-label="Close">×</button>
+        <h4>Email Kasun</h4>
+        <div class="email-modal-row">
+            <span class="email-modal-address">kasun.k4@gmail.com</span>
+            <button class="email-modal-copy-btn" id="email-modal-copy-btn" type="button">📋 Copy</button>
+        </div>
+    </div>
+</div>
+
+<script id="__email-modal-script">
+(function(){
+    "use strict";
+    var EMAIL = "kasun.k4@gmail.com";
+    var overlay = document.getElementById('email-modal-overlay');
+    var closeBtn = document.getElementById('email-modal-close');
+    var copyBtn = document.getElementById('email-modal-copy-btn');
+
+    function openModal(e){
+        if (e) e.preventDefault();
+        overlay.classList.add('is-active');
+    }
+    function closeModal(){
+        overlay.classList.remove('is-active');
+    }
+
+    document.querySelectorAll('.email-trigger').forEach(function(link){
+        link.addEventListener('click', openModal);
+    });
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', function(e){
+        if (e.target === overlay) closeModal();
+    });
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape') closeModal();
+    });
+    copyBtn.addEventListener('click', function(){
+        var restore = function(){
+            copyBtn.innerHTML = '&#128203; Copy';
+        };
+        var showCopied = function(){
+            copyBtn.innerHTML = '&#10003; Copied';
+            setTimeout(restore, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(EMAIL).then(showCopied, function(){
+                fallbackCopy();
+            });
+        } else {
+            fallbackCopy();
+        }
+        function fallbackCopy(){
+            var tmp = document.createElement('textarea');
+            tmp.value = EMAIL;
+            tmp.style.position = 'fixed';
+            tmp.style.opacity = '0';
+            document.body.appendChild(tmp);
+            tmp.select();
+            try { document.execCommand('copy'); showCopied(); } catch(err){}
+            document.body.removeChild(tmp);
+        }
+    });
+})();
+</script>
+
+
+
+<script src="assets/edit-mode.js" id="__edit-loader"></script>
+
+
+
+
+
+</body></html>

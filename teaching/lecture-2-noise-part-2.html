@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 2: Noise Part 2: Classification of Noise | Kasun Pathirage</title>
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #e60000;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 2rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .course-meta {
+            font-size: 0.95rem;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 2rem 0;
+        }
+        .lecture-card {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .lecture-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            color: var(--primary);
+            line-height: 1.35;
+        }
+        .lecture-topics {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.25rem;
+        }
+        .lecture-card h4 {
+            font-size: 1.02rem;
+            color: var(--primary);
+            margin: 1.5rem 0 0.5rem 0;
+        }
+        .lecture-card h4:first-of-type {
+            margin-top: 0.5rem;
+        }
+        .lecture-card p, .lecture-card li {
+            font-size: 0.95rem;
+        }
+        .lecture-card ul {
+            padding-left: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        .lecture-card li {
+            margin-bottom: 0.35rem;
+        }
+        .formula-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0;
+            font-family: Cambria, "Times New Roman", serif;
+            font-size: 1rem;
+            color: #222;
+        }
+        .formula-box .label {
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 0.2rem;
+        }
+        .worked-example {
+            background: #fbfbfb;
+            border-left: 3px solid var(--secondary);
+            padding: 0.9rem 1.1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .worked-example p { margin: 0.4rem 0; }
+        .callout {
+            background: #fff8e6;
+            border: 1px solid #f0e0b0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #5a4a1a;
+        }
+        .diagram-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem 0.75rem 0.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .diagram-box svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            min-width: 560px;
+        }
+        .diagram-caption {
+            font-size: 0.78rem;
+            color: #888;
+            text-align: center;
+            margin: 0.5rem 0 0.25rem;
+        }
+        .media-box {
+            background: #eee;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            margin: 1rem 0;
+            color: #888;
+            font-size: 0.95rem;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: #fff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: normal;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn:hover {
+            background-color: var(--secondary);
+            color: #fff;
+            text-decoration: none;
+        }
+        .btn.disabled {
+            background-color: #ccc;
+            cursor: default;
+            pointer-events: none;
+        }
+    
+        .lead { font-size: 1.02rem; color: #333; }
+        .page-nav { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem 1rem; margin-bottom:1.5rem; }
+        .page-nav .back-link { margin-bottom:0; }
+        .chips { display:flex; flex-wrap:wrap; gap:.4rem .5rem; margin:.25rem 0 1.25rem; }
+        .chip { font-size:.78rem; background:#f1f1f5; color:#444; border-radius:12px; padding:.2rem .65rem; }
+        .toc { background:#fafafa; border:1px solid #e5e5e5; border-radius:6px; padding:.85rem 1.25rem; margin:1.25rem 0 .5rem; font-size:.92rem; }
+        .toc ol { margin:.45rem 0 0; padding-left:1.25rem; columns:2; column-gap:2rem; }
+        .toc li { margin-bottom:.2rem; break-inside:avoid; }
+        .toc a { color:#333; text-decoration:none; } .toc a:hover { color:var(--secondary); text-decoration:underline; }
+        .lecture-page h2 { font-size:1.3rem; margin:2.25rem 0 .6rem; padding-top:.5rem; border-top:1px solid #e8e8e8; color:var(--primary); scroll-margin-top:1rem; }
+        .lecture-page h3 { font-size:1.05rem; margin:1.5rem 0 .4rem; color:var(--primary); }
+        .lecture-page p, .lecture-page li { font-size:.97rem; line-height:1.6; }
+        .lecture-page ul, .lecture-page ol { padding-left:1.3rem; }
+        .lecture-page li { margin-bottom:.4rem; }
+        .formula-box { overflow-x:auto; line-height:1.75; }
+        .worked-example, .callout { font-size:.95rem; }
+        .small { font-size:.82rem !important; color:#777; }
+        table.cmp { width:100%; border-collapse:collapse; font-size:.86rem; margin:1rem 0; display:block; overflow-x:auto; }
+        table.cmp th, table.cmp td { border:1px solid #e0e0e0; padding:.45rem .65rem; text-align:left; vertical-align:top; line-height:1.45; }
+        table.cmp th { background:#f4f4f6; font-weight:600; }
+        table.cmp td.hl { background:#fff0f0; font-weight:600; color:#a00000; }
+        .diagram-box { padding:1rem .75rem .5rem; }
+        .diagram-box svg { min-width:560px; }
+        .download-bar { display:flex; flex-wrap:wrap; gap:.6rem; align-items:center; margin:1.25rem 0 0; }
+        .btn.alt { background:#fff; color:var(--primary); border:1px solid #bbb; }
+        .btn.alt:hover { background:var(--secondary); color:#fff; border-color:var(--secondary); }
+        .lecture-nav { display:flex; justify-content:space-between; gap:1rem; margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid #ddd; flex-wrap:wrap; }
+        .lecture-nav a { color:var(--secondary); text-decoration:none; font-weight:600; font-size:.92rem; max-width:48%; }
+        .lecture-nav a:hover { text-decoration:underline; }
+        .lecture-nav .next { margin-left:auto; text-align:right; }
+        .series-label { font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:#888; font-weight:600; margin:2rem 0 .75rem; }
+        .lecture-row .num { display:inline-block; min-width:2rem; color:var(--secondary); font-weight:700; }
+        .lecture-row .btn-row { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.75rem; }
+        @media (max-width:640px){ .container{margin:1rem;padding:1.25rem;} .toc ol{columns:1;} .lecture-nav a{max-width:100%;} }
+    
+        /* stacked fractions and radicals for equations */
+        .frac { display:inline-flex; flex-direction:column; align-items:stretch; vertical-align:middle; margin:0 .18em; text-align:center; line-height:1.25; }
+        .frac > .num { padding:0 .3em .1em; border-bottom:1.4px solid currentColor; }
+        .frac > .den { padding:.1em .3em 0; }
+        sup .frac, sub .frac { font-size:1em; }
+        .rad { display:inline-block; position:relative; padding-left:.72em; white-space:nowrap; }
+        .rad > .rs { position:absolute; left:0; top:0; width:.72em; height:100%; overflow:visible; }
+        .rad > .rb { display:inline-block; border-top:1.4px solid currentColor; padding:0 .15em; line-height:1.3; }
+        .rad.tall { vertical-align:middle; }
+        .rad.tall > .rb { display:block; padding-top:.15em; }
+        .par { font-size:1.7em; font-weight:200; line-height:0; vertical-align:-.1em; }
+        .formula-box .frac, .worked-example .frac { font-size:1.02em; }
+    </style>
+
+</head>
+<body>
+    <div class="container ">
+        <div class="page-nav"><a href="teaching.html" class="back-link">&larr; All lectures</a><a href="../index.html" class="back-link">Portfolio &rarr;</a></div>
+        <div class="series-label">BM3110 Electronic Instrumentation &middot; Lecture 2 of 7</div>
+        <h1>Noise and Interference in Instrumentation, Part 2: Classification of Noise</h1>
+        <div class="course-meta">University of Moratuwa &middot; Dept. of Biomedical Engineering &middot; Semester 5 &middot; Fall 2026 &middot; 38 slides</div>
+        <div class="chips"><span class="chip">thermal (Johnson&ndash;Nyquist) noise</span><span class="chip">combining noise sources</span><span class="chip">RC filter noise bandwidth</span><span class="chip">shot noise</span><span class="chip">1/f (flicker) noise</span><span class="chip">burst (popcorn) noise</span></div>
+        <div class="download-bar"><a href="noise-in-instrumentation-part-2.pdf" class="btn">Download slides (PDF) &darr;</a></div>
+        <hr>
+        <div class="lecture-page">
+
+            <p>This lecture covers where random noise in an instrumentation circuit comes from, and how to combine it correctly. Each noise source is classified by the physical mechanism that produces it, not by the component it appears in, because the same mechanism (e.g. thermal agitation of charge carriers) shows up in resistors, transistors and interconnects alike.</p>
+
+            <h2>1. Classification by physical origin</h2>
+            <p>The lecture groups the noise mechanisms by the physics behind them:</p>
+
+            <div class="diagram-box">
+                <svg viewBox="0 0 860 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flow diagram: Noise, classified by physical origin, branches into Thermal Noise, Shot Noise, 1/f (Flicker) Noise, Burst Noise, and Other.">
+                    <!-- connectors -->
+                    <g fill="none" stroke="#8a99a3" stroke-width="1.5">
+                        <line x1="430" y1="60" x2="430" y2="95"/>
+                        <line x1="90" y1="95" x2="770" y2="95"/>
+                        <line x1="90" y1="95" x2="90" y2="130"/>
+                        <line x1="260" y1="95" x2="260" y2="130"/>
+                        <line x1="430" y1="95" x2="430" y2="130"/>
+                        <line x1="600" y1="95" x2="600" y2="130"/>
+                        <line x1="770" y1="95" x2="770" y2="130"/>
+                    </g>
+                    <!-- top box -->
+                    <rect x="280" y="10" width="300" height="50" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+                    <text x="430" y="30" text-anchor="middle" font-size="15" font-weight="600" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">Noise</text>
+                    <text x="430" y="47" text-anchor="middle" font-size="10.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">(classification by physical origin)</text>
+                    <!-- category boxes -->
+                    <g font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
+                        <rect x="15" y="130" width="150" height="44" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+                        <text x="90" y="157" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Thermal Noise</text>
+
+                        <rect x="185" y="130" width="150" height="44" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+                        <text x="260" y="157" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Shot Noise</text>
+
+                        <rect x="355" y="130" width="150" height="44" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+                        <text x="430" y="149" text-anchor="middle" font-size="12.5" fill="#1a1a1a">1/f (Flicker)</text>
+                        <text x="430" y="164" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Noise</text>
+
+                        <rect x="525" y="130" width="150" height="44" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+                        <text x="600" y="157" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Burst Noise</text>
+
+                        <rect x="695" y="130" width="150" height="44" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+                        <text x="770" y="157" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Other</text>
+                    </g>
+                </svg>
+                <div class="diagram-caption">Fig. 1: Noise classified by the physics behind its origin (redrawn from the lecture slides)</div>
+            </div>
+
+            <p>Each branch has its own noise power spectral density (PSD). Using the PSD, noise from completely different physical causes can be compared and combined on equal footing:</p>
+            <ul>
+                <li><strong>Thermal noise:</strong> random motion of charge carriers due to thermal energy; present in every resistance. PSD: S&nbsp;=&nbsp;4k<sub>B</sub>T. Independent of resistance and of any applied voltage; directly proportional to temperature; white (flat with frequency); Gaussian-distributed.</li>
+                <li><strong>Shot noise:</strong> discreteness of charge crossing a potential barrier (e.g. a p&ndash;n junction). PSD: S&nbsp;=&nbsp;2qI<sub>DC</sub> (q&nbsp;=&nbsp;1.602&times;10&#8315;&sup1;&#8313;&nbsp;C). Independent of temperature and of applied voltage; proportional to the DC bias current; white; Poisson-distributed, converging to Gaussian for large I<sub>DC</sub> by the central limit theorem.</li>
+                <li><strong>1/f (flicker) noise:</strong> charge carriers spending time trapped in material trap states; integrating the trapping/release rate over all states gives the characteristic 1/f dependence. PSD: S(f)&nbsp;=&nbsp;KI<sub>DC</sub><sup>&alpha;</sup>&middot;<span class="frac"><span class="num">1</span><span class="den">f</span></span>, with K and &alpha; device-dependent (typically 0.5&nbsp;&lt;&nbsp;&alpha;&nbsp;&lt;&nbsp;2). Proportional to DC bias current, dominant at low frequencies ("pink noise"). Unlike thermal or shot noise, its total power depends on the <em>absolute</em> frequency band, not just the bandwidth.</li>
+                <li><strong>Burst ("popcorn") noise:</strong> sudden, discrete step transitions from charge carriers trapping/detrapping at material defect sites; mostly eliminated in modern semiconductors.</li>
+                <li><strong>Other:</strong> source-specific mechanisms not covered in depth: avalanche noise, contact noise, random telegraph noise.</li>
+            </ul>
+
+            <h2>2. Thermal (Johnson&ndash;Nyquist) noise</h2>
+            <p>It is present in every resistance, does not depend on any applied voltage, and depends only on temperature and resistance:</p>
+            <div class="formula-box">
+                <span class="label">Noise voltage power spectral density (white)</span>
+                v&#772;<sub>n</sub><sup>2</sup> = 4k<sub>B</sub>TR &nbsp;[V&sup2;/Hz]
+            </div>
+            <p>Two properties matter in practice. At a fixed temperature, the noise <em>voltage</em> increases with resistance while the noise <em>current</em> decreases with resistance, but the noise <em>power</em> does not depend on resistance at all.</p>
+
+            <div class="worked-example">
+                <p><strong>Worked example:</strong> RMS thermal noise of a 10&nbsp;k&Omega; resistor at room
+                temperature (25&nbsp;&deg;C = 298.15&nbsp;K), measured through an ideal bandpass filter passing
+                1&ndash;11&nbsp;kHz (&Delta;f = 10&nbsp;kHz).</p>
+                <p>4k<sub>B</sub>T = 4 &times; 1.381&times;10&#8315;&sup2;&sup3; &times; 298.15 = 1.647&times;10&#8315;&sup2;&#8304; W/Hz</p>
+                <p>Noise power: P = 4k<sub>B</sub>T &middot; &Delta;f = 1.647&times;10&#8315;&sup2;&#8304; &times; 10&#8308; = 1.647&times;10&#8315;&sup1;&#8310; W</p>
+                <p>V<sub>RMS</sub> = <span class="rad"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb">P&middot;R</span></span> = <strong>1.28 &micro;V</strong> &nbsp;&nbsp; I<sub>RMS</sub> = <span class="rad tall"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb"><span class="frac"><span class="num">P</span><span class="den">R</span></span></span></span> = <strong>128 pA</strong></p>
+            </div>
+
+            <h2>3. Combining noise sources correctly</h2>
+            <p>Independent (uncorrelated) noise sources cannot be added directly. Only their <em>mean-square</em> values add:</p>
+            <div class="formula-box">
+                <span class="label">Series resistors: total noise voltage</span>
+                v&#772;<sub>n,total</sub><sup>2</sup> = v&#772;<sub>n1</sub><sup>2</sup> + v&#772;<sub>n2</sub><sup>2</sup> = 4k<sub>B</sub>T&Delta;f(R<sub>1</sub>+R<sub>2</sub>)
+            </div>
+            <p>Modeling resistors as Thevenin (series voltage) sources makes this simple, since voltage sources in series add. The equivalent Norton (parallel current-source) form gives the same result with messier algebra, and it is a common student mistake: current noise sources only add directly when the resistors are actually in parallel, and voltage noise sources only add directly when the resistors are actually in series. Mixing the two up gives a result that looks plausible but is wrong.</p>
+            <p>The result generalizes: for any number of resistors at a common temperature T, the combined noise is exactly what a <em>single lumped resistor</em> would produce, using the equivalent series or parallel resistance:</p>
+            <div class="formula-box">
+                <span class="label">N resistors at temperature T (series or parallel)</span>
+                V<sub>RMS</sub> = <span class="rad"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb">4k<sub>B</sub>T&Delta;f&middot;R<sub>series</sub></span></span> &nbsp;&nbsp;and&nbsp;&nbsp; I<sub>RMS</sub> = <span class="rad tall"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb"><span class="frac"><span class="num">4k<sub>B</sub>T&Delta;f</span><span class="den">R<sub>parallel</sub></span></span></span></span>
+            </div>
+            <p>This only works when every resistor is at the <em>same</em> temperature. If two resistors in series or parallel are at different temperatures, each resistor's contribution has to be calculated separately before combining, because a single equivalent resistance can no longer stand in for both.</p>
+
+            <h2>4. Thermal noise through an RC low-pass filter</h2>
+            <p>A single-pole RC filter has an <em>equivalent noise bandwidth</em> that is wider than its 3&nbsp;dB bandwidth by a factor of &pi;/2, which leads to a simple result:</p>
+            <div class="formula-box">
+                <span class="label">Output noise power (independent of R)</span>
+                P<sub>out</sub> = <span class="frac"><span class="num">k<sub>B</sub>T</span><span class="den">C</span></span> &nbsp;&nbsp;&rArr;&nbsp;&nbsp; V<sub>RMS</sub> = <span class="rad tall"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L2 11 L5 19.5 L10 0.7" fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><span class="rb"><span class="frac"><span class="num">k<sub>B</sub>T</span><span class="den">C</span></span></span></span>
+            </div>
+            <div class="callout">This is the well-known <strong>"kT/C noise"</strong> result: the output noise of an RC network depends only on the capacitor value, not the resistance. It is a basic constraint in the design of low-noise analog front ends and sampled-data circuits (e.g. switched-capacitor sensor readouts).</div>
+
+            <h2>5. Shot noise</h2>
+            <p>Arises only where charge must cross a potential barrier (a p&ndash;n junction being the typical case), since the charge transfer there is discrete rather than continuous. In a plain wire or resistor, by contrast, charge moves freely as a continuum. Its spectral density is proportional to the DC bias current: S<sub>I</sub> = 2qI<sub>DC</sub>, Since it is a counting process, it is Poisson-distributed, but for the large currents in real circuits the central limit theorem makes it converge to Gaussian noise.</p>
+            <p>It is usually small compared to thermal noise, so why consider it? Shot noise matters most when a <em>small signal</em> of interest rides on top of a large DC bias. This is common in amplifying circuits: the bias current itself is of no interest, but the shot noise it carries can be comparable to the small signal. At high frequencies and low temperatures, thermal noise (which drops with temperature) and 1/f noise (which drops with frequency) both become small, leaving shot noise, which depends on neither, as the dominant source.</p>
+
+            <h2>6. 1/f (flicker) noise</h2>
+            <p>It dominates at low frequencies and falls off as frequency increases, dropping below the frequency-independent thermal/shot noise floor at the device's <strong>corner frequency</strong>. The lower the corner frequency, the better the device (the voltage-noise and current-noise corner frequencies are not necessarily the same). Resistors can have flicker noise too ("excess noise"), though well-made thin-film resistors keep it very low; wirewound and carbon-composition resistors are worse.</p>
+            <div class="formula-box">
+                <span class="label">Noise power in a given band [f<sub>1</sub>, f<sub>2</sub>]</span>
+                P<sub>avg</sub> = KI<sub>DC</sub><sup>&alpha;</sup>&middot;ln<span class="par">(</span><span class="frac"><span class="num">f<sub>2</sub></span><span class="den">f<sub>1</sub></span></span><span class="par">)</span>
+            </div>
+            <p>Unlike thermal or shot noise, this depends on the actual frequency band chosen, not just its width. Doubling both f<sub>1</sub> and f<sub>2</sub> changes the noise power even though &Delta;f is unchanged. This is a common mistake when applying the bandwidth-only thinking from thermal noise to 1/f noise.</p>
+
+            <h2>7. Burst ("popcorn") noise</h2>
+            <p>Sudden, discrete steps in offset voltage or current, caused by charge carriers trapping and detrapping at material defect sites. With today's cleaner materials and fabrication, it is mostly a concern of older semiconductor processes.</p>
+
+            
+        </div>
+        <div class="download-bar"><a href="noise-in-instrumentation-part-2.pdf" class="btn">Download slides (PDF) &darr;</a><a href="teaching.html" class="btn alt">All lectures</a></div>
+        <div class="lecture-nav"><a href="lecture-1-noise-part-1.html">&larr; Lecture 1: Introduction</a><a class="next" href="lecture-3-noise-part-3.html">Lecture 3: Diode and BJT Noise Models &rarr;</a></div>
+    </div>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+</body>
+</html>

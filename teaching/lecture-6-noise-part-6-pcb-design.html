@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 6: Noise Part 6: Best Practices for PCB Design | Kasun Pathirage</title>
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #e60000;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 2rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .course-meta {
+            font-size: 0.95rem;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 2rem 0;
+        }
+        .lecture-card {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .lecture-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            color: var(--primary);
+            line-height: 1.35;
+        }
+        .lecture-topics {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.25rem;
+        }
+        .lecture-card h4 {
+            font-size: 1.02rem;
+            color: var(--primary);
+            margin: 1.5rem 0 0.5rem 0;
+        }
+        .lecture-card h4:first-of-type {
+            margin-top: 0.5rem;
+        }
+        .lecture-card p, .lecture-card li {
+            font-size: 0.95rem;
+        }
+        .lecture-card ul {
+            padding-left: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        .lecture-card li {
+            margin-bottom: 0.35rem;
+        }
+        .formula-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0;
+            font-family: Cambria, "Times New Roman", serif;
+            font-size: 1rem;
+            color: #222;
+        }
+        .formula-box .label {
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 0.2rem;
+        }
+        .worked-example {
+            background: #fbfbfb;
+            border-left: 3px solid var(--secondary);
+            padding: 0.9rem 1.1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .worked-example p { margin: 0.4rem 0; }
+        .callout {
+            background: #fff8e6;
+            border: 1px solid #f0e0b0;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #5a4a1a;
+        }
+        .diagram-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem 0.75rem 0.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .diagram-box svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            min-width: 560px;
+        }
+        .diagram-caption {
+            font-size: 0.78rem;
+            color: #888;
+            text-align: center;
+            margin: 0.5rem 0 0.25rem;
+        }
+        .media-box {
+            background: #eee;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            margin: 1rem 0;
+            color: #888;
+            font-size: 0.95rem;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: #fff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: normal;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn:hover {
+            background-color: var(--secondary);
+            color: #fff;
+            text-decoration: none;
+        }
+        .btn.disabled {
+            background-color: #ccc;
+            cursor: default;
+            pointer-events: none;
+        }
+    
+        .lead { font-size: 1.02rem; color: #333; }
+        .page-nav { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem 1rem; margin-bottom:1.5rem; }
+        .page-nav .back-link { margin-bottom:0; }
+        .chips { display:flex; flex-wrap:wrap; gap:.4rem .5rem; margin:.25rem 0 1.25rem; }
+        .chip { font-size:.78rem; background:#f1f1f5; color:#444; border-radius:12px; padding:.2rem .65rem; }
+        .toc { background:#fafafa; border:1px solid #e5e5e5; border-radius:6px; padding:.85rem 1.25rem; margin:1.25rem 0 .5rem; font-size:.92rem; }
+        .toc ol { margin:.45rem 0 0; padding-left:1.25rem; columns:2; column-gap:2rem; }
+        .toc li { margin-bottom:.2rem; break-inside:avoid; }
+        .toc a { color:#333; text-decoration:none; } .toc a:hover { color:var(--secondary); text-decoration:underline; }
+        .lecture-page h2 { font-size:1.3rem; margin:2.25rem 0 .6rem; padding-top:.5rem; border-top:1px solid #e8e8e8; color:var(--primary); scroll-margin-top:1rem; }
+        .lecture-page h3 { font-size:1.05rem; margin:1.5rem 0 .4rem; color:var(--primary); }
+        .lecture-page p, .lecture-page li { font-size:.97rem; line-height:1.6; }
+        .lecture-page ul, .lecture-page ol { padding-left:1.3rem; }
+        .lecture-page li { margin-bottom:.4rem; }
+        .formula-box { overflow-x:auto; line-height:1.75; }
+        .worked-example, .callout { font-size:.95rem; }
+        .small { font-size:.82rem !important; color:#777; }
+        table.cmp { width:100%; border-collapse:collapse; font-size:.86rem; margin:1rem 0; display:block; overflow-x:auto; }
+        table.cmp th, table.cmp td { border:1px solid #e0e0e0; padding:.45rem .65rem; text-align:left; vertical-align:top; line-height:1.45; }
+        table.cmp th { background:#f4f4f6; font-weight:600; }
+        table.cmp td.hl { background:#fff0f0; font-weight:600; color:#a00000; }
+        .diagram-box { padding:1rem .75rem .5rem; }
+        .diagram-box svg { min-width:560px; }
+        .download-bar { display:flex; flex-wrap:wrap; gap:.6rem; align-items:center; margin:1.25rem 0 0; }
+        .btn.alt { background:#fff; color:var(--primary); border:1px solid #bbb; }
+        .btn.alt:hover { background:var(--secondary); color:#fff; border-color:var(--secondary); }
+        .lecture-nav { display:flex; justify-content:space-between; gap:1rem; margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid #ddd; flex-wrap:wrap; }
+        .lecture-nav a { color:var(--secondary); text-decoration:none; font-weight:600; font-size:.92rem; max-width:48%; }
+        .lecture-nav a:hover { text-decoration:underline; }
+        .lecture-nav .next { margin-left:auto; text-align:right; }
+        .series-label { font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:#888; font-weight:600; margin:2rem 0 .75rem; }
+        .lecture-row .num { display:inline-block; min-width:2rem; color:var(--secondary); font-weight:700; }
+        .lecture-row .btn-row { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.75rem; }
+        @media (max-width:640px){ .container{margin:1rem;padding:1.25rem;} .toc ol{columns:1;} .lecture-nav a{max-width:100%;} }
+    
+        /* stacked fractions and radicals for equations */
+        .frac { display:inline-flex; flex-direction:column; align-items:stretch; vertical-align:middle; margin:0 .18em; text-align:center; line-height:1.25; }
+        .frac > .num { padding:0 .3em .1em; border-bottom:1.4px solid currentColor; }
+        .frac > .den { padding:.1em .3em 0; }
+        sup .frac, sub .frac { font-size:1em; }
+        .rad { display:inline-block; position:relative; padding-left:.72em; white-space:nowrap; }
+        .rad > .rs { position:absolute; left:0; top:0; width:.72em; height:100%; overflow:visible; }
+        .rad > .rb { display:inline-block; border-top:1.4px solid currentColor; padding:0 .15em; line-height:1.3; }
+        .rad.tall { vertical-align:middle; }
+        .rad.tall > .rb { display:block; padding-top:.15em; }
+        .par { font-size:1.7em; font-weight:200; line-height:0; vertical-align:-.1em; }
+        .formula-box .frac, .worked-example .frac { font-size:1.02em; }
+    </style>
+
+</head>
+<body>
+    <div class="container ">
+        <div class="page-nav"><a href="teaching.html" class="back-link">&larr; All lectures</a><a href="../index.html" class="back-link">Portfolio &rarr;</a></div>
+        <div class="series-label">BM3110 Electronic Instrumentation &middot; Lecture 6 of 7</div>
+        <h1>Noise and Interference in Instrumentation, Part 6: Best Practices for PCB Design</h1>
+        <div class="course-meta">University of Moratuwa &middot; Dept. of Biomedical Engineering &middot; Semester 5 &middot; Fall 2026 &middot; 15 slides</div>
+        <div class="chips"><span class="chip">layout process</span><span class="chip">crosstalk</span><span class="chip">traces</span><span class="chip">shared ground impedance</span><span class="chip">guard rings</span><span class="chip">decoupling capacitors</span><span class="chip">splitting analog and digital</span><span class="chip">ECG PCB assignment and power-tree design rationale</span></div>
+        <div class="download-bar"><a href="noise-in-instrumentation-part-6-pcb-design.pdf" class="btn">Download slides (PDF) &darr;</a></div>
+        <hr>
+        <div class="lecture-page">
+
+<p class="lead">Interference theory only helps if it holds up on a real board. This lecture covers the PCB layout practices that keep sensitive analog nodes quiet and the physics behind each one. It finishes with a <strong>group assignment</strong> (laying out a battery-powered wearable ECG acquisition device) and the reasoning behind its power-supply architecture.</p>
+
+<div class="toc"><strong>On this page</strong>
+<ol>
+<li><a href="#s1">Layout principles and process</a></li>
+<li><a href="#s2">Crosstalk and traces</a></li>
+<li><a href="#s3">Shared ground impedance</a></li>
+<li><a href="#s4">Guard rings</a></li>
+<li><a href="#s5">Decoupling (bypass) capacitors</a></li>
+<li><a href="#s6">Splitting the PCB: analog and digital</a></li>
+<li><a href="#s7">Assignment: wearable ECG board</a></li>
+<li><a href="#s8">Design rationale: power tree, ADC and reference</a></li>
+</ol></div>
+
+<h2 id="s1">1. Layout principles and process</h2>
+<p>The lecture summarises PCB considerations for instrumentation in four groups:</p>
+<ul>
+<li><strong>Analog paths and sensitive nodes:</strong> keep analog signal paths short; separate analog and digital signals and portions of the board; keep inputs and outputs separate (and shield sensitive parts if needed) to prevent feedback and oscillation; remember that parallel components can couple electromagnetically (crosstalk); do not route sensitive nodes under or between other components.</li>
+<li><strong>Grounding:</strong> provide good ground return paths and high-frequency bypassing; minimise inductance (vital for high-speed circuits); maintain an effective ground plane and fill void areas on signal layers with ground fill.</li>
+<li><strong>Power:</strong> bring power in near the <em>outputs</em>, so supply currents do not flow near the inputs of amplifying stages; pay close attention to how AGND and DGND connect.</li>
+<li><strong>General:</strong> through-hole parts interact with every layer in a multi-layer design. Surface-mount parts have less inductance, but the via placement still sets the loop.</li>
+</ul>
+<p>The suggested <strong>layout process</strong>: review the schematic and mark sensitive areas, sensitive analog paths, EMI and interference sources and heat sources; fix connector positions and plan part placement <em>before</em> routing; and spend time on planning, prioritising the analog portion first, then power routing and planes, then bypass capacitors and other critical components. Choose packages that make layout easier (e.g. SMD for short connections).</p>
+
+<h2 id="s2">2. Crosstalk and traces</h2>
+<p><strong>Crosstalk</strong> is the unwanted transfer of signals between adjacent conductors, through capacitive or inductive coupling (the mechanisms of Part 5). It is most visible on parallel signal paths and high-speed data lines, and is mitigated by increasing the spacing between conductors, using twisted-pair cables, and differential signalling.</p>
+<p>Traces are more than just wires: they can act as <strong>antennas</strong> and have transmission-line properties (inductance and resistance). Power traces should therefore be wide, and connections and terminations (vias) should be made properly.</p>
+
+<h2 id="s3">3. Shared ground impedance</h2>
+<p>Shared ground connections create <strong>conductive coupling</strong> between sub-circuits: the return currents of both flow through the same impedance, making the ground reference of the sensitive circuit fluctuate. The lecture contrasts two PCB implementations of the same schematic:</p>
+<ul>
+<li><strong>Avoid:</strong> a long shared return, which gives a larger ground loop and a shared impedance.</li>
+<li><strong>Preferred:</strong> a direct via to the ground plane for each part, which gives the shortest return, a minimal loop and no shared return impedance.</li>
+</ul>
+
+<h2 id="s4">4. Guard rings</h2>
+<p>Contaminants, moisture or high-voltage traces on a PCB cause stray nanoampere currents to leak across the board surface. If that leakage reaches a highly sensitive, high-impedance input node, it corrupts the signal. The fix is a dedicated copper trace around the sensitive node, called a <strong>guard ring</strong>:</p>
+<ul>
+<li><strong>Passive</strong> guard rings are simply grounded, acting as a shield against capacitive coupling.</li>
+<li><strong>Active</strong> guard rings are driven by an op-amp buffer to exactly the same voltage as the sensitive input trace. Because the potential between ring and input node is identical, the voltage difference is zero, so by Ohm&rsquo;s law <em>no</em> leakage current can cross the gap. Stray current leaking from external noise sources hits the guard ring first and is shunted away through the buffer&rsquo;s low-impedance output before it can reach the critical signal.</li>
+</ul>
+
+<h2 id="s5">5. Decoupling (bypass) capacitors</h2>
+<p>ICs draw current in short, sharp pulses whenever they switch (logic, MCUs, ADCs, even op-amps), but the supply reaches the IC through traces that have inductance. Because <i>v</i> = <i>L</i> <span class="frac"><span class="num">d<i>i</i></span><span class="den">d<i>t</i></span></span>, a pulse that is fast enough makes the supply collapse at the IC pin:</p>
+<div class="worked-example"><p><strong>Example.</strong> With 10 nH of trace inductance and a 100 mA current step in 1 ns: <i>&Delta;V</i> = <span class="frac"><span class="num">10 nH &times; 100 mA</span><span class="den">1 ns</span></span> = <strong>1 V</strong> dip on the IC supply.</p></div>
+<div class="diagram-box"><svg viewBox="0 0 780 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Decoupling capacitor: without one, the IC current pulse flows in a large loop through the trace inductance and the supply at the IC pin dips; with a capacitor beside the IC the loop is small and the supply stays clean."><text x="185" y="22" text-anchor="middle" font-size="13.5" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">Without decoupling</text><rect x="10" y="46" width="56" height="168" rx="4" fill="#f2f2f2" stroke="#999" stroke-width="1.4"/><text x="38" y="129" text-anchor="middle" font-size="12.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">LDO</text><rect x="310" y="46" width="56" height="168" rx="4" fill="#f2f2f2" stroke="#999" stroke-width="1.4"/><text x="338" y="129" text-anchor="middle" font-size="12.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">IC</text><line x1="66.0" y1="70.0" x2="130.0" y2="70.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><path d="M130,70 a9,9 0 0 1 18,0 a9,9 0 0 1 18,0 a9,9 0 0 1 18,0 " fill="none" stroke="#333" stroke-width="1.6"/><line x1="184.0" y1="70.0" x2="310.0" y2="70.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="66.0" y1="190.0" x2="310.0" y2="190.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><text x="157" y="54" text-anchor="middle" font-size="12.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">L<tspan font-size="9.5" dy="3">trace</tspan></text><text x="70" y="62" text-anchor="start" font-size="10.5" fill="#777" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">V<tspan font-size="9" dy="3">DD</tspan></text><text x="70" y="206" text-anchor="start" font-size="10.5" fill="#777" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">GND</text><rect x="70" y="84" width="238" height="92" rx="3" fill="none" stroke="#e60000" stroke-width="1.8" stroke-dasharray="6 3"/><text x="185" y="228" text-anchor="middle" font-size="12" fill="#e60000" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">large loop through the trace inductance</text><text x="575" y="22" text-anchor="middle" font-size="13.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">With a decoupling capacitor</text><rect x="400" y="46" width="56" height="168" rx="4" fill="#f2f2f2" stroke="#999" stroke-width="1.4"/><text x="428" y="129" text-anchor="middle" font-size="12.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">LDO</text><rect x="700" y="46" width="56" height="168" rx="4" fill="#f2f2f2" stroke="#999" stroke-width="1.4"/><text x="728" y="129" text-anchor="middle" font-size="12.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">IC</text><line x1="456.0" y1="70.0" x2="520.0" y2="70.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><path d="M520,70 a9,9 0 0 1 18,0 a9,9 0 0 1 18,0 a9,9 0 0 1 18,0 " fill="none" stroke="#333" stroke-width="1.6"/><line x1="574.0" y1="70.0" x2="700.0" y2="70.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="456.0" y1="190.0" x2="700.0" y2="190.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><text x="547" y="54" text-anchor="middle" font-size="12.5" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">L<tspan font-size="9.5" dy="3">trace</tspan></text><text x="460" y="62" text-anchor="start" font-size="10.5" fill="#777" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">V<tspan font-size="9" dy="3">DD</tspan></text><text x="460" y="206" text-anchor="start" font-size="10.5" fill="#777" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">GND</text><line x1="650.0" y1="70.0" x2="650.0" y2="128.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="650.0" y1="136.0" x2="650.0" y2="190.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="637.0" y1="128.0" x2="663.0" y2="128.0" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><line x1="637.0" y1="136.0" x2="663.0" y2="136.0" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><circle cx="650" cy="70" r="3" fill="#333"/><circle cx="650" cy="190" r="3" fill="#333"/><text x="628" y="136" text-anchor="end" font-size="12.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">C<tspan font-size="9.5" dy="3">dec</tspan></text><polyline points="650,80 650,80" fill="none" stroke="#1f5fa8" stroke-width="0" stroke-linejoin="round" stroke-linecap="round"/><rect x="650" y="80" width="44" height="100" rx="3" fill="none" stroke="#1f5fa8" stroke-width="1.8" stroke-dasharray="6 3"/><text x="575" y="228" text-anchor="middle" font-size="12" fill="#1f5fa8" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">small loop: fast current comes from the capacitor</text></svg><div class="diagram-caption">Fig. 1: Without decoupling, the pulse current flows in a large loop through the trace inductance; a capacitor beside the IC supplies it through a tiny loop (redrawn from the lecture slides)</div></div>
+<p>A decoupling capacitor from the supply pin to ground, right next to the IC, is a <strong>local charge reservoir</strong>: fast current pulses come from the capacitor through a tiny loop, and the regulator only has to top it up slowly. Because of its low impedance at high frequency, it decouples in both directions: it keeps the IC&rsquo;s switching noise off the shared supply rail, and it shunts rail noise to ground before it reaches the IC (adding to the IC&rsquo;s PSRR).</p>
+<h3>Choosing and placing capacitors</h3>
+<ul>
+<li>Add a <strong>100 nF ceramic</strong> capacitor at every supply pin, plus a <strong>1&ndash;10 &micro;F bulk</strong> capacitor per rail or IC group for slower, larger current demands.</li>
+<li>For the assignment: 100 nF at every IC supply pin (INA, ADC, MCU and LDO outputs (plus any datasheet-specified values). The <strong>ADC reference pin needs its own decoupling</strong> (datasheet value) because reference noise goes straight into every sample. AVDD capacitors return to AGND, DVDD capacitors to DGND.</li>
+<li><strong>Placement matters more than value:</strong> do <em>not</em> put vias between the bypass capacitor and the active device. A via adds inductance and defeats the purpose of the capacitor, which is to provide a low-inductance path for fast current. Route vias into the bypass capacitor and then into the active component; use wide traces; keep them as close as possible; and put the bypass capacitor on the same layer as the active component.</li>
+</ul>
+
+<h2 id="s6">6. Splitting the PCB: analog and digital</h2>
+<p>Partition the board into distinct <strong>analog and digital regions</strong> whenever the layout allows, placing analog and digital parts in separate regions. Split the <em>ground plane</em> only if necessary. A continuous ground is often the better choice, since splitting it can force long return-current detours. If it must be split, join the grounds at <strong>one point, typically under the ADC</strong>.</p>
+
+<h2 id="s7">7. Assignment: wearable ECG board</h2>
+<p>The group assignment (two students per group) evaluates how well you can select and place components and lay out a PCB to minimise noise and obtain clean ECG signals from a <strong>battery-powered wearable ECG acquisition device</strong>. Additional components (e.g. filters) may be added, but the blocks shown are mandatory: instrumentation amplifier (INA), ADC, microprocessor with BLE, reference voltage, driven-right-leg (DRL) circuit, and the power chain of Li-ion battery, buck-boost converter, and LDOs for analog and digital rails.</p>
+
+<h2 id="s8">8. Design rationale: power tree, ADC and reference</h2>
+<p>The assignment slides pose a series of &ldquo;why?&rdquo; questions. The answers describe a power-supply and conversion architecture designed around noise.</p>
+<div class="diagram-box"><svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Power tree of the battery-powered ECG device: a Li-ion battery feeds a buck-boost converter; its output splits into a ferrite bead and analog LDO powering AVDD for the INA, ADC and reference, and a separate digital LDO powering DVDD for the MCU and BLE radio."><rect x="285" y="10" width="190" height="46" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/><text x="380.0" y="30.0" text-anchor="middle" font-size="12.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">Li-ion battery</text><text x="380.0" y="47.0" text-anchor="middle" font-size="11" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">3.0&ndash;4.2 V</text><rect x="285" y="84" width="190" height="52" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/><text x="380.0" y="107.0" text-anchor="middle" font-size="12.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">Buck-boost converter</text><text x="380.0" y="124.0" text-anchor="middle" font-size="11" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">switching at 1&ndash;2 MHz</text><line x1="380.0" y1="56.0" x2="380.0" y2="76.0" stroke="#333" stroke-width="1.8" stroke-linecap="round"/><polygon points="380,84 376.4,76.0 383.6,76.0" fill="#333"/><text x="500" y="108" text-anchor="start" font-size="11" fill="#c26500" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">ripple &asymp; 20 mV</text><line x1="380.0" y1="136.0" x2="380.0" y2="160.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><line x1="170.0" y1="160.0" x2="590.0" y2="160.0" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><circle cx="380" cy="160" r="3.5" fill="#333"/><line x1="170.0" y1="160.0" x2="170.0" y2="176.0" stroke="#1f5fa8" stroke-width="1.8" stroke-linecap="round"/><polygon points="170,184 166.4,176.0 173.6,176.0" fill="#1f5fa8"/><line x1="590.0" y1="160.0" x2="590.0" y2="176.0" stroke="#c26500" stroke-width="1.8" stroke-linecap="round"/><polygon points="590,184 586.4,176.0 593.6,176.0" fill="#c26500"/><rect x="75" y="184" width="190" height="40" rx="4" fill="#fff" stroke="#1f5fa8" stroke-width="1.8"/><text x="170.0" y="208.0" text-anchor="middle" font-size="12.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">Ferrite bead + C</text><line x1="170.0" y1="224.0" x2="170.0" y2="236.0" stroke="#1f5fa8" stroke-width="1.8" stroke-linecap="round"/><polygon points="170,244 166.4,236.0 173.6,236.0" fill="#1f5fa8"/><rect x="75" y="244" width="190" height="40" rx="4" fill="#f1f6fc" stroke="#1f5fa8" stroke-width="1.8"/><text x="170.0" y="268.0" text-anchor="middle" font-size="12.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">LDO (analog)</text><line x1="170.0" y1="284.0" x2="170.0" y2="296.0" stroke="#1f5fa8" stroke-width="1.8" stroke-linecap="round"/><polygon points="170,304 166.4,296.0 173.6,296.0" fill="#1f5fa8"/><rect x="60" y="304" width="220" height="46" rx="4" fill="#fff" stroke="#1f5fa8" stroke-width="1.8"/><text x="170.0" y="324.0" text-anchor="middle" font-size="12.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">AVDD / AGND</text><text x="170.0" y="341.0" text-anchor="middle" font-size="11" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">INA, ADC, V<tspan font-size="9" dy="3">ref</tspan></text><rect x="495" y="184" width="190" height="40" rx="4" fill="#fdf3e8" stroke="#c26500" stroke-width="1.8"/><text x="590.0" y="208.0" text-anchor="middle" font-size="12.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">LDO (digital)</text><line x1="590.0" y1="224.0" x2="590.0" y2="296.0" stroke="#c26500" stroke-width="1.8" stroke-linecap="round"/><polygon points="590,304 586.4,296.0 593.6,296.0" fill="#c26500"/><rect x="480" y="304" width="220" height="46" rx="4" fill="#fff" stroke="#c26500" stroke-width="1.8"/><text x="590.0" y="324.0" text-anchor="middle" font-size="12.5" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-weight="600">DVDD / DGND</text><text x="590.0" y="341.0" text-anchor="middle" font-size="11" fill="#555" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">MCU + BLE radio</text><text x="380" y="266" text-anchor="middle" font-size="11" fill="#888" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">isolation</text><line x1="300" y1="276" x2="460" y2="276" stroke="#8a99a3" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="4 3"/><text x="590" y="358" text-anchor="middle" font-size="10" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif"></text><text x="735" y="332" text-anchor="middle" font-size="10" fill="#1a1a1a" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif"></text><text x="604" y="268" text-anchor="start" font-size="11" fill="#c26500" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">&Delta;I bursts every</text><text x="604" y="282" text-anchor="start" font-size="11" fill="#c26500" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">7.5&ndash;100 ms</text></svg><div class="diagram-caption">Fig. 2: Power tree for the wearable ECG board (redrawn from the lecture slides)</div></div>
+<h3>Why a buck-boost converter?</h3>
+<p>A Li-ion cell ranges from 4.2 V fully charged to about 3 V fully discharged. To hold 3.3 V we must step <em>down</em> while the battery is full and step <em>up</em> when it is nearly flat, and a buck-boost does both.</p>
+<h3>Why a separate ADC rather than the MCU&rsquo;s?</h3>
+<ul>
+<li>The MCU&rsquo;s ADC is fine, but the MCU has a clock, BLE RF and so on, which can couple into the ADC measurements; a separate ADC sits in the quiet analog area.</li>
+<li><strong>Resolution versus DC offset:</strong> each electrode&ndash;skin interface has a half-cell potential and the difference between two electrodes can be &asymp; 300 mV DC, which is 300 times the 1 mV ECG riding on top. A 12-bit MCU ADC with a 3.3 V range has a step of <i>q</i> = <span class="frac"><span class="num">3.3</span><span class="den">2<sup>12</sup></span></span> &asymp; 0.8 mV, about the whole ECG (1 LSB). Getting 1 &micro;V resolution at the input needs a front-end gain of &asymp; 800, at which point the DC offset saturates the amplifier. (You would need AC coupling, high-pass filters and several gain stages, each adding noise, parts and slow recovery after motion.) A 24-bit ADC has a far smaller step, so a front-end gain of about 6 is sufficient.</li>
+<li>The MCU&rsquo;s ADC would be good enough only if you need the heart rate alone, with an analog front end that already provides gain and high-pass filtering.</li>
+</ul>
+<h3>Why emphasise the reference voltage?</h3>
+<p>If the reference fluctuates, all digitised samples fluctuate with it (see Part 5).</p>
+<h3>Why another (linear) regulator after the switching regulator?</h3>
+<p>The buck-boost leaves tens of mV of switching ripple at 1&ndash;2 MHz, while an ECG signal may be only 1 mV. A linear regulator (LDO) cleans up the ripple by attenuating it by its power-supply rejection ratio:</p>
+<div class="formula-box"><i>v</i><sub>out,ripple</sub> = <i>v</i><sub>in,ripple</sub> &times; 10<sup>&minus;<span class="frac"><span class="num">PSRR</span><span class="den">20</span></span></sup> &emsp;(e.g. 20 mV with 40 dB of PSRR at 1 MHz leaves 0.2 mV)</div>
+<p>PSRR is frequency-dependent (check the regulator datasheet; it is usually high at low frequencies and drops at MHz), so choose an LDO that has high PSRR <em>at the switching frequency of the chosen buck-boost</em>. Because the device is battery powered, keep the LDO drop-out voltage as low as possible.</p>
+<h3>Why two LDOs?</h3>
+<ul>
+<li>The MCU and BLE radio draw current in <strong>pulses</strong> (&Delta;<i>I</i>). Through a shared impedance <i>Z</i> (a single LDO serving both analog and digital sides) this gives &Delta;<i>V</i> = &Delta;<i>I</i> &middot; <i>Z</i> on that rail: a 10 mA burst through 0.1 &Omega; puts <strong>1 mV</strong> straight onto the analog supply.</li>
+<li>With a separate analog LDO, whose PSRR is about 60 dB at low frequency, that falls to about <strong>1 &micro;V</strong>. This keeps digital return currents and supply noise out of the analog front end.</li>
+<li>BLE bursts repeat every 7.5&ndash;100 ms (about 10&ndash;133 Hz), which is <em>inside the ECG band</em>, so filtering cannot remove them afterwards. They have to be prevented from entering the analog section in the first place.</li>
+</ul>
+
+        </div>
+        <div class="download-bar"><a href="noise-in-instrumentation-part-6-pcb-design.pdf" class="btn">Download slides (PDF) &darr;</a><a href="teaching.html" class="btn alt">All lectures</a></div>
+        <div class="lecture-nav"><a href="lecture-5-noise-part-5.html">&larr; Lecture 5: Interference, Coupling and Mitigation</a><a class="next" href="lecture-7-ecg-front-end.html">Lecture 7: Designing an ECG Front-End &rarr;</a></div>
+    </div>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+</body>
+</html>

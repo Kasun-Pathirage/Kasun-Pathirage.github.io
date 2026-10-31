@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Automated a manual 80&quot; window blind in under 48 hours, driven by a salvaged car power window motor with custom circuitry, Alexa integration, 3D printed linkages, and custom end-stops.">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Automated Window Blind | Kasun Pathirage">
+    <meta property="og:description" content="Automated a manual 80&quot; window blind in under 48 hours, driven by a salvaged car power window motor with custom circuitry, Alexa integration, 3D printed linkages, and custom end-stops.">
+    <meta property="og:site_name" content="Kasun Pathirage">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Automated Window Blind | Kasun Pathirage</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f9; color: #333; line-height: 1.6; }
+        .container { max-width: 800px; margin: 3rem auto; padding: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #1a1a1a; margin-top: 0; }
+        h2 { color: #1a1a1a; }
+        .back-link { display: inline-block; margin-bottom: 2rem; color: #e60000; text-decoration: none; font-weight: bold; }
+        .back-link:hover { text-decoration: underline; }
+        .meta { color: #555; }
+        .construction { background: #fff4e5; border-left: 4px solid #e60000; padding: 0.9rem 1.2rem; margin: 1.5rem 0; border-radius: 4px; }
+        .construction strong { color: #e60000; }
+        .figure { margin: 1.5rem 0; text-align: center; }
+        .figure img, .figure video { max-width: 100%; border-radius: 6px; display: block; margin: 0 auto; }
+        .figure figcaption { font-size: 0.9rem; color: #666; margin-top: 0.5rem; }
+        .figure-grid { display: grid; gap: 1rem; margin: 1.5rem 0; }
+        .figure-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .figure-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .figure-grid .figure { margin: 0; }
+        .figure-grid img { width: 100%; height: 220px; object-fit: cover; }
+        .figure-grid img.cutout { height: 260px; object-fit: contain; }
+        @media (max-width: 600px) { .container { margin: 1rem; padding: 1.25rem; } .figure-grid.cols-2, .figure-grid.cols-3 { grid-template-columns: 1fr; } }
+    /* 3D viewer, styled to match the site's existing media-box convention */
+    .viewer-box {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 6px;
+        margin: 1.5rem 0;
+        overflow: hidden;
+    }
+    .viewer-tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid #eee; background: #fafafa; }
+    .viewer-tab {
+        font-family: inherit; font-size: 0.78rem; background: none; border: none; cursor: pointer;
+        color: #555; padding: 0.5rem 0.75rem; border-right: 1px solid #eee;
+    }
+    .viewer-tab:last-child { border-right: none; }
+    .viewer-tab.is-active { color: #e60000; font-weight: bold; background: #fff; }
+    .viewer-stage {
+        position: relative; width: 100%; height: clamp(220px, 40vh, 380px); background: #eee;
+        background-image:
+            linear-gradient(#e2e2e2 1px, transparent 1px),
+            linear-gradient(90deg, #e2e2e2 1px, transparent 1px);
+        background-size: 26px 26px;
+    }
+    .viewer-stage canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+    .viewer-stage canvas:active { cursor: grabbing; }
+    .viewer-hint {
+        position: absolute; left: 12px; bottom: 10px; font-size: 0.72rem; letter-spacing: 0.02em;
+        color: #888; pointer-events: none;
+    }
+    .viewer-loading {
+        position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        font-size: 0.82rem; color: #888; background: #eee;
+    }
+    .viewer-loading[hidden] { display: none; }
+    .viewer-caption { padding: 0.9rem 1.1rem; font-size: 0.88rem; color: #555; border-top: 1px solid #eee; }
+    .viewer-caption p { margin: 0; }
+    .viewer-downloads { padding: 0 1.1rem 1rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
+    .viewer-downloads a { font-size: 0.82rem; color: #e60000; text-decoration: none; font-weight: 600; white-space: nowrap; }
+    .viewer-downloads a:hover { text-decoration: underline; }
+    pre { background: #1e1e1e; color: #e6e6e6; padding: 1rem; border-radius: 6px; overflow: auto; max-height: 340px; font-size: .76rem; line-height: 1.45; }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+    p code, li code { background: #eee; color: #a30000; padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.88em; }
+    .downloads-list a { color: #e60000; font-weight: 600; text-decoration: none; }
+    .downloads-list a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">← Back to Portfolio</a>
+        <h1>Rapid Prototyping: 80" Automated Window Blind</h1>
+        <p class="meta"><strong>Date:</strong> September 2024&nbsp; |&nbsp; <strong>Tech:</strong> Custom Circuitry, 3D Printing, Amazon Alexa API, Sinric Pro API</p>
+
+        <div class="construction">
+            <strong>🚧 Page under construction.</strong> This is a short teaser. The firmware and pulley CAD are up below; a full write-up of the design process is on the way.
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 2rem 0;">
+
+        <h2>Project Overview</h2>
+        <p>I turned a manual 80" window blind into a voice-controlled one in under 48 hours. To do this, I used a salvaged car power window motor to pull the blind's lift cord, a Wi-Fi microcontroller to link it to Alexa through the Sinric Pro API, and 3D printed linkages to tie the motor to the existing hardware. Saying "Alexa, open the blinds" is all it takes.</p>
+
+        <figure class="figure">
+            <video src="media/blinds-demo-2025.mp4" poster="images/cover.jpg" controls="" playsinline="" preload="metadata"></video>
+            <figcaption>The first install raising and lowering an 80" blind on command.</figcaption>
+        </figure>
+
+        <h2>Under the Hood</h2>
+        <p>I put all the electronics on a single hand-wired perfboard: an ESP8266 (NodeMCU, ESP-12F) for Wi-Fi and control logic, an IBT-4 H-bridge to drive the motor in both directions, and an adjustable high-current buck converter to step the supply down for the electronics. I also added custom end-stops that tell the controller when the blind is fully open or closed, so the motor stops on its own.</p>
+
+        <div class="figure-grid cols-2">
+            <figure class="figure">
+                <img class="cutout" src="images/control-board.webp" alt="Perfboard with an ESP8266 NodeMCU, an IBT-4 H-bridge motor driver and a buck converter" loading="lazy">
+                <figcaption>Control board: ESP8266, IBT-4 H-bridge, buck converter.</figcaption>
+            </figure>
+            <figure class="figure">
+                <img class="cutout" src="images/ir-sensor.webp" alt="Small IR sensor module with twisted lead wires" loading="lazy">
+                <figcaption>IR sensor module for end-stop detection.</figcaption>
+            </figure>
+        </div>
+
+        <h2>The Drive: Power Window Motor and Pulley</h2>
+        <p>To wind the blind's lift cord, I designed and 3D printed a custom pulley for the salvaged power window motor. I gave the pulley grooves that act as provisions for ball bearings. A deeper dive into the pulley design is coming soon.</p>
+
+        <div class="figure-grid cols-2">
+            <figure class="figure">
+                <img class="cutout" src="images/pulley-on-motor.webp" alt="3D printed pulley mounted on the salvaged car power window motor" loading="lazy">
+                <figcaption>3D printed pulley mounted on the power window motor.</figcaption>
+            </figure>
+            <figure class="figure">
+                <img class="cutout" src="images/pulley-top.webp" alt="Top view of the 3D printed pulley showing its grooves" loading="lazy">
+                <figcaption>Top view of the pulley, showing the grooves for ball bearings.</figcaption>
+            </figure>
+        </div>
+
+        
+
+        <h2 id="viewer">Pulley CAD</h2>
+        <p>I printed the pulley as three pieces: a shaft, a flange piece and a separate cap. Drag to rotate, scroll to zoom, and grab the STL or native SolidWorks part for any piece below the viewer.</p>
+
+        <div class="viewer-box">
+            <div class="viewer-tabs" role="tablist">
+                <button class="viewer-tab is-active" data-model="assembly" role="tab" aria-selected="true">Full assembly</button>
+                <button class="viewer-tab" data-model="shaft_v2" role="tab" aria-selected="false">Pulley shaft</button>
+                <button class="viewer-tab" data-model="cap_v2" role="tab" aria-selected="false">Pulley cap</button>
+                <button class="viewer-tab" data-model="shaft_only_v2" role="tab" aria-selected="false">Shaft only</button>
+            </div>
+            <div class="viewer-stage">
+                <canvas id="stl-canvas"></canvas>
+                <div class="viewer-hint">drag to rotate · scroll to zoom</div>
+                <div class="viewer-loading" id="viewer-loading">loading mesh…</div>
+            </div>
+            <div class="viewer-caption" id="viewer-caption">
+                <p data-model="assembly" data-label="Full assembly">The assembled pulley: the grooved cap at the base, with the shaft standing on it and the flange on top.</p>
+                <p data-model="shaft_v2" data-label="Pulley shaft" hidden="">The 55&nbsp;mm flange with its 15&nbsp;mm shaft.</p>
+                <p data-model="cap_v2" data-label="Pulley cap" hidden="">The 55&nbsp;mm cap, with the concentric grooves that serve as provisions for ball bearings.</p>
+                <p data-model="shaft_only_v2" data-label="Shaft only" hidden="">The 15&nbsp;mm shaft modeled on its own, without the flange.</p>
+            </div>
+            <div class="viewer-downloads" id="viewer-downloads"></div>
+        </div>
+        <p class="downloads-list">Full SolidWorks assembly: <a href="cad/pulley-cad-v2-solidworks.zip" download="">Download (.zip)</a></p>
+
+        <h2>Firmware</h2>
+        <p>I wrote the ESP8266's Arduino code on top of the Sinric Pro blinds device, which is what exposes the blind to Alexa. Saying "open" or "close" drives the H-bridge up or down until one of three things happens: the matching limit switch trips, a manual button is pressed, or a 4&nbsp;s safety timeout runs out. I made the limit switches and the two manual up/down buttons interrupt-driven and debounced, and set up the buttons so they can also stop a voice-triggered move mid-travel. Note that this code is a work in progress: it runs the prototype, but it is not complete or fine-tuned yet.</p>
+        <pre><code>/*
+  Automated window blind: ESP8266 (NodeMCU) + IBT-4 H-bridge + car power window motor.
+  Alexa control through the Sinric Pro "Blinds" device type.
+
+  - "Open" / "close" runs the motor up or down. Partial positions are not supported.
+  - "Turn off" stops the motor.
+  - A voice-triggered move stops when the matching limit switch trips, when either
+    manual button is pressed, or after maxRunTimeInMS, whichever comes first.
+  - Two manual buttons drive the blind up or down while held, but never past a limit switch.
+  - Limit switches and buttons use the internal pull-ups and are active LOW (switch to GND).
+
+  Work in progress: this is a working prototype, not finished or fine-tuned firmware.
+
+  Fill in your own Wi-Fi and Sinric Pro credentials before flashing.
+*/
+
+#include &lt;Arduino.h&gt;
+#include &lt;ESP8266WiFi.h&gt;
+#include &lt;SinricPro.h&gt;
+#include &lt;SinricProBlinds.h&gt;
+
+#define WIFI_SSID "YOUR_WIFI_SSID"
+#define WIFI_PASS "YOUR_WIFI_PASSWORD"
+
+#define APP_KEY "YOUR_SINRIC_APP_KEY"
+#define APP_SECRET "YOUR_SINRIC_APP_SECRET"
+#define BLINDS_ID "YOUR_SINRIC_DEVICE_ID"
+
+#define BAUD_RATE 115200
+
+#define MOTOR_DRIVER_IN1 D0
+#define MOTOR_DRIVER_IN2 D1
+#define MOTOR_DRIVER_EN D2
+
+// Limit switches can be held closed at power-up (blind fully up or down), so they sit on
+// pins with no boot-mode role. D3 (GPIO0) must be HIGH at boot, which is fine for a
+// momentary button that is only pressed after the board is running.
+#define UPPER_LIMIT_SWITCH D5   // GPIO14
+#define LOWER_LIMIT_SWITCH D6   // GPIO12
+
+#define MANUAL_DRIVE_UP D7      // GPIO13
+#define MANUAL_DRIVE_DOWN D3    // GPIO0
+
+int blindsPosition = 0;
+int blindsFullyOpenPosition = 100;
+int blindsFullyClosedPosition = 0;
+
+bool powerState = false;
+
+int currentDirection = 0; // -1 is downwards, 0 is stopped, 1 is upwards.
+volatile bool manualDriveUp = false;
+volatile bool manualDriveDown = false;
+
+volatile bool lowerLimitSwitchTriggered = false;
+volatile bool upperLimitSwitchTriggered = false;
+
+volatile unsigned long lastDebounceTime = 0;
+volatile unsigned long debounceDelay = 50;  // ms
+
+const int pollEveryMS = 100;  // Poll limit switches every this number of ms during blinds motion.
+const int maxRunTimeInMS = 4000; // How long the motor will stay on in automatic mode before automatically stopping.
+
+void debounce(){
+  lastDebounceTime = millis();
+  while ((millis() - lastDebounceTime) &lt; debounceDelay){}
+}
+
+////////////////////////////////////////////////
+
+void IRAM_ATTR handleUpperLimitSwitchInterrupt(){
+
+  debounce();
+
+  if (digitalRead(UPPER_LIMIT_SWITCH) == 0){
+    upperLimitSwitchTriggered = true;
+  }
+  else{
+    upperLimitSwitchTriggered = false;
+  }
+}
+
+void IRAM_ATTR handleLowerLimitSwitchInterrupt(){
+
+  debounce();
+
+  if (digitalRead(LOWER_LIMIT_SWITCH) == 0){
+    lowerLimitSwitchTriggered = true;
+  }
+  else{
+    lowerLimitSwitchTriggered = false;
+  }
+}
+
+////////////////////////////////////////////////
+
+void IRAM_ATTR handleManualDriveDownInterrupt(){
+
+  debounce();
+
+  if (digitalRead(MANUAL_DRIVE_DOWN) == 0){
+    manualDriveDown = true;
+  }
+  else{
+    manualDriveDown = false;
+  }
+}
+
+void IRAM_ATTR handleManualDriveUpInterrupt(){
+
+  debounce();
+
+  if (digitalRead(MANUAL_DRIVE_UP) == 0){
+    manualDriveUp = true;
+  }
+  else{
+    manualDriveUp = false;
+  }
+}
+
+////////////////////////////////////////////////
+
+void stopMotor() {
+  currentDirection = 0;
+  digitalWrite(MOTOR_DRIVER_IN1, LOW);
+  digitalWrite(MOTOR_DRIVER_IN2, LOW);
+  digitalWrite(MOTOR_DRIVER_EN, HIGH);
+}
+
+void motorBlindsUp(){
+    currentDirection = 1;
+    digitalWrite(MOTOR_DRIVER_IN1, HIGH);
+    digitalWrite(MOTOR_DRIVER_IN2, LOW);
+    digitalWrite(MOTOR_DRIVER_EN, LOW);
+}
+
+void motorBlindsDown(){
+    currentDirection = -1;
+    digitalWrite(MOTOR_DRIVER_IN1, LOW);
+    digitalWrite(MOTOR_DRIVER_IN2, HIGH);
+    digitalWrite(MOTOR_DRIVER_EN, LOW);
+}
+
+////////////////////////////////////////////////
+
+bool onPowerState(const String &amp;deviceId, bool &amp;state) {
+  Serial.printf("Device %s power turned %s \r\n", deviceId.c_str(), state ? "on" : "off");
+  powerState = state;
+  if (powerState == false) {
+    stopMotor();
+  }
+
+  return true;  // request handled properly
+}
+
+bool onRangeValue(const String &amp;deviceId, int &amp;position) {
+  // Called for "open the blinds" / "close the blinds".
+  Serial.printf("Device %s set position to %d\r\n", deviceId.c_str(), position);
+
+  if (position == blindsFullyOpenPosition) {
+    motorBlindsUp();
+  }
+
+  else if (position == blindsFullyClosedPosition) {
+    motorBlindsDown();
+  }
+
+  unsigned long startTimeInMS = millis();
+
+  while ((millis() - startTimeInMS) &lt; maxRunTimeInMS) {
+
+    bool manualOverride = manualDriveDown || manualDriveUp;
+    bool limitSwitchLimited = (upperLimitSwitchTriggered &amp;&amp; (currentDirection == 1)) || (lowerLimitSwitchTriggered &amp;&amp; (currentDirection == -1));
+
+    if (manualOverride || limitSwitchLimited){
+      break;
+    }
+
+    SinricPro.handle();
+    delay(pollEveryMS);
+
+  }
+
+  stopMotor();
+  return true;  // request handled properly
+}
+
+bool onAdjustRangeValue(const String &amp;deviceId, int &amp;positionDelta) {
+  blindsPosition += positionDelta;
+  Serial.printf("Device %s position changed about %i to %d\r\n", deviceId.c_str(), positionDelta, blindsPosition);
+  positionDelta = blindsPosition;  // calculate and return absolute position
+  if (positionDelta &gt; 0) {
+    onRangeValue(BLINDS_ID, blindsFullyOpenPosition);
+  }
+  else {
+    onRangeValue(BLINDS_ID, blindsFullyClosedPosition);
+  }
+  return true;  // request handled properly
+}
+
+////////////////////////////////////////////////
+
+void setupWiFi(){ // setup function for WiFi connection
+  Serial.printf("\r\n[Wifi]: Connecting");
+  WiFi.setSleepMode(WIFI_NONE_SLEEP);
+  WiFi.setAutoReconnect(true);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.printf(".");
+    delay(250);
+  }
+
+  IPAddress localIP = WiFi.localIP();
+  Serial.printf("connected!\r\n[WiFi]: IP-Address is %d.%d.%d.%d\r\n", localIP[0], localIP[1], localIP[2], localIP[3]);
+}
+
+void setupSinricPro() {
+  // get a new Blinds device from SinricPro
+  SinricProBlinds &amp;myBlinds = SinricPro[BLINDS_ID];
+  myBlinds.onPowerState(onPowerState);
+  myBlinds.onRangeValue(onRangeValue);
+  myBlinds.onAdjustRangeValue(onAdjustRangeValue);
+
+  // setup SinricPro
+  SinricPro.onConnected([](){Serial.printf("Connected to SinricPro\r\n");});
+  SinricPro.onDisconnected([](){Serial.printf("Disconnected from SinricPro\r\n");});
+
+  SinricPro.begin(APP_KEY, APP_SECRET);
+}
+
+void setupMotorControl() {
+  pinMode(MOTOR_DRIVER_IN1, OUTPUT);
+  pinMode(MOTOR_DRIVER_IN2, OUTPUT);
+  pinMode(MOTOR_DRIVER_EN, OUTPUT);
+  digitalWrite(MOTOR_DRIVER_IN1, LOW);
+  digitalWrite(MOTOR_DRIVER_IN2, LOW);
+  digitalWrite(MOTOR_DRIVER_EN, HIGH);
+}
+
+void setupLimitSwitches() {
+  pinMode(UPPER_LIMIT_SWITCH, INPUT_PULLUP);
+  pinMode(LOWER_LIMIT_SWITCH, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(UPPER_LIMIT_SWITCH), handleUpperLimitSwitchInterrupt, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(LOWER_LIMIT_SWITCH), handleLowerLimitSwitchInterrupt, CHANGE);
+}
+
+void setupManualDrive() {
+  pinMode(MANUAL_DRIVE_DOWN, INPUT_PULLUP);
+  pinMode(MANUAL_DRIVE_UP, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(MANUAL_DRIVE_DOWN), handleManualDriveDownInterrupt, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(MANUAL_DRIVE_UP), handleManualDriveUpInterrupt, CHANGE);
+}
+
+////////////////////////////////////////////////
+
+void manualDrive(){
+
+  if (manualDriveUp &amp;&amp; upperLimitSwitchTriggered == false){
+    motorBlindsUp();
+  }
+  else if (manualDriveDown &amp;&amp; lowerLimitSwitchTriggered == false) {
+    motorBlindsDown();
+  }
+  else{
+    stopMotor();
+  }
+
+}
+
+////////////////////////////////////////////////
+
+// main setup function
+void setup() {
+  Serial.begin(BAUD_RATE);
+  setupLimitSwitches();
+  setupMotorControl();
+  setupManualDrive();
+  setupWiFi();
+  setupSinricPro();
+}
+
+void loop() {
+  SinricPro.handle();
+  manualDrive();
+}
+</code></pre>
+        <p class="downloads-list"><a href="code/blinds-firmware.ino" download="">Download the firmware (.ino)</a>. Wi-Fi and Sinric Pro credentials are replaced with placeholders; fill in your own before flashing.</p>
+
+        <h2>Second Install</h2>
+        <p>I have since installed the same system on a second window.</p>
+
+        <figure class="figure">
+            <video src="media/blinds-demo-2026.mp4" poster="images/poster-2026.jpg" controls="" playsinline="" preload="metadata"></video>
+            <figcaption>Second install in action.</figcaption>
+        </figure>
+
+        <p style="color:#666; font-style:italic;">More coming soon: the mechanical design, the end-stops, and lessons learned from building it in a weekend.</p>
+    </div>
+<script src="../assets/three.min.js"></script>
+<script src="js/3d-models.js"></script>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+<script src="../assets/zoom.js"></script>
+
+
+
+
+
+</body></html>

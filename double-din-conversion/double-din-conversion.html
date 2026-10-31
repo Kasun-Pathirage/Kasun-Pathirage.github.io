@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Designed and 3D-printed a modular structure in SolidWorks to relocate the climate-control assembly for a double-DIN head unit, also converting the temperature knob to servo control (same fix as the HVAC project).">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Double-DIN Radio Conversion | Kasun Pathirage">
+<meta property="og:description" content="Designed and 3D-printed a modular structure in SolidWorks to relocate the climate-control assembly for a double-DIN head unit, also converting the temperature knob to servo control (same fix as the HVAC project).">
+<meta property="og:site_name" content="Kasun Pathirage">
+<meta name="twitter:card" content="summary_large_image">
+<title>Double-DIN Radio Conversion | Kasun Pathirage</title>
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f6f8;
+        color: #333;
+        line-height: 1.6;
+    }
+    .container {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    h1 { color: #1a1a1a; margin-top: 0; }
+    .hero-image { margin: 1.5rem 0; }
+    .hero-image img { display: block; width: 100%; max-height: 420px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    h2 {
+        color: #1a1a1a;
+        margin-top: 2.5rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid #eee;
+    }
+    h3 { color: #1a1a1a; margin-top: 1.8rem; }
+    .back-link { display: inline-block; margin-bottom: 2rem; color: #e60000; text-decoration: none; font-weight: bold; }
+    .back-link:hover { text-decoration: underline; }
+    .meta { color: #555; }
+    a { color: #e60000; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+    .table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+    th, td { border: 1px solid #ddd; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background-color: #1a1a1a; color: #fff; }
+    tr:nth-child(even) { background-color: #f8f8f8; }
+    .quick-facts {
+        background: #fafafa;
+        border: 1px solid #eee;
+        border-left: 4px solid #e60000;
+        border-radius: 6px;
+        padding: 1.2rem 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .quick-facts h4 { margin: 0 0 0.6rem 0; color: #1a1a1a; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .quick-facts ul { margin: 0; padding-left: 1.2rem; }
+    .quick-facts li { margin-bottom: 0.35rem; }
+    .step-list { padding-left: 1.3rem; }
+    .step-list li { margin-bottom: 0.6rem; }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+    p code, li code, td code { background: #eee; color: #a30000; padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.88em; }
+    .pending-note { font-size: 0.85rem; color: #888; font-style: italic; }
+
+    /* 3D viewer, styled to match the site's existing media-box convention */
+    .viewer-box {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 6px;
+        margin: 1.5rem 0;
+        overflow: hidden;
+    }
+    .viewer-tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid #eee; background: #fafafa; }
+    .viewer-tab {
+        font-family: inherit; font-size: 0.78rem; background: none; border: none; cursor: pointer;
+        color: #555; padding: 0.5rem 0.75rem; border-right: 1px solid #eee;
+    }
+    .viewer-tab:last-child { border-right: none; }
+    .viewer-tab.is-active { color: #e60000; font-weight: bold; background: #fff; }
+    .viewer-stage {
+        position: relative; width: 100%; height: clamp(220px, 40vh, 380px); background: #eee;
+        background-image:
+            linear-gradient(#e2e2e2 1px, transparent 1px),
+            linear-gradient(90deg, #e2e2e2 1px, transparent 1px);
+        background-size: 26px 26px;
+    }
+    .viewer-stage canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+    .viewer-stage canvas:active { cursor: grabbing; }
+    .viewer-hint {
+        position: absolute; left: 12px; bottom: 10px; font-size: 0.72rem; letter-spacing: 0.02em;
+        color: #888; pointer-events: none;
+    }
+    .viewer-loading {
+        position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        font-size: 0.82rem; color: #888; background: #eee;
+    }
+    .viewer-loading[hidden] { display: none; }
+    .viewer-caption { padding: 0.9rem 1.1rem; font-size: 0.88rem; color: #555; border-top: 1px solid #eee; }
+    .viewer-caption p { margin: 0; }
+    .viewer-downloads { padding: 0 1.1rem 1rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
+    .viewer-downloads a { font-size: 0.82rem; color: #e60000; text-decoration: none; font-weight: 600; white-space: nowrap; }
+    .viewer-downloads a:hover { text-decoration: underline; }
+</style>
+<style id="photo-figures">
+    figure { margin: 1.2rem 0; text-align: center; }
+    figure img { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); display: block; margin: 0 auto; }
+    figcaption { font-size: 0.85rem; color: #777; margin-top: 0.5rem; }
+    .figure-grid { display: grid; gap: 1rem; margin: 1.2rem 0; }
+    .figure-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .figure-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .figure-grid figure { margin: 0; }
+    .figure-grid > figure { min-width: 0; }
+    .figure-grid.parts img { height: 220px; width: 100%; object-fit: contain; box-shadow: none; }
+    @media (max-width: 640px) {
+        .figure-grid.cols-3 { grid-template-columns: repeat(2, 1fr); }
+        .figure-grid.cols-2 { grid-template-columns: 1fr; }
+        .figure-grid.parts img { height: 160px; }
+    }
+</style>
+<style id="single-figure-size">
+    /* Standalone images: keep them from filling the whole screen so the text stays readable. Click to zoom. */
+    .container > figure img { max-width: min(100%, 560px); max-height: 400px; width: auto; }
+    .container > figure.figure-wide img { max-width: min(100%, 680px); max-height: 460px; }
+    .container > figure.figure-narrow img { max-width: min(100%, 380px); max-height: 360px; }
+</style>
+<style id="compact-tables">
+    /* Tables: size to their content instead of the full column, and cap long ones with a scroll + sticky header. */
+    .container .table-wrap { max-height: 460px; overflow: auto; border-radius: 6px; }
+    .container .table-wrap table { width: auto; max-width: 100%; margin: 0 auto; font-size: 0.85rem; }
+    .container .table-wrap th, .container .table-wrap td { padding: 0.32rem 0.6rem; }
+    .container .table-wrap th { position: sticky; top: 0; z-index: 1; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <a href="../index.html" class="back-link">← Back to Portfolio</a>
+
+    <h1>Double-DIN Radio Conversion &amp; Servo-Driven Climate Control</h1>
+    <p class="meta"><strong>Date:</strong> May 2023 &nbsp;|&nbsp; <strong>Tech:</strong> Design for Additive Manufacturing (DfAM) | Multi-Body SolidWorks Assembly | Mechatronic Redesign | Stress-Concentration Mitigation (Fillets, Wall Thickening) | Fastener-Based Modular Joints</p>
+
+    <hr style="border: 0; border-top: 1px solid #ddd; margin: 2rem 0;">
+
+    <h2 id="viewer">Interactive 3D Models</h2>
+    <p>These are the actual print files I used for the build: one tab for the full assembly and one for each part, grouped as common parts, the airflow-direction side (Flow) and the temperature-control side (Temp). Drag to rotate, scroll to zoom. STL downloads are below the viewer.</p>
+
+    <div class="viewer-box">
+        <div class="viewer-tabs" role="tablist">
+            <button class="viewer-tab is-active" data-model="assembly" role="tab" aria-selected="true">Full assembly</button>
+            <button class="viewer-tab" data-model="front_circuit_housing" role="tab" aria-selected="false">Front circuit housing</button>
+            <button class="viewer-tab" data-model="main_knob_house" role="tab" aria-selected="false">Main knob housing</button>
+            <button class="viewer-tab" data-model="storage_bracket_left" role="tab" aria-selected="false">Storage bracket (L)</button>
+            <button class="viewer-tab" data-model="storage_bracket_right" role="tab" aria-selected="false">Storage bracket (R)</button>
+            <button class="viewer-tab" data-model="flow_base_plate" role="tab" aria-selected="false">Flow: base plate</button>
+            <button class="viewer-tab" data-model="flow_hemispherical_part" role="tab" aria-selected="false">Flow: hemispherical part</button>
+            <button class="viewer-tab" data-model="flow_click_generator" role="tab" aria-selected="false">Flow: click generator</button>
+            <button class="viewer-tab" data-model="flow_gear_hub" role="tab" aria-selected="false">Flow: gear hub</button>
+            <button class="viewer-tab" data-model="flow_cable_holder" role="tab" aria-selected="false">Flow: cable holder</button>
+            <button class="viewer-tab" data-model="flow_cable_holder_cover" role="tab" aria-selected="false">Flow: cable holder cover</button>
+            <button class="viewer-tab" data-model="temp_hemispherical_part" role="tab" aria-selected="false">Temp: hemispherical part</button>
+            <button class="viewer-tab" data-model="temp_knob_rod" role="tab" aria-selected="false">Temp: knob rod</button>
+            <button class="viewer-tab" data-model="temp_potentiometer_holder" role="tab" aria-selected="false">Temp: potentiometer holder</button>
+            <button class="viewer-tab" data-model="temp_potentiometer" role="tab" aria-selected="false">Temp: potentiometer</button>
+        </div>
+        <div class="viewer-stage">
+            <canvas id="stl-canvas"></canvas>
+            <div class="viewer-hint">drag to rotate · scroll to zoom</div>
+            <div class="viewer-loading" id="viewer-loading">loading mesh…</div>
+        </div>
+        <div class="viewer-caption" id="viewer-caption">
+            <p data-model="assembly" data-label="Full assembly">The full relocated climate-control structure: 14 parts across three groups: shared common parts, the airflow-direction control side (kept its cable-actuated mechanism), and the temperature-control side (converted to servo + potentiometer control).</p>
+            <p data-model="front_circuit_housing" data-label="Front circuit housing" hidden="">Common part. Encloses and locates circuitry/wiring for the front-facing control cluster.</p>
+            <p data-model="main_knob_house" data-label="Main knob housing" hidden="">Common part. Shared housing structure that both control knobs mount through.</p>
+            <p data-model="storage_bracket_left" data-label="Storage bracket (L)" hidden="">Common part. Structural bracket tying the storage bay to the relocated A/C box.</p>
+            <p data-model="storage_bracket_right" data-label="Storage bracket (R)" hidden="">Common part. Mirrored bracket for the right side of the same joint.</p>
+            <p data-model="flow_base_plate" data-label="Flow: base plate" hidden="">Airflow-direction control side. Structural base the rest of this sub-assembly builds on.</p>
+            <p data-model="flow_hemispherical_part" data-label="Flow: hemispherical part" hidden="">Airflow-direction control side. Outer housing shell that seats against the dash.</p>
+            <p data-model="flow_click_generator" data-label="Flow: click generator" hidden="">Airflow-direction control side. Produces the tactile click feel as the vent-direction knob is turned.</p>
+            <p data-model="flow_gear_hub" data-label="Flow: gear hub" hidden="">Airflow-direction control side. Gear interface translating knob rotation into the mechanism's motion.</p>
+            <p data-model="flow_cable_holder" data-label="Flow: cable holder" hidden="">Airflow-direction control side. Retains and routes the relocated actuator cable.</p>
+            <p data-model="flow_cable_holder_cover" data-label="Flow: cable holder cover" hidden="">Airflow-direction control side. Closes over the cable holder to keep the run captured.</p>
+            <p data-model="temp_hemispherical_part" data-label="Temp: hemispherical part" hidden="">Temperature-control side. Outer housing shell on this side.</p>
+            <p data-model="temp_knob_rod" data-label="Temp: knob rod" hidden="">Temperature-control side. Interface rod linking the dash-facing knob to the internal mechanism.</p>
+            <p data-model="temp_potentiometer_holder" data-label="Temp: potentiometer holder" hidden="">Temperature-control side. Mounts the potentiometer that replaces the stock cable mechanism.</p>
+            <p data-model="temp_potentiometer" data-label="Temp: potentiometer" hidden="">Temperature-control side. The servo-control sensing component itself, seated in the holder in place of the stock cable takeoff.</p>
+        </div>
+        <div class="viewer-downloads" id="viewer-downloads"></div>
+    </div>
+
+    <h2>Overview</h2>
+    <p>My 2003 Mitsubishi Lancer ES came with a single-DIN radio opening. I wanted a double-DIN head unit, which is about twice as tall, but the factory climate controls sat right under the radio bay, where the extra height needed to go. So I pulled the A/C control assembly out and designed a new structure that moved it lower in the dash, keeping the vents, the cable and servo linkages, and the two knobs working.</p>
+    <p>I modeled every part in SolidWorks and printed them at home on a Creality Ender 3 V2. While I was at it, I also fixed a common problem on this car, where the temperature knob mechanism seizes and snaps its drive rod, by switching that side from a cable to a servo and potentiometer.</p>
+
+    <div class="quick-facts">
+        <h4>Quick Facts</h4>
+        <ul>
+            <li>I organized the rebuilt assembly as <strong>3 SolidWorks sub-assemblies</strong> (14 parts) feeding one top-level assembly: parts common to the whole structure, the airflow-direction side, and the temperature-control side.</li>
+            <li>I converted the temperature knob from its stock cable to <strong>servo + potentiometer</strong> control, which fixed a common Mitsubishi Lancer 2002-2003 problem where the mechanism seizes and the plastic drive rod shears.</li>
+            <li>I kept the cable on the airflow-direction knob, since it doesn't have the seizing problem, but still rebuilt it with its own click-detent generator and gear hub.</li>
+            <li>I designed the parts to sit on a near-flat base with few overhangs, and kept them small enough that a failed print only cost about an hour.</li>
+            <li><strong>Lesson learned:</strong> my first set was PLA and it deformed in the parked car over the summer. For a car, I'd recommend ABS or another high-temperature filament instead.</li>
+        </ul>
+    </div>
+
+    <h2>Design Approach</h2>
+    <p>I split the assembly into lots of small parts instead of one or two big shells:</p>
+    <ul class="step-list">
+        <li><strong>Small parts.</strong> I did this because big single prints are more likely to warp or split, and a failure late in a long print wastes a lot of time. With small pieces, a failed print would cost me an hour, and if something breaks in the car, I can reprint just that part.</li>
+        <li><strong>Flat base, few overhangs.</strong> Where possible, I designed each part to sit flat on the bed with shallow overhangs. This meant less support material, cleaner bottoms, and fewer adhesion failures on my open-frame printer.</li>
+        <li><strong>Reinforcement at load points.</strong> Where there's repeated load (knob rotation, bracket screws, mounting tabs) I added fillets and thicker walls. I used screws and nuts to carry the joints instead of relying on the print's layer adhesion, and chose their lengths to span the full depth of each hole. I also avoided countersunk and counterbored holes, since they thin the wall exactly where it needs to be thickest.</li>
+        <li><strong>Fillets where they fit.</strong> I rounded edges wherever the dash had room. This reduced stress concentrations on the parts.</li>
+    </ul>
+
+    <h2>Two Knobs, Two Fixes</h2>
+    <p>On the temperature side, I designed the model with room for a potentiometer instead of the original cable mechanism. I did this to fix a known problem on the 2003 Lancer: the temperature knob mechanism seizes, and forcing it snaps the plastic drive rod, which leaves the cable mechanism useless.</p>
+    <p>By using a servo to drive the blend door and a potentiometer to read the knob, I left no cable or rod that could break. The electronics also fit in with everything else I was putting into the dash for the new head unit. The servo bracket, the potentiometer coupling and the control board are covered in detail in my <a href="../hvac-retrofitting/hvac-retrofitting.html">HVAC blend-door project</a>.</p>
+    <p>The airflow-direction knob (which picks the vents) doesn't have this problem, so I left its cable. However, I still rebuilt it from scratch, with its own click-detent generator, gear hub, and a printed cable holder and cover for the relocated cable.</p>
+
+    <h2>Parts List</h2>
+    <p>Click a part to open it in the 3D viewer.</p>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Group</th><th>Part</th><th>Role</th></tr></thead>
+            <tbody>
+                <tr><td rowspan="4">Common</td><td><a href="#viewer" data-viewer-tab="front_circuit_housing">Front circuit housing</a></td><td>Encloses and locates circuitry/wiring for the front-facing control cluster</td></tr>
+                <tr><td><a href="#viewer" data-viewer-tab="main_knob_house">Main knob housing</a></td><td>Shared housing structure that both control knobs mount through</td></tr>
+                <tr><td><a href="#viewer" data-viewer-tab="storage_bracket_left">Storage-to-A/C bracket (left)</a></td><td>Structural bracket tying the storage bay to the relocated A/C box</td></tr>
+                <tr><td><a href="#viewer" data-viewer-tab="storage_bracket_right">Storage-to-A/C bracket (right)</a></td><td>Mirrored bracket for the right side of the same joint</td></tr>
+                <tr><td rowspan="6">Flow-direction control side</td><td><a href="#viewer" data-viewer-tab="flow_base_plate">Base plate</a></td><td>Structural base the rest of this sub-assembly builds on</td></tr>
+                <tr><td><a href="#viewer" data-viewer-tab="flow_hemispherical_part">Hemispherical housing</a></td><td>Outer housing shell that seats against the dash on this side</td></tr>
+                <tr><td><a href="#viewer" data-viewer-tab="flow_click_generator">Click-detent generator</a></td><td>Produces the tactile click feel as the vent-direction knob is turned</td></tr>
+                <tr><td><a href="#viewer" data-viewer-tab="flow_gear_hub">Gear hub</a></td><td>Gear interface translating knob rotation into the mechanism's motion</td></tr>
+                <tr><td><a href="#viewer" data-viewer-tab="flow_cable_holder">Cable holder</a></td><td>Retains and routes the relocated actuator cable for this control</td></tr>
+                <tr><td><a href="#viewer" data-viewer-tab="flow_cable_holder_cover">Cable holder cover</a></td><td>Closes over the cable holder to keep the run captured</td></tr>
+                <tr><td rowspan="5">Temperature control side</td><td><a href="#viewer" data-viewer-tab="temp_hemispherical_part">Hemispherical housing</a></td><td>Outer housing shell on the temperature-control side</td></tr>
+                <tr><td><a href="#viewer" data-viewer-tab="temp_knob_rod">Knob rod</a></td><td>Interface rod linking the dash-facing knob to the internal mechanism</td></tr>
+                <tr><td><a href="#viewer" data-viewer-tab="temp_potentiometer_holder">Potentiometer holder</a></td><td>Mounts the potentiometer that replaces the stock cable mechanism</td></tr>
+                <tr><td><a href="#viewer" data-viewer-tab="temp_potentiometer">Potentiometer</a></td><td>The servo-control sensing component itself, seated in the holder above in place of the stock cable takeoff</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Print Process &amp; a Lesson Learned</h2>
+    <p>I printed everything on a stock Creality Ender 3 V2. Since it has no enclosure, room temperature and drafts affected print quality. I joined the parts with screws at the reinforced points described above instead of glue or press fits, so any part can be taken out and replaced on its own.</p>
+    <p>Here are some of the parts I printed for this build:</p>
+    <div class="figure-grid cols-3 parts">
+        <figure>
+            <img src="images/printed-flow-gear-hub.jpg" alt="The printed gear hub for the airflow-direction knob." loading="lazy">
+            <figcaption>The <a href="#viewer" data-viewer-tab="flow_gear_hub">gear hub</a> (airflow side).</figcaption>
+        </figure>
+        <figure>
+            <img src="images/printed-flow-cable-holder.jpg" alt="The printed cable holder for the airflow-direction cable." loading="lazy">
+            <figcaption>The <a href="#viewer" data-viewer-tab="flow_cable_holder">cable holder</a> (airflow side).</figcaption>
+        </figure>
+        <figure>
+            <img src="images/printed-temp-pot-holder.jpg" alt="The printed potentiometer holder for the temperature knob." loading="lazy">
+            <figcaption>The <a href="#viewer" data-viewer-tab="temp_potentiometer_holder">potentiometer holder</a> (temperature side).</figcaption>
+        </figure>
+        <figure>
+            <img src="images/printed-hemispherical-housing.jpg" alt="The printed hemispherical housing for the airflow-direction knob." loading="lazy">
+            <figcaption>The <a href="#viewer" data-viewer-tab="flow_hemispherical_part">hemispherical housing</a> (airflow side).</figcaption>
+        </figure>
+        <figure>
+            <img src="images/printed-parts-assembled.jpg" alt="Several printed parts from the climate-control assembly, fitted together." loading="lazy">
+            <figcaption>A few printed parts fitted together.</figcaption>
+        </figure>
+    </div>
+
+    <div class="quick-facts">
+        <h4>PLA doesn't survive a parked car in summer</h4>
+        <p style="margin: 0;">My first full set was PLA. It was fine until a hot spell in the summer, when the inside of the parked car got well past PLA's softening point and one part warped. It wasn't a disaster, but I had to reprint it. Any FDM printer will do, but for a part that lives in a car, I'd recommend <strong>ABS or another high-temperature filament</strong> instead of PLA.</p>
+    </div>
+
+    <p>These photos show one of the warped parts after the summer:</p>
+    <div class="figure-grid cols-2 parts">
+        <figure>
+            <img src="images/pla-warped-1.jpg" alt="A PLA part bent out of shape by the summer heat in the parked car, side view." loading="lazy">
+            <figcaption>The warped PLA part, side view.</figcaption>
+        </figure>
+        <figure>
+            <img src="images/pla-warped-2.jpg" alt="A close-up of the same warped PLA part." loading="lazy">
+            <figcaption>A closer look at the warping.</figcaption>
+        </figure>
+    </div>
+
+</div>
+
+<script src="../assets/three.min.js"></script>
+<script src="js/3d-models.js"></script>
+<script src="../assets/zoom.js"></script>
+<script src="../assets/edit-mode.js" id="__edit-loader"></script>
+
+
+
+
+
+
+
+
+
+</body></html>
